@@ -1,0 +1,161 @@
+@import "dockview/dist/styles/dockview.css";
+@import "react-complex-tree/lib/style-modern.css";
+
+/* #region Fonts */
+@font-face {
+  font-family: "Material Icons Round";
+  font-style: normal;
+  font-weight: 400;
+  src: url("/MaterialIconsRound-Regular.woff2") format("woff2");
+}
+
+.material-icons-round {
+  font-family: "Material Icons Round";
+  font-weight: normal;
+  font-style: normal;
+  font-size: 20px;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  display: inline-block;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  color: inherit;
+  font-feature-settings: "liga";
+  -webkit-font-feature-settings: "liga";
+  -webkit-font-smoothing: antialiased;
+}
+
+@font-face {
+  font-family: "Fira Code";
+  src: url("/FiraCode-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+}
+/* #endregion */
+
+* {
+  box-sizing: border-box;
+}
+
+:root {
+  --color-bg: #100f0f;
+  --color-fg: #cecdc3;
+  --color-bg-secondary: #1c1b1a;
+  --color-fg-secondary: #878580;
+  --color-fg-muted: #575653;
+
+  --color-ui: #282726;
+  --color-ui-hover: #343331;
+  --color-ui-active: #403e3c;
+
+  --color-error: #af3029;
+  --color-success: #66800b;
+  --color-info: #205ea6;
+  --color-warning: #bc5215;
+  --color-active: #3aa99f;
+
+  --radius-1: 2px;
+  --space-s: 8px;
+  --space-m: 16px;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: Roboto, sans-serif;
+  background-color: var(--color-bg);
+  color: var(--color-fg);
+}
+
+p {
+  margin: 0;
+}
+
+.sidebar {
+  padding-right: var(--space-s);
+}
+
+/* #region DockView */
+.dockview-theme-custom {
+  --dv-background-color: var(--color-bg);
+  --dv-paneview-active-outline-color: var(--color-active);
+  --dv-tabs-and-actions-container-font-size: 0.8rem;
+  --dv-tabs-and-actions-container-height: 3em;
+  --dv-drag-over-background-color: rgba(100, 100, 100, 0.5);
+  --dv-drag-over-border-color: rgba(100, 100, 100, 0.8);
+  --dv-tabs-container-scrollbar-color: var(--color-ui-active);
+  --dv-icon-hover-background-color: var(--color-ui-hover);
+  --dv-floating-box-shadow: var(--color-ui-active) 0px 0px 0px 2px;
+  --dv-group-view-background-color: var(--color-bg);
+  --dv-tabs-and-actions-container-background-color: var(--color-ui);
+  --dv-activegroup-visiblepanel-tab-background-color: var(--color-bg);
+  --dv-activegroup-hiddenpanel-tab-background-color: var(--color-ui);
+  --dv-inactivegroup-visiblepanel-tab-background-color: var(--color-bg);
+  --dv-inactivegroup-hiddenpanel-tab-background-color: var(--color-ui);
+  --dv-tab-divider-color: #222;
+  --dv-activegroup-visiblepanel-tab-color: var(--color-fg);
+  --dv-activegroup-hiddenpanel-tab-color: var(--color-fg-secondary);
+  --dv-inactivegroup-visiblepanel-tab-color: var(--color-fg-muted);
+  --dv-inactivegroup-hiddenpanel-tab-color: var(--color-fg-muted);
+  --dv-separator-border: var(--color-ui-active);
+  /* --dv-paneview-header-border-color: red; */
+}
+
+.grid-view {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.panel-tab {
+  display: flex;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  min-width: 8em;
+  margin: 0 0.5em;
+  gap: 0.5em;
+}
+
+.panel-tab .icon:last-child {
+  border-radius: var(--radius-1);
+}
+
+.panel-tab .icon:last-child:hover {
+  background-color: var(--dv-icon-hover-background-color);
+}
+/* #endregion */
+
+/* #region rtc */
+.rct-dark {
+  user-select: none;
+  /* --rct-color-search-highlight-bg: red; */
+  --rct-bar-color: var(--color-active);
+  --rct-focus-outline: var(--color-fg-secondary);
+  --rct-color-focustree-item-selected-text: var(--color-fg);
+  --rct-color-focustree-item-selected-bg: var(--color-ui);
+  --rct-color-focustree-item-hover-bg: var(--color-ui-hover);
+  --rct-color-focustree-item-hover-text: var(--color-fg);
+  --rct-color-focustree-item-active-bg: var(--color-ui-active);
+  --rct-color-focustree-item-active-text: var(--color-fg);
+  --rct-color-focustree-item-draggingover-bg: #313131;
+  --rct-color-focustree-item-draggingover-color: #ffffff;
+  --rct-color-arrow: var(--color-fg);
+  --rct-search-border: #4f4f4f;
+  --rct-search-border-bottom: var(--color-active);
+  --rct-search-bg: #373737;
+  --rct-search-text: var(--color-fg);
+  --rct-search-text-offset: calc(var(--rct-search-padding) * 2 + 16px);
+}
+
+.rct-dark .icon {
+  margin-right: var(--space-s);
+}
+/* #endregion */
