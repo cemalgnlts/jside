@@ -1,9 +1,10 @@
 import Icon from "@components/Icon";
+import { getFileIcon } from "../../libs/languageIcons";
 
 function PanelTab(props) {
   return (
     <div className="panel-tab">
-      <Icon name="insert_drive_file" />
+      {getFileIcon(props.api.title) || <Icon name="insert_drive_file" />}
       <p>{props.api.title}</p>
       <Icon name="close" />
     </div>

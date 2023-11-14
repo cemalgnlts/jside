@@ -1,13 +1,13 @@
 import { GridviewReact, Orientation, LayoutPriority } from "dockview";
-import Header from "./components/Header";
-import Footer from "./components/Footer";
-import Sidebar from "./components/Sidebar";
-import Dockview from "./components/DockView";
+import Header from "@components/Header";
+import Footer from "@components/Footer";
+import Sidebar from "@components/Sidebar";
+import DockView from "@components/DockView";
 
 const gridComponents = {
   header: Header,
   sidebar: Sidebar,
-  main: Dockview,
+  main: DockView,
   footer: Footer
 };
 

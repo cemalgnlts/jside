@@ -40,7 +40,7 @@
 }
 
 :root {
-  --color-bg: #100f0f;
+  --color-bg: #1f1f1f;
   --color-fg: #cecdc3;
   --color-bg-secondary: #1c1b1a;
   --color-fg-secondary: #878580;
@@ -80,6 +80,11 @@ p {
 
 .sidebar {
   padding-right: var(--space-s);
+}
+
+.icon {
+  width: 20px;
+  height: 20px;
 }
 
 /* #region DockView */
@@ -133,7 +138,7 @@ p {
 }
 /* #endregion */
 
-/* #region rtc */
+/* #region rct */
 .rct-dark {
   user-select: none;
   /* --rct-color-search-highlight-bg: red; */

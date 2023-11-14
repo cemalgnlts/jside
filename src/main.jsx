@@ -5,10 +5,8 @@ import "./main.css";
 
 import { Provider } from "jotai";
 
-import { store } from "./store.js";
-
 ReactDOM.createRoot(document.getElementById("root")).render(
-  <Provider store={store}>
+  <Provider>
     <App />
   </Provider>
 );

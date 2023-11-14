@@ -5,6 +5,9 @@ import {
 } from "react-complex-tree";
 
 import Icon from "@components/Icon";
+import { getFileIcon } from "../../libs/languageIcons";
+import { useAtomValue } from "jotai";
+import { $files } from "../../state";
 
 const items = {
   root: {
@@ -32,18 +35,22 @@ const items = {
 };
 
 function FileTree() {
+  const files = useAtomValue($files);
+
   const renderItemTitle = (ev) => {
     const { isFolder, title } = ev.item;
-    let icon = "insert_drive_file";
 
-    if (isFolder) icon = ev.context.isExpanded ? "folder_open" : "folder";
+    let IconEl = null;
 
-    return <ItemTitle title={title} icon={icon} />;
+    if (isFolder) {
+      const name = ev.context.isExpanded ? "folder_open" : "folder";
+      IconEl = <Icon name={name} />;
+    } else {
+      IconEl = getFileIcon(title) || <Icon name="insert_drive_file" />;
+    }
+
+    return <ItemTitle title={title}>{IconEl}</ItemTitle>;
   };
-
-  const onCollapse = (item) => {};
-
-  const onExpand = (item) => {};
 
   return (
     <UncontrolledTreeEnvironment
@@ -51,8 +58,6 @@ function FileTree() {
         new StaticTreeDataProvider(items, (item, data) => ({ ...item, data }))
       }
       getItemTitle={(item) => item.title}
-      onExpandItem={onExpand}
-      onCollapseItem={onCollapse}
       renderItemTitle={renderItemTitle}
       viewState={{}}
     >
@@ -61,10 +66,10 @@ function FileTree() {
   );
 }
 
-function ItemTitle({ title, icon }) {
+function ItemTitle({ title, children }) {
   return (
     <>
-      <Icon name={icon} />
+      {children}
       <p>{title}</p>
     </>
   );

@@ -7,7 +7,7 @@ import {  fileURLToPath, URL } from "node:url";
 export default defineConfig({
   resolve: {
     alias: {
-      "@components": fileURLToPath(new URL("./src/components", import.meta.url))
+      "@components": fileURLToPath(new URL("./src/components", import.meta.url)),
     }
   },
   plugins: [react()]

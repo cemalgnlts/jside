@@ -1,14 +1,10 @@
-import { DockviewReact, DockviewDefaultTab } from "dockview";
-import { PanelContent, PanelTab, PanelFileTab } from "@components/Panel";
+import { DockviewReact } from "dockview";
+import { PanelContent, PanelTab } from "@components/Panel";
 import Editor from "@components/Editor";
 
 const components = {
   default: PanelContent,
   editor: Editor
-};
-
-const tabComponents = {
-  panelFileTab: PanelFileTab
 };
 
 function DockView() {
@@ -24,7 +20,6 @@ function DockView() {
   return (
     <DockviewReact
       components={components}
-      tabComponents={tabComponents}
       defaultTabComponent={PanelTab}
       onReady={onReady}
     />
