@@ -1,3 +1,5 @@
+import { memo } from "react";
+
 import {
   UncontrolledTreeEnvironment,
   StaticTreeDataProvider,
@@ -6,37 +8,8 @@ import {
 
 import Icon from "@components/Icon";
 import { getFileIcon } from "../../libs/languageIcons";
-import { useAtomValue } from "jotai";
-import { $files } from "../../state";
 
-const items = {
-  root: {
-    index: "root",
-    isFolder: true,
-    children: ["child2", "child1"],
-    title: "folder"
-  },
-  child2: {
-    index: "child2",
-    isFolder: true,
-    children: ["child3"],
-    title: "assets"
-  },
-  child1: {
-    index: "child1",
-    children: [],
-    title: "main.js"
-  },
-  child3: {
-    index: "child3",
-    children: [],
-    title: "base.css"
-  }
-};
-
-function FileTree() {
-  const files = useAtomValue($files);
-
+function FileTree({ items }) {
   const renderItemTitle = (ev) => {
     const { isFolder, title } = ev.item;
 
@@ -75,4 +48,4 @@ function ItemTitle({ title, children }) {
   );
 }
 
-export default FileTree;
+export default memo(FileTree);

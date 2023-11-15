@@ -82,9 +82,27 @@ p {
   padding-right: var(--space-s);
 }
 
-.icon {
+.icon,
+.btn-icon {
   width: 20px;
   height: 20px;
+}
+
+button {
+  background-color: transparent;
+  border: none;
+  outline: none;
+  cursor: pointer;
+}
+
+.btn-ghost {
+  text-align: center;
+}
+
+.btn-ghost > .icon {
+  vertical-align: middle;
+  margin: 0;
+  padding: 0;
 }
 
 /* #region DockView */
@@ -129,11 +147,12 @@ p {
   gap: 0.5em;
 }
 
-.panel-tab .icon:last-child {
+.panel-tab .btn-ghost {
   border-radius: var(--radius-1);
+  color: var(--dv-activegroup-visiblepanel-tab-color);
 }
 
-.panel-tab .icon:last-child:hover {
+.panel-tab .btn-ghost:hover {
   background-color: var(--dv-icon-hover-background-color);
 }
 /* #endregion */

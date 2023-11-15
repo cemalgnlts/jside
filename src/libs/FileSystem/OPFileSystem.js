@@ -49,19 +49,16 @@ class OPFileSystem {
   }
 
   /**
-   * Creates a directory.
-   * @param {string} path.
-   * @param {{ recursive: boolean }} options Options.
+   * Create recursive directories.
+   * @param {string} path
    */
-  async mkdir(path, options = { recursive: false }) {
+  async mkdir(path) {
     const fixedPath = this.normalizePath(path);
     const parts = fixedPath.slice(1).split("/");
     let dirHandle = this._rootDirHandle;
 
     for (const name of parts) {
-      dirHandle = await dirHandle.getDirectoryHandle(name, {
-        create: options.recursive
-      });
+      dirHandle = await dirHandle.getDirectoryHandle(name, { create: true });
     }
   }
 
@@ -73,21 +70,19 @@ class OPFileSystem {
    */
   async readdir(path, options = { recursive: false }) {
     const fixedPath = this.normalizePath(path);
-    const dir = this.dirname(fixedPath);
 
-    const dirHandle = this._getParentDirectoryHandle(dir);
+    const dirHandle = await this._getParentDirectoryHandle(fixedPath);
+    const res = [];
 
     if (options.recursive) {
-      const res = [];
-
       for await (const dir of this._getFilesRecursively(dirHandle)) {
         res.push(dir);
       }
-
-      return res;
+    } else {
+      for await (const dir of dirHandle.keys()) res.push(dir);
     }
 
-    return dirHandle.keys();
+    return res;
   }
 
   /**
@@ -147,6 +142,9 @@ class OPFileSystem {
    */
   async _getParentDirectoryHandle(path) {
     let dirHandle = this._rootDirHandle;
+    const parts = path.slice(1).split("/");
+
+    if (parts.length === 1 && parts[0] === "") return dirHandle;
 
     for (const name of path.slice(1).split("/")) {
       dirHandle = await dirHandle.getDirectoryHandle(name);
@@ -157,30 +155,32 @@ class OPFileSystem {
 
   /**
    * @param {FileSystemHandle} entry
-   * @param {string[]} [path=[""]] Do not change!
    * @returns {String[]}
    * @private
    */
-  async *_getFilesRecursively(entry, path = [""]) {
+  async *_getFilesRecursively(entry) {
     if (entry.kind === "file") {
-      path.push(entry.name);
-      const relativePath = path.join("/");
-      path.length = 1;
+      const relativePath = await this._rootDirHandle.resolve(entry);
 
-      yield relativePath;
+      yield `/${relativePath.join("/")}`;
     } else if (entry.kind === "directory") {
-      for await (const handle of entry.values()) {
-        if (handle.kind === "directory") path.push(handle.name);
+      const relativePath = await this._rootDirHandle.resolve(entry);
 
-        yield* this._getFilesRecursively(handle, path);
+      yield `/${relativePath.join("/")}/`;
+
+      for await (const handle of entry.values()) {
+        yield* this._getFilesRecursively(handle);
       }
     }
   }
 
   normalizePath(path = "") {
+    if (this._rootDirHandle === null)
+      throw Error("First use requestPermission() function!");
+
     let fixedPath = path.trim();
 
-    if (fixedPath.length < 2) throw Error("Wrong or empty path attribute!");
+    if (fixedPath.length < 1) throw Error("Wrong or empty path attribute!");
 
     fixedPath = !path.startsWith("/") ? `/${path}` : path;
 
