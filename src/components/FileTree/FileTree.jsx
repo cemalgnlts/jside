@@ -31,6 +31,13 @@ function FileTree({ items }) {
   };
 
   const onItemSelect = (item) => {
+    const panel = dockViewApi.getPanel(item.index);
+
+    if (panel) {
+      if (!panel.isActive) panel.api.setActive();
+      return;
+    }
+
     dockViewApi.addPanel({
       id: item.index,
       component: "editor",

@@ -2,6 +2,7 @@ import { useEffect, useRef } from "react";
 import { monaco, defaultOptions } from "./monacoLoader.js";
 import { useAtomValue } from "jotai";
 import { $fileSystem } from "../../state.js";
+import { getCodeLanguageFromName } from "../../utils/index.js";
 
 /** @param {import("dockview").ISplitviewPanelProps} props*/
 function Editor(props) {
@@ -10,23 +11,29 @@ function Editor(props) {
 
   useEffect(() => {
     /** @type {monaco.editor.IStandaloneCodeEditor} */
-    let state = null;
+    let editor = null;
+    /** @type {import("monaco-editor").editor.IEditorConstructionOptions} */
+    const options = { ...defaultOptions };
 
     const getContent = async (path) => {
-      const content = await fileSystem.readFile(path, "utf8");
-      state.setValue(content);
+      const uri = monaco.Uri.file(path);
+      let model = monaco.editor.getModel(uri);
+
+      if (!model) {
+        const content = await fileSystem.readFile(path, "utf8");
+        const language = getCodeLanguageFromName(path);
+        model = monaco.editor.createModel(content, language, uri);
+      }
+
+      options.model = model;
+      editor = monaco.editor.create(editorContainerRef.current, options);
     };
 
-    /** @type {import("monaco-editor").editor.IEditorConstructionOptions} */
-    const options = {
-      ...defaultOptions,
-      readOnly: true
-    };
-
-    state = monaco.editor.create(editorContainerRef.current, options);
     getContent(props.api.id);
 
-    return () => state.dispose();
+    return () => {
+      if (editor) editor.dispose();
+    };
   }, []);
 
   return (

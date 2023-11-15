@@ -9,8 +9,6 @@ import tsWorker from "monaco-editor/esm/vs/language/typescript/ts.worker?worker"
 
 /** @type {import("monaco-editor").editor.IEditorConstructionOptions} */
 const defaultOptions = {
-  value: "",
-  language: "javascript",
   automaticLayout: true,
   scrollBeyondLastLine: false,
   fontFamily: "Fira Code",

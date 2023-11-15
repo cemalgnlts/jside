@@ -1,0 +1,9 @@
+{
+  "base": "vs-dark",
+  "inherit": true,
+  "rules": [
+    { "token": "comment", "foreground": "626466" },
+    { "token": "keyword", "foreground": "6CAEDD" },
+    { "token": "identifier", "foreground": "fac863" }
+  ]
+}

@@ -129,6 +129,7 @@ button {
   --dv-inactivegroup-visiblepanel-tab-color: var(--color-fg-muted);
   --dv-inactivegroup-hiddenpanel-tab-color: var(--color-fg-muted);
   --dv-separator-border: var(--color-ui-active);
+  --dv-active-sash-color: var(var(--color-active));
   /* --dv-paneview-header-border-color: red; */
 }
 
