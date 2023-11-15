@@ -9,6 +9,9 @@ const store = atom({
   currentDir: "/test"
 });
 
+const $dockViewApi = atom(null);
+const $fileSystem = atom(() => fileSystem);
+
 const $fileTree = atom(async (get) => {
   if (!fileSystem) {
     fileSystem = await FileSystem.getFileSystem();
@@ -43,7 +46,7 @@ const $fileTree = atom(async (get) => {
 
     const parts = path.slice(1, -1).split("/");
     if (parts.length === 2) {
-      if(isFolder) format.root.children.unshift(path);
+      if (isFolder) format.root.children.unshift(path);
       else format.root.children.push(path);
     } else if (parts.length > 2 && isFolder) {
       parts.pop();
@@ -51,8 +54,8 @@ const $fileTree = atom(async (get) => {
       format[parent].children.push(path);
     }
   }
-  console.log(format);
+
   return format;
 });
 
-export { $fileTree };
+export { $dockViewApi, $fileSystem, $fileTree };

@@ -1,4 +1,4 @@
-import { memo } from "react";
+import { memo, useEffect, useRef } from "react";
 
 import {
   UncontrolledTreeEnvironment,
@@ -8,8 +8,13 @@ import {
 
 import Icon from "@components/Icon";
 import { getFileIcon } from "../../libs/languageIcons";
+import { useAtomValue } from "jotai";
+import { $dockViewApi } from "../../state";
 
 function FileTree({ items }) {
+  /** @type {import("dockview").DockviewApi} */
+  const dockViewApi = useAtomValue($dockViewApi);
+
   const renderItemTitle = (ev) => {
     const { isFolder, title } = ev.item;
 
@@ -25,13 +30,25 @@ function FileTree({ items }) {
     return <ItemTitle title={title}>{IconEl}</ItemTitle>;
   };
 
+  const onItemSelect = (item) => {
+    dockViewApi.addPanel({
+      id: item.index,
+      component: "editor",
+      title: item.title
+    });
+  };
+
   return (
     <UncontrolledTreeEnvironment
       dataProvider={
-        new StaticTreeDataProvider(items, (item, data) => ({ ...item, data }))
+        new StaticTreeDataProvider(items, (item, data) => ({
+          ...item,
+          data
+        }))
       }
       getItemTitle={(item) => item.title}
       renderItemTitle={renderItemTitle}
+      onPrimaryAction={onItemSelect}
       viewState={{}}
     >
       <Tree treeId="fileTree" rootItem="root" treeLabel="File Tree" />

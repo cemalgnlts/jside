@@ -1,28 +1,31 @@
 import { useEffect, useRef } from "react";
-import { monaco } from "./monacoLoader.js";
+import { monaco, defaultOptions } from "./monacoLoader.js";
+import { useAtomValue } from "jotai";
+import { $fileSystem } from "../../state.js";
 
-function Editor() {
+/** @param {import("dockview").ISplitviewPanelProps} props*/
+function Editor(props) {
   const editorContainerRef = useRef(null);
+  const fileSystem = useAtomValue($fileSystem);
 
   useEffect(() => {
-    /** @type {import("monaco-editor").editor.IEditorConstructionOptions} */
-    const properties = {
-      value: 'function hello() {\n\tconsole.log("Hello world!");\n}',
-      language: "javascript",
-      automaticLayout: true,
-      scrollBeyondLastLine: false,
-      fontFamily: "Fira Code",
-      fontLigatures: false,
-      fontSize: 16,
-      minimap: {
-        enabled: false
-      },
-      padding: {
-        top: 10
-      }
+    /** @type {monaco.editor.IStandaloneCodeEditor} */
+    let state = null;
+
+    const getContent = async (path) => {
+      const content = await fileSystem.readFile(path, "utf8");
+      state.setValue(content);
     };
 
-    const state = monaco.editor.create(editorContainerRef.current, properties);
+    /** @type {import("monaco-editor").editor.IEditorConstructionOptions} */
+    const options = {
+      ...defaultOptions,
+      readOnly: true
+    };
+
+    state = monaco.editor.create(editorContainerRef.current, options);
+    getContent(props.api.id);
+
     return () => state.dispose();
   }, []);
 
