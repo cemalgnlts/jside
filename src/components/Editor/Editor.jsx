@@ -1,13 +1,12 @@
 import { useEffect, useRef } from "react";
 import { monaco, defaultOptions } from "./monacoLoader.js";
 import { useAtomValue } from "jotai";
-import { $fileSystem } from "../../state.js";
+import { fileSystem } from "../../state.js";
 import { getCodeLanguageFromName } from "../../utils/index.js";
 
 /** @param {import("dockview").ISplitviewPanelProps} props*/
 function Editor(props) {
   const editorContainerRef = useRef(null);
-  const fileSystem = useAtomValue($fileSystem);
 
   useEffect(() => {
     /** @type {monaco.editor.IStandaloneCodeEditor} */
@@ -35,7 +34,7 @@ function Editor(props) {
       if (!editor) return;
 
       if (!ev.isActive) viewState = editor.saveViewState();
-      if (ev.isActive && editor !== null) {
+      else {
         editor.restoreViewState(viewState);
         setTimeout(() => editor.focus(), 50);
       }

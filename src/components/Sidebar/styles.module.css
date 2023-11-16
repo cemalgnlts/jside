@@ -1,8 +1,27 @@
-.sidebar > div:last-child {
-    margin-right: var(--space-s);
+.sidebar {
+  height: 100%;
 }
 
-.title {
+.sidebar > div:last-child {
+  margin-right: var(--space-s);
+}
+
+.header {
   padding: var(--space-s);
   background-color: var(--color-bg-secondary);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.header > .title {
+  font-size: 1rem;
+}
+
+.actions {
+  visibility: hidden;
+}
+
+.sidebar:hover .header > .actions {
+  visibility: visible;
 }

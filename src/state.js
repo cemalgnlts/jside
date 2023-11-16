@@ -2,6 +2,8 @@ import { atom } from "jotai";
 
 import FileSystem from "./libs/FileSystem";
 
+import { formatProjectFilesAsTree } from "./utils";
+
 let fileSystem = null;
 
 const store = atom({
@@ -10,52 +12,36 @@ const store = atom({
 });
 
 const $dockViewApi = atom(null);
-const $fileSystem = atom(() => fileSystem);
 
-const $fileTree = atom(async (get) => {
+const $files = atom(async (get) => {
   if (!fileSystem) {
     fileSystem = await FileSystem.getFileSystem();
   }
 
   const currentDir = get(store).currentDir;
-
-  const paths = await fileSystem.readdir(currentDir, { recursive: true });
-
-  const format = {
-    root: {
-      index: "root",
-      isFolder: true,
-      title: currentDir.slice(1),
-      children: []
-    }
-  };
-
-  for (const path of paths) {
-    if (path === `${currentDir}/`) continue;
-
-    const isFolder = path.endsWith("/");
-
-    const base = fileSystem.basename(isFolder ? path.slice(0, -1) : path);
-
-    format[path] = {
-      index: path,
-      title: base,
-      children: [],
-      isFolder
-    };
-
-    const parts = path.slice(1, -1).split("/");
-    if (parts.length === 2) {
-      if (isFolder) format.root.children.unshift(path);
-      else format.root.children.push(path);
-    } else if (parts.length > 2 && isFolder) {
-      parts.pop();
-      const parent = `/${parts.join("/")}/`;
-      format[parent].children.push(path);
-    }
-  }
-
-  return format;
+  return fileSystem.readdir(currentDir, { recursive: true });
 });
 
-export { $dockViewApi, $fileSystem, $fileTree };
+const $tree = atom({});
+
+const $fileTree = atom(
+  async (get) => {
+    const currentDir = get(store).currentDir;
+    const files = await get($files);
+    const format = await formatProjectFilesAsTree(files, currentDir);
+
+    return format;
+  },
+  async (get, set) => {
+    const tree = await get($files);
+    set($tree, tree);
+  }
+);
+
+async function formatFiles(currentDir) {
+  const format = await formatProjectFilesAsTree(paths, currentDir);
+
+  return format;
+}
+
+export { $dockViewApi, $tree, $fileTree, fileSystem };

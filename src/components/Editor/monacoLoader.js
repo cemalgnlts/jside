@@ -7,9 +7,7 @@ import cssWorker from "monaco-editor/esm/vs/language/css/css.worker?worker";
 import htmlWorker from "monaco-editor/esm/vs/language/html/html.worker?worker";
 import tsWorker from "monaco-editor/esm/vs/language/typescript/ts.worker?worker";
 
-import DarkTheme from "./theme.json";
-
-/** @type {import("monaco-editor").editor.IEditorConstructionOptions} */
+/** @type {monaco.editor.IEditorConstructionOptions} */
 const defaultOptions = {
   automaticLayout: true,
   scrollBeyondLastLine: false,

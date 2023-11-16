@@ -79,28 +79,48 @@ p {
   margin: 0;
 }
 
-.icon,
-.btn-icon {
-  width: 20px;
-  height: 20px;
+.icon {
+  flex-shrink: 0;
+  font-size: 1rem;
 }
 
-button {
+.btn-icon,
+.icon {
+  width: 20px;
+  height: 20px;
+  line-height: 20px;
+}
+
+.btn {
   background-color: transparent;
   border: none;
   outline: none;
   cursor: pointer;
+  color: inherit;
+  font-size: 1rem;
   padding: 0;
+  overflow: hidden;
+}
+
+.btn-small > .icon {
+  font-size: 0.85rem !important;
 }
 
 .btn-ghost {
   text-align: center;
+  border-radius: 100%;
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
 }
 
 .btn-ghost > .icon {
-  vertical-align: middle;
-  margin: 0;
-  padding: 0;
+  height: 28px;
+  line-height: 28px;
+}
+
+.btn-ghost:hover {
+  background-color: var(--color-ui-hover);
 }
 
 /* #region DockView */
@@ -126,7 +146,7 @@ button {
   --dv-inactivegroup-visiblepanel-tab-color: var(--color-fg-muted);
   --dv-inactivegroup-hiddenpanel-tab-color: var(--color-fg-muted);
   --dv-separator-border: var(--color-ui-active);
-  --dv-active-sash-color: var(var(--color-active));
+  --dv-active-sash-color: var(--color-active);
   /* --dv-paneview-header-border-color: red; */
 }
 
@@ -146,35 +166,31 @@ button {
   gap: 0.5em;
 }
 
-.panel-tab .btn-ghost {
-  border-radius: var(--radius-1);
-  color: var(--dv-activegroup-visiblepanel-tab-color);
+.split-view-container .sash-container .sash.disabled:active,
+.split-view-container .sash-container .sash.disabled:hover {
+  background-color: transparent;
 }
 
-.panel-tab .btn-ghost:hover {
-  background-color: var(--dv-icon-hover-background-color);
-}
-
-.groupview.active-group
-  > .tabs-and-actions-container
-  > .tabs-container
-  > .tab.inactive-tab
-  .btn-ghost {
+.tab.inactive-tab .btn-ghost {
   visibility: hidden;
 }
 
-.groupview.active-group
-  > .tabs-and-actions-container
-  > .tabs-container
-  > .tab.inactive-tab
-  .icon {
-    opacity: 0.5;
+.tab.inactive-tab .icon {
+  opacity: 0.5;
+}
+
+.tab.active-tab {
+  border-top-color: var(--color-active);
+}
+
+.tab {
+  border-top: solid 1px transparent;
+  margin-top: 1px;
 }
 /* #endregion */
 
 /* #region rct */
 .rct-dark {
-  user-select: none;
   /* --rct-color-search-highlight-bg: red; */
   --rct-bar-color: var(--color-active);
   --rct-focus-outline: var(--color-fg-secondary);

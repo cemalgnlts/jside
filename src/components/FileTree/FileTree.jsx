@@ -11,7 +11,7 @@ import { getFileIcon } from "../../libs/languageIcons";
 import { useAtomValue } from "jotai";
 import { $dockViewApi } from "../../state";
 
-function FileTree({ items }) {
+function FileTree({ items, treeRef }) {
   /** @type {import("dockview").DockviewApi} */
   const dockViewApi = useAtomValue($dockViewApi);
 
@@ -58,7 +58,12 @@ function FileTree({ items }) {
       onPrimaryAction={onItemSelect}
       viewState={{}}
     >
-      <Tree treeId="fileTree" rootItem="root" treeLabel="File Tree" />
+      <Tree
+        treeId="fileTree"
+        rootItem="root"
+        treeLabel="File Tree"
+        ref={treeRef}
+      />
     </UncontrolledTreeEnvironment>
   );
 }

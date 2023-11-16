@@ -1,3 +1,5 @@
+import Path from "./Path.js";
+
 class OPFileSystem {
   /** @type {FileSystemDirectoryHandle} */
   _rootDirHandle = null;
@@ -19,7 +21,7 @@ class OPFileSystem {
    */
   async writeFile(path, contents) {
     const fixedPath = this.normalizePath(path);
-    const { dir, base } = this.pathParse(fixedPath);
+    const { dir, base } = Path.pathParse(fixedPath);
 
     const dirHandle = await this._getParentDirectoryHandle(dir);
     const fileHandle = await dirHandle.getFileHandle(base, { create: true });
@@ -37,7 +39,7 @@ class OPFileSystem {
    */
   async readFile(path, type = "file") {
     const fixedPath = this.normalizePath(path);
-    const { dir, base } = this.pathParse(fixedPath);
+    const { dir, base } = Path.pathParse(fixedPath);
 
     const dirHandle = await this._getParentDirectoryHandle(dir);
     const fileHandle = await dirHandle.getFileHandle(base);
@@ -92,7 +94,7 @@ class OPFileSystem {
    */
   async rm(path, options = { recursive: false }) {
     const fixedPath = this.normalizePath(path);
-    const { dir, base } = this.pathParse(fixedPath);
+    const { dir, base } = Path.pathParse(fixedPath);
 
     const dirHandle = await this._getParentDirectoryHandle(dir);
 
@@ -106,7 +108,7 @@ class OPFileSystem {
    */
   async renameFile(path, newName) {
     const fixedPath = this.normalizePath(path);
-    const { dir, base } = this.pathParse(fixedPath);
+    const { dir, base } = Path.pathParse(fixedPath);
 
     const dirHandle = await this._getParentDirectoryHandle(dir);
     const file = await dirHandle.getFileHandle(base);
@@ -122,7 +124,7 @@ class OPFileSystem {
   async moveFile(path, targetFolderPath) {
     const sourceFixedPath = this.normalizePath(path);
     const { dir: sourceDir, base: sourceBase } =
-      this.pathParse(sourceFixedPath);
+      Path.pathParse(sourceFixedPath);
 
     const sourceDirHandle = await this._getParentDirectoryHandle(sourceDir);
     const file = await sourceDirHandle.getFileHandle(sourceBase);
@@ -187,36 +189,6 @@ class OPFileSystem {
     if (fixedPath.endsWith("/")) fixedPath = fixedPath.slice(0, -1);
 
     return fixedPath;
-  }
-
-  /**
-   * Returns the directory name of a path.
-   * @param {string} path
-   * @returns {string}
-   */
-  dirname(path) {
-    return path.slice(0, path.lastIndexOf("/"));
-  }
-
-  /**
-   * Returns the last portion of a path.
-   * @param {string} path
-   * @returns {string}
-   */
-  basename(path) {
-    return path.slice(path.lastIndexOf("/") + 1);
-  }
-
-  /**
-   * Returns an object whose properties represent significant elements of the path.
-   * @param {string} path
-   * @returns {{ dir: string, base: string }}
-   */
-  pathParse(path) {
-    const dir = this.dirname(path);
-    const base = this.basename(path);
-
-    return { dir, base };
   }
 }
 
