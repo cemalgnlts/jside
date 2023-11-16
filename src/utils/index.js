@@ -35,11 +35,13 @@ export async function formatProjectFilesAsTree(paths, currentDir) {
     format[path] = {
       index: path,
       title: base,
-      children: [],
       isFolder
     };
 
+    if (isFolder) format[path].children = [];
+
     const parts = path.slice(1, -1).split("/");
+
     if (parts.length === 2) {
       if (isFolder) format.root.children.unshift(path);
       else format.root.children.push(path);

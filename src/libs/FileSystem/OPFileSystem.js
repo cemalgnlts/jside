@@ -21,7 +21,7 @@ class OPFileSystem {
    */
   async writeFile(path, contents) {
     const fixedPath = this.normalizePath(path);
-    const { dir, base } = Path.pathParse(fixedPath);
+    const { dir, base } = Path.parse(fixedPath);
 
     const dirHandle = await this._getParentDirectoryHandle(dir);
     const fileHandle = await dirHandle.getFileHandle(base, { create: true });
@@ -39,7 +39,7 @@ class OPFileSystem {
    */
   async readFile(path, type = "file") {
     const fixedPath = this.normalizePath(path);
-    const { dir, base } = Path.pathParse(fixedPath);
+    const { dir, base } = Path.parse(fixedPath);
 
     const dirHandle = await this._getParentDirectoryHandle(dir);
     const fileHandle = await dirHandle.getFileHandle(base);
@@ -94,7 +94,7 @@ class OPFileSystem {
    */
   async rm(path, options = { recursive: false }) {
     const fixedPath = this.normalizePath(path);
-    const { dir, base } = Path.pathParse(fixedPath);
+    const { dir, base } = Path.parse(fixedPath);
 
     const dirHandle = await this._getParentDirectoryHandle(dir);
 
@@ -108,7 +108,7 @@ class OPFileSystem {
    */
   async renameFile(path, newName) {
     const fixedPath = this.normalizePath(path);
-    const { dir, base } = Path.pathParse(fixedPath);
+    const { dir, base } = Path.parse(fixedPath);
 
     const dirHandle = await this._getParentDirectoryHandle(dir);
     const file = await dirHandle.getFileHandle(base);
@@ -124,7 +124,7 @@ class OPFileSystem {
   async moveFile(path, targetFolderPath) {
     const sourceFixedPath = this.normalizePath(path);
     const { dir: sourceDir, base: sourceBase } =
-      Path.pathParse(sourceFixedPath);
+      Path.parse(sourceFixedPath);
 
     const sourceDirHandle = await this._getParentDirectoryHandle(sourceDir);
     const file = await sourceDirHandle.getFileHandle(sourceBase);

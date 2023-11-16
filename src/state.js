@@ -13,35 +13,38 @@ const store = atom({
 
 const $dockViewApi = atom(null);
 
-const $files = atom(async (get) => {
+const $fileTree = atom({
+  root: {
+    title: ""
+  }
+});
+
+const $updateFileTree = atom(null, async (get, set) => {
   if (!fileSystem) {
     fileSystem = await FileSystem.getFileSystem();
   }
 
   const currentDir = get(store).currentDir;
-  return fileSystem.readdir(currentDir, { recursive: true });
+
+  const files = await fileSystem.readdir(currentDir, { recursive: true });
+  const format = await formatProjectFilesAsTree(files, currentDir);
+
+  set($fileTree, { ...format });
 });
 
-const $tree = atom({});
+const $insertFile = atom(null, (get, set, info) => {
+  const tree = get($fileTree);
 
-const $fileTree = atom(
-  async (get) => {
-    const currentDir = get(store).currentDir;
-    const files = await get($files);
-    const format = await formatProjectFilesAsTree(files, currentDir);
+  const clone = { ...tree };
+  clone["new"] = {
+    index: "new",
+    title: "",
+    isFolder: false
+  };
 
-    return format;
-  },
-  async (get, set) => {
-    const tree = await get($files);
-    set($tree, tree);
-  }
-);
+  clone[info.parent].children.push("new");
 
-async function formatFiles(currentDir) {
-  const format = await formatProjectFilesAsTree(paths, currentDir);
+  set($fileTree, clone);
+});
 
-  return format;
-}
-
-export { $dockViewApi, $tree, $fileTree, fileSystem };
+export { $dockViewApi, $fileTree, $updateFileTree, $insertFile, fileSystem };

@@ -1,24 +1,38 @@
 import FileTree from "@components/FileTree";
 
-import { useAtom, useAtomValue } from "jotai";
-import { $tree, $fileTree } from "../../state";
+import { useAtomValue, useSetAtom } from "jotai";
+import {
+  $fileTree,
+  $updateFileTree,
+  $insertFile,
+  fileSystem
+} from "../../state";
 
 import styles from "./styles.module.css";
 import Icon from "../Icon/Icon";
 import Button from "../button/Button";
-import { useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 
 function Sidebar() {
   /** @type {React.MutableRefObject<import("react-complex-tree").TreeRef>} */
   let treeRef = useRef(null);
-  const files = useAtomValue($tree);
-  const [, refreshFiles] = useAtom($fileTree);
+  const files = useAtomValue($fileTree);
+  const insertFile = useSetAtom($insertFile);
+  const updateFileTree = useSetAtom($updateFileTree);
 
-  const refresh = () => {
-    refreshFiles();
+  useEffect(() => {
+    updateFileTree();
+  }, []);
+
+  useEffect(() => {
+    if (treeRef && files["new"]) {
+      setTimeout(() => treeRef.current.startRenamingItem("new"), 50);
+    }
+  }, [files]);
+
+  const addNewFile = () => {
+    insertFile({ parent: "root" });
   };
-
-  const addNewFile = () => {};
 
   const addNewFolder = () => {};
 
@@ -26,19 +40,20 @@ function Sidebar() {
     treeRef.current.collapseAll();
   };
 
+  const refresh = () => {
+    updateFileTree();
+  };
+
   return (
     <aside className={styles.sidebar}>
       <div className={styles.header}>
         <span className={styles.title}>{files.root.title}</span>
         <div className={styles.actions}>
-          <Button title="New file" icon small ghost>
+          <Button title="New file" onClick={addNewFile} icon small ghost>
             <Icon name="note_add" />
           </Button>
           <Button title="New folder" icon small ghost>
             <Icon name="create_new_folder" />
-          </Button>
-          <Button title="Refresh" onClick={refresh} icon small ghost>
-            <Icon name="refresh" />
           </Button>
           <Button
             title="Collapse folders"
@@ -48,6 +63,9 @@ function Sidebar() {
             ghost
           >
             <Icon name="unfold_less" />
+          </Button>
+          <Button title="Refresh" onClick={refresh} icon small ghost>
+            <Icon name="refresh" />
           </Button>
         </div>
       </div>

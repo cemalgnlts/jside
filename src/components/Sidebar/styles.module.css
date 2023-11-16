@@ -18,6 +18,15 @@
   font-size: 1rem;
 }
 
+.header > .title:empty + .actions {
+  cursor: not-allowed;
+}
+
+.header > .title:empty + .actions > button {
+  pointer-events: none;
+  opacity: 0.8;
+}
+
 .actions {
   visibility: hidden;
 }

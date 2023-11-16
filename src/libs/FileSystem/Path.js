@@ -22,7 +22,7 @@ export default class Path {
    * @param {string} path
    * @returns {{ dir: string, base: string }}
    */
-  static pathParse(path) {
+  static parse(path) {
     const dir = Path.dirname(path);
     const base = Path.basename(path);
 

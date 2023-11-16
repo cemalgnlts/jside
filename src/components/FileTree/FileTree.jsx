@@ -1,15 +1,13 @@
-import { memo, useEffect, useRef } from "react";
+import { memo } from "react";
 
-import {
-  UncontrolledTreeEnvironment,
-  StaticTreeDataProvider,
-  Tree
-} from "react-complex-tree";
+import { UncontrolledTreeEnvironment, Tree } from "react-complex-tree";
 
 import Icon from "@components/Icon";
 import { getFileIcon } from "../../libs/languageIcons";
 import { useAtomValue } from "jotai";
 import { $dockViewApi } from "../../state";
+
+import FileSystemTreeDataProvider from "./FileSystemTreeDataProvider";
 
 function FileTree({ items, treeRef }) {
   /** @type {import("dockview").DockviewApi} */
@@ -45,17 +43,18 @@ function FileTree({ items, treeRef }) {
     });
   };
 
+  const onRename = (item, name) => {
+    dockViewApi.getPanel(item.index)?.setTitle(name);
+  };
+
   return (
     <UncontrolledTreeEnvironment
-      dataProvider={
-        new StaticTreeDataProvider(items, (item, data) => ({
-          ...item,
-          data
-        }))
-      }
+      dataProvider={new FileSystemTreeDataProvider(items)}
       getItemTitle={(item) => item.title}
       renderItemTitle={renderItemTitle}
       onPrimaryAction={onItemSelect}
+      onRenameItem={onRename}
+      disableMultiselect={true}
       viewState={{}}
     >
       <Tree
