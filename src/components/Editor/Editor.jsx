@@ -12,8 +12,10 @@ function Editor(props) {
   useEffect(() => {
     /** @type {monaco.editor.IStandaloneCodeEditor} */
     let editor = null;
-    /** @type {import("monaco-editor").editor.IEditorConstructionOptions} */
+    /** @type {monaco.editor.IEditorConstructionOptions} */
     const options = { ...defaultOptions };
+    /** @type {monaco.editor.ICodeEditorViewState} */
+    let viewState = null;
 
     const getContent = async (path) => {
       const uri = monaco.Uri.file(path);
@@ -29,10 +31,22 @@ function Editor(props) {
       editor = monaco.editor.create(editorContainerRef.current, options);
     };
 
+    const activeListener = props.api.onDidActiveChange((ev) => {
+      if (!editor) return;
+
+      if (!ev.isActive) viewState = editor.saveViewState();
+      if (ev.isActive && editor !== null) {
+        editor.restoreViewState(viewState);
+        setTimeout(() => editor.focus(), 50);
+      }
+    });
+
     getContent(props.api.id);
 
     return () => {
       if (editor) editor.dispose();
+
+      activeListener.dispose();
     };
   }, []);
 

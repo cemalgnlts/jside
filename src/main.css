@@ -42,7 +42,7 @@
 :root {
   --color-bg: #1f1f1f;
   --color-fg: #cecdc3;
-  --color-bg-secondary: #1c1b1a;
+  --color-bg-secondary: #181818;
   --color-fg-secondary: #878580;
   --color-fg-muted: #575653;
 
@@ -72,14 +72,11 @@ body {
   font-family: Roboto, sans-serif;
   background-color: var(--color-bg);
   color: var(--color-fg);
+  user-select: none;
 }
 
 p {
   margin: 0;
-}
-
-.sidebar {
-  padding-right: var(--space-s);
 }
 
 .icon,
@@ -156,6 +153,22 @@ button {
 
 .panel-tab .btn-ghost:hover {
   background-color: var(--dv-icon-hover-background-color);
+}
+
+.groupview.active-group
+  > .tabs-and-actions-container
+  > .tabs-container
+  > .tab.inactive-tab
+  .btn-ghost {
+  visibility: hidden;
+}
+
+.groupview.active-group
+  > .tabs-and-actions-container
+  > .tabs-container
+  > .tab.inactive-tab
+  .icon {
+    opacity: 0.5;
 }
 /* #endregion */
 

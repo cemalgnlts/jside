@@ -7,6 +7,8 @@ import cssWorker from "monaco-editor/esm/vs/language/css/css.worker?worker";
 import htmlWorker from "monaco-editor/esm/vs/language/html/html.worker?worker";
 import tsWorker from "monaco-editor/esm/vs/language/typescript/ts.worker?worker";
 
+import DarkTheme from "./theme.json";
+
 /** @type {import("monaco-editor").editor.IEditorConstructionOptions} */
 const defaultOptions = {
   automaticLayout: true,
@@ -45,5 +47,7 @@ self.MonacoEnvironment = {
 };
 
 monaco.editor.setTheme("vs-dark");
+monaco.languages.typescript.javascriptDefaults.setEagerModelSync(true);
+monaco.languages.typescript.typescriptDefaults.setEagerModelSync(true);
 
 export { monaco, defaultOptions };

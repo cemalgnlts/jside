@@ -1,0 +1,8 @@
+.sidebar > div:last-child {
+    margin-right: var(--space-s);
+}
+
+.title {
+  padding: var(--space-s);
+  background-color: var(--color-bg-secondary);
+}
