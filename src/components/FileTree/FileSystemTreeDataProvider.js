@@ -30,7 +30,7 @@ export default class FileSystemTreeDataProvider {
     // newPath.push(name);
     // newPath = newPath.push("/");
 
-    this.items[item.index].title = name;
+    this.items[item.index].name = name;
     // this.item[item.index].path = newPath;
 
     this.changeHandler?.([item.index]);

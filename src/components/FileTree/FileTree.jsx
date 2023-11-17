@@ -39,7 +39,7 @@ function FileTree({ items, treeRef }) {
     dockViewApi.addPanel({
       id: item.index,
       component: "editor",
-      title: item.title
+      title: item.name
     });
   };
 
@@ -50,7 +50,7 @@ function FileTree({ items, treeRef }) {
   return (
     <UncontrolledTreeEnvironment
       dataProvider={new FileSystemTreeDataProvider(items)}
-      getItemTitle={(item) => item.title}
+      // getItemTitle={(item) => item.name}
       renderItemTitle={renderItemTitle}
       onPrimaryAction={onItemSelect}
       onRenameItem={onRename}

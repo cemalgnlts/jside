@@ -15,7 +15,7 @@ const $dockViewApi = atom(null);
 
 const $fileTree = atom({
   root: {
-    title: ""
+    name: ""
   }
 });
 
@@ -38,7 +38,8 @@ const $insertFile = atom(null, (get, set, info) => {
   const clone = { ...tree };
   clone["new"] = {
     index: "new",
-    title: "",
+    name: "",
+    path: "",
     isFolder: false
   };
 

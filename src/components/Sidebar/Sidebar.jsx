@@ -47,7 +47,7 @@ function Sidebar() {
   return (
     <aside className={styles.sidebar}>
       <div className={styles.header}>
-        <span className={styles.title}>{files.root.title}</span>
+        <span className={styles.name}>{files.root.name}</span>
         <div className={styles.actions}>
           <Button title="New file" onClick={addNewFile} icon small ghost>
             <Icon name="note_add" />
