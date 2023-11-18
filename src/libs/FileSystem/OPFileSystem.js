@@ -15,6 +15,19 @@ class OPFileSystem {
   }
 
   /**
+   *
+   */
+  async initFiles(data) {
+    for (const [path, text] of Object.entries(data)) {
+      const dir = Path.dirname(path);
+
+      if (dir !== "") await this.mkdir(dir);
+      
+      await this.writeFile(path, text);
+    }
+  }
+
+  /**
    * Writes data to the file.
    * @param {string} path.
    * @param {string|Blob|ArrayBuffer|DataView} contents File content.
@@ -123,8 +136,7 @@ class OPFileSystem {
    */
   async moveFile(path, targetFolderPath) {
     const sourceFixedPath = this.normalizePath(path);
-    const { dir: sourceDir, base: sourceBase } =
-      Path.parse(sourceFixedPath);
+    const { dir: sourceDir, base: sourceBase } = Path.parse(sourceFixedPath);
 
     const sourceDirHandle = await this._getParentDirectoryHandle(sourceDir);
     const file = await sourceDirHandle.getFileHandle(sourceBase);

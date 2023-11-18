@@ -8,7 +8,7 @@ const gridComponents = {
   header: Header,
   sidebar: Sidebar,
   main: DockView,
-  footer: Footer
+  footer: Footer,
 };
 
 /** @type {import("dockview").SerializedGridviewComponent} */
@@ -22,9 +22,9 @@ const serializedGridView = {
           data: {
             id: "header-id",
             component: "header",
-            minimumHeight: 20,
-            maximumHeight: 20
-          }
+            minimumHeight: 25,
+            maximumHeight: 25,
+          },
         },
         {
           type: "branch",
@@ -35,8 +35,8 @@ const serializedGridView = {
               data: {
                 id: "sidebar-id",
                 component: "sidebar",
-                minimumWidth: 250
-              }
+                minimumWidth: 250,
+              },
             },
             {
               type: "leaf",
@@ -45,26 +45,26 @@ const serializedGridView = {
                 id: "main-id",
                 component: "main",
                 minimumWidth: 1000,
-                priority: LayoutPriority.High
-              }
-            }
-          ]
+                priority: LayoutPriority.High,
+              },
+            },
+          ],
         },
         {
           type: "leaf",
           data: {
             id: "footer-id",
             component: "footer",
-            minimumHeight: 20,
-            maximumHeight: 20
-          }
-        }
-      ]
+            minimumHeight: 25,
+            maximumHeight: 25,
+          },
+        },
+      ],
     },
     width: 100,
     height: 100,
-    orientation: Orientation.VERTICAL
-  }
+    orientation: Orientation.VERTICAL,
+  },
 };
 
 function App() {

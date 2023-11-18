@@ -28,6 +28,7 @@ function Editor(props) {
 
       options.model = model;
       editor = monaco.editor.create(editorContainerRef.current, options);
+      editor.focus();
     };
 
     const activeListener = props.api.onDidActiveChange((ev) => {
@@ -36,11 +37,11 @@ function Editor(props) {
       if (!ev.isActive) viewState = editor.saveViewState();
       else {
         editor.restoreViewState(viewState);
-        setTimeout(() => editor.focus(), 50);
+        requestAnimationFrame(() => editor.focus());
       }
     });
 
-    getContent(props.api.id);
+    getContent(props.params.path);
 
     return () => {
       if (editor) editor.dispose();

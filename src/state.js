@@ -22,6 +22,7 @@ const $fileTree = atom({
 const $updateFileTree = atom(null, async (get, set) => {
   if (!fileSystem) {
     fileSystem = await FileSystem.getFileSystem();
+    globalThis.fileSystem = fileSystem;
   }
 
   const currentDir = get(store).currentDir;

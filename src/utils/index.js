@@ -35,6 +35,7 @@ export async function formatProjectFilesAsTree(paths, currentDir) {
     format[path] = {
       index: path,
       name: base,
+      path: `${parent}/${base}`,
       parent,
       isFolder
     };

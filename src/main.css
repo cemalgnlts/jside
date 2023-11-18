@@ -175,11 +175,12 @@ p {
   visibility: hidden;
 }
 
-.tab.inactive-tab .icon {
+.tab.inactive-tab .icon,
+.groupview.inactive-group .icon {
   opacity: 0.5;
 }
 
-.tab.active-tab {
+.groupview.active-group .tab.active-tab {
   border-top-color: var(--color-active);
 }
 

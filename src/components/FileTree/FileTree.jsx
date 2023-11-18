@@ -14,18 +14,18 @@ function FileTree({ items, treeRef }) {
   const dockViewApi = useAtomValue($dockViewApi);
 
   const renderItemTitle = (ev) => {
-    const { isFolder, title } = ev.item;
+    const { isFolder, name } = ev.item;
 
     let IconEl = null;
 
     if (isFolder) {
-      const name = ev.context.isExpanded ? "folder_open" : "folder";
-      IconEl = <Icon name={name} />;
+      const iconName = ev.context.isExpanded ? "folder_open" : "folder";
+      IconEl = <Icon name={iconName} />;
     } else {
-      IconEl = getFileIcon(title) || <Icon name="insert_drive_file" />;
+      IconEl = getFileIcon(name) || <Icon name="insert_drive_file" />;
     }
 
-    return <ItemTitle title={title}>{IconEl}</ItemTitle>;
+    return <ItemTitle title={name}>{IconEl}</ItemTitle>;
   };
 
   const onItemSelect = (item) => {
@@ -38,6 +38,9 @@ function FileTree({ items, treeRef }) {
 
     dockViewApi.addPanel({
       id: item.index,
+      params: {
+        path: item.path
+      },
       component: "editor",
       title: item.name
     });
@@ -50,7 +53,7 @@ function FileTree({ items, treeRef }) {
   return (
     <UncontrolledTreeEnvironment
       dataProvider={new FileSystemTreeDataProvider(items)}
-      // getItemTitle={(item) => item.name}
+      getItemTitle={(item) => item.name}
       renderItemTitle={renderItemTitle}
       onPrimaryAction={onItemSelect}
       onRenameItem={onRename}
