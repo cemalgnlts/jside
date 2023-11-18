@@ -20,7 +20,7 @@ export async function formatProjectFilesAsTree(paths, currentDir) {
     root: {
       index: "root",
       isFolder: true,
-      name: currentDir.slice(1),
+      title: currentDir.slice(1),
       children: []
     }
   };
@@ -34,7 +34,7 @@ export async function formatProjectFilesAsTree(paths, currentDir) {
 
     format[path] = {
       index: path,
-      name: base,
+      title: base,
       path: `${parent}/${base}`,
       parent,
       isFolder

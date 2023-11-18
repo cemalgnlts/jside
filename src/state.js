@@ -39,7 +39,7 @@ const $insertFile = atom(null, (get, set, info) => {
   const clone = { ...tree };
   clone["new"] = {
     index: "new",
-    name: "",
+    title: "",
     path: "",
     isFolder: false
   };

@@ -1,6 +1,19 @@
-function LoadingIcon(props) {
+import { useEffect } from "react";
+import styles from "./styles.module.css";
+
+function LoadingIcon() {
+  useEffect(() => {
+    return () => document.dispatchEvent(new Event("tree-ready"));
+  }, []);
+
   return (
-    <svg width="38" height="38" viewBox="0 0 38 38" stroke="#fff" {...props}>
+    <svg
+      width="38"
+      height="38"
+      viewBox="0 0 38 38"
+      stroke="#ffca28"
+      className={styles.loading}
+    >
       <g fill="none" fillRule="evenodd">
         <g transform="translate(1 1)" strokeWidth="2">
           <circle strokeOpacity=".5" cx="18" cy="18" r="18" />

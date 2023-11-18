@@ -1,5 +1,4 @@
 import JSTextIcon from "./JSTextIcon";
-import LoadingIcon from "./LoadingIcon";
 import SquircleIcon from "./SquircleIcon";
 
 import styles from "./styles.module.css";
@@ -10,11 +9,8 @@ function Splash() {
       <div className={styles.appIcon}>
         <SquircleIcon />
         <JSTextIcon />
+        <p className={styles.title}>IDE</p>
       </div>
-
-      <p className={styles.title}>IDE</p>
-
-      <LoadingIcon className={styles.loading} />
     </div>
   );
 }

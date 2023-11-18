@@ -1,5 +1,7 @@
+import { memo } from "react";
 import { GridviewReact } from "dockview";
 import { Orientation, LayoutPriority } from "dockview";
+
 import Header from "@components/Header";
 import Footer from "@components/Footer";
 import Sidebar from "@components/Sidebar";
@@ -83,4 +85,4 @@ function GridView() {
   );
 }
 
-export default GridView;
+export default memo(GridView);
