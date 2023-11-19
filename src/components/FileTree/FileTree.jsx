@@ -33,6 +33,7 @@ function FileTree({ items, treeRef }) {
 
     if (panel) {
       if (!panel.isActive) panel.api.setActive();
+
       return;
     }
 

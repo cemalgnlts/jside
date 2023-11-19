@@ -34,11 +34,11 @@ const serializedGridView = {
           data: [
             {
               type: "leaf",
-              size: 10,
+              size: 22,
               data: {
                 id: "sidebar-id",
                 component: "sidebar",
-                minimumWidth: 250
+                minimumWidth: 200
               }
             },
             {

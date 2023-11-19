@@ -5,10 +5,11 @@ function PanelTab(props) {
   const close = () => {
     props.api.panel.api.close();
   };
-  
+
   return (
     <div className="panel-tab">
-      {getFileIcon(props.api.title) || <Icon name="insert_drive_file" />}
+      {props.params.noIcon === false &&
+        (getFileIcon(props.api.title) || <Icon name="insert_drive_file" />)}
       <p>{props.api.title}</p>
       <button onClick={close} className="btn btn-icon btn-ghost">
         <Icon name="close" />

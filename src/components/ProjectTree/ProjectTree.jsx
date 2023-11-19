@@ -8,22 +8,23 @@ import Icon from "../Icon";
 const items = {
   root: {
     index: "root",
+    canMove: true,
     isFolder: true,
-    children: ["p1", "p2"]
+    children: ["child1", "child2"],
+    title: "Root item",
+    canRename: true
   },
-  p1: {
-    index: "p1",
-    title: "First Project",
-    isFolder: false
+  child1: {
+    index: "child1",
+    title: "Child item 1",
   },
-  p2: {
-    index: "p2",
-    title: "Another project",
-    isFolder: false
+  child2: {
+    index: "child2",
+    title: "Child item 2",
   }
 };
 
-function ProjectsTree() {
+function ProjectTree() {
   const renderItem = (item) => {
     return (
       <ItemTitle title={item.title}>
@@ -34,13 +35,18 @@ function ProjectsTree() {
 
   return (
     <UncontrolledTreeEnvironment
-      dataProvider={new StaticTreeDataProvider(items, (item) => ({ ...item }))}
+      dataProvider={
+        new StaticTreeDataProvider(items, (item, data) => ({
+          ...item,
+          data
+        }))
+      }
       getItemTitle={(item) => item.title}
-      renderItem={renderItem}
+      renderItemTitle={renderItem}
       disableMultiselect={true}
       viewState={{}}
     >
-      <Tree treeId="projectsTree" rootItem="root" treeLabel="Projects Tree" />
+      <Tree treeId="projectTree" rootItem="root" treeLabel="Project Tree" />
     </UncontrolledTreeEnvironment>
   );
 }
@@ -54,4 +60,4 @@ function ItemTitle({ title, children }) {
   );
 }
 
-export default ProjectsTree;
+export default ProjectTree;

@@ -1,11 +1,14 @@
 import { DockviewReact } from "dockview";
 import { PanelContent, PanelTab } from "@components/Panel";
-import Editor from "@components/Editor";
 import { useSetAtom } from "jotai";
 import { $dockViewApi } from "../../state";
 
+import Editor from "@components/Editor";
+import ProjectTemplate from "@components/ProjectTemplate";
+
 const components = {
   default: PanelContent,
+  projectTemplates: ProjectTemplate,
   editor: Editor
 };
 
