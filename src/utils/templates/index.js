@@ -1,12 +1,27 @@
 import react from "./framework/react.js";
 
-const templates = {
-  react: react
-};
+const templates = [
+  {
+    title: "Frameworks",
+    content: [
+      {
+        title: "React",
+        icon: "jsx",
+        files: react
+      },
+      {
+        title: "React",
+        icon: "tsx",
+        files: react
+      }
+    ]
+  }
+];
 
-function getTemplate(name, useTypeScript = false) {
-  const prjName = `${name}${useTypeScript ? "-ts" : ""}`;
-  return templates[prjName];
+function getTemplate(index) {
+  const [tmpId, cntId] = index.split(",");
+
+  return templates[tmpId].content[cntId].files;
 }
 
-export { getTemplate };
+export { templates, getTemplate };

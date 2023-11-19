@@ -46,7 +46,7 @@
   --color-fg-secondary: #adaaa4;
   --color-fg-muted: #575653;
 
-  --color-ui: #282726;
+  --color-ui: #313131;
   --color-ui-hover: #343331;
   --color-ui-active: #403e3c;
 
@@ -136,6 +136,20 @@ section {
 
 .btn-ghost:hover {
   background-color: var(--color-ui-hover);
+}
+
+.text-field {
+  width: 100%;
+  background-color: var(--color-ui);
+  outline: none;
+  border: none;
+  color: inherit;
+  padding: var(--space-s);
+  border: solid 1px var(--color-ui);
+}
+
+.text-field:focus {
+  border-color: var(--color-active);
 }
 
 /* #region DockView */
@@ -255,13 +269,27 @@ h6 {
   font-weight: 400;
 }
 
-h1 { font-size: 1.476rem; }
-h2 { font-size: 1.383rem; }
-h3 { font-size: 1.296rem; }
-h4 { font-size: 1.215rem; }
-h5 { font-size: 1.138rem; }
-h6 { font-size: 1.067rem; }
-p { font-size: 1rem; }
+h1 {
+  font-size: 1.476rem;
+}
+h2 {
+  font-size: 1.383rem;
+}
+h3 {
+  font-size: 1.296rem;
+}
+h4 {
+  font-size: 1.215rem;
+}
+h5 {
+  font-size: 1.138rem;
+}
+h6 {
+  font-size: 1.067rem;
+}
+p {
+  font-size: 1rem;
+}
 
 small,
 .small {

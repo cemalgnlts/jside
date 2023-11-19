@@ -23,12 +23,14 @@
   grid-area: icon;
   width: 42px;
   height: auto;
+  pointer-events: none;
 }
 
 .card > figcaption {
   display: flex;
   flex-direction: column;
   gap: var(--space-s);
+  pointer-events: none;
 }
 
 .card > figcaption > small {

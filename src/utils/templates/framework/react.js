@@ -117,3 +117,5 @@ export default App;`,
     </g>
 </svg>`
 };
+
+export default files;
