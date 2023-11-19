@@ -10,7 +10,7 @@ function PanelTab(props) {
     <div className="panel-tab">
       {props.params.noIcon === false &&
         (getFileIcon(props.api.title) || <Icon name="insert_drive_file" />)}
-      <p>{props.api.title}</p>
+      <small>{props.api.title}</small>
       <button onClick={close} className="btn btn-icon btn-ghost">
         <Icon name="close" />
       </button>

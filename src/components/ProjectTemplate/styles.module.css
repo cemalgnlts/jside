@@ -1,0 +1,36 @@
+.container {
+  display: flex;
+  gap: 1em;
+}
+
+.card {
+  border: solid 2px var(--color-ui-active);
+  padding: 1em;
+  gap: 1em;
+  display: flex;
+  align-items: center;
+  border-radius: var(--radius-1);
+  cursor: pointer;
+  transition: border-color 250ms ease-out;
+  width: 200px;
+}
+
+.card:hover {
+  border-color: var(--color-active);
+}
+
+.card > svg {
+  grid-area: icon;
+  width: 42px;
+  height: auto;
+}
+
+.card > figcaption {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-s);
+}
+
+.card > figcaption > small {
+  color: var(--color-fg-secondary);
+}

@@ -43,7 +43,7 @@
   --color-bg: #1f1f1f;
   --color-fg: #cecdc3;
   --color-bg-secondary: #181818;
-  --color-fg-secondary: #878580;
+  --color-fg-secondary: #adaaa4;
   --color-fg-muted: #575653;
 
   --color-ui: #282726;
@@ -56,7 +56,9 @@
   --color-warning: #bc5215;
   --color-active: #3aa99f;
 
-  --radius-1: 2px;
+  --radius-1: 4px;
+  --radius-2: 8px;
+
   --space-s: 8px;
   --space-m: 16px;
 }
@@ -75,13 +77,26 @@ body {
   user-select: none;
 }
 
-p {
-  margin: 0;
+section {
+  padding: 1em;
+  display: grid;
+  grid-auto-rows: auto;
+  gap: 1em;
 }
 
 .icon {
   flex-shrink: 0;
   font-size: 1rem;
+}
+
+.space-s {
+  display: block;
+  height: var(--space-s);
+}
+
+.space-m {
+  display: block;
+  height: var(--space-m);
 }
 
 .btn-icon,
@@ -213,5 +228,43 @@ p {
 
 .rct-dark .icon {
   margin-right: var(--space-s);
+}
+/* #endregion */
+
+/* #region Defaults */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+figure {
+  margin: 0;
+}
+
+h1,
+h2,
+h3 {
+  font-weight: 500;
+}
+
+h4,
+h5,
+h6 {
+  font-weight: 400;
+}
+
+h1 { font-size: 1.476rem; }
+h2 { font-size: 1.383rem; }
+h3 { font-size: 1.296rem; }
+h4 { font-size: 1.215rem; }
+h5 { font-size: 1.138rem; }
+h6 { font-size: 1.067rem; }
+p { font-size: 1rem; }
+
+small,
+.small {
+  font-size: 0.8rem;
 }
 /* #endregion */
