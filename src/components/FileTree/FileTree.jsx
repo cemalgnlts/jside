@@ -1,19 +1,20 @@
-import { memo } from "react";
+import { memo, useEffect, useState } from "react";
 
 import { UncontrolledTreeEnvironment, Tree } from "react-complex-tree";
 
 import Icon from "@components/Icon";
 import { getFileIcon } from "../../libs/languageIcons";
-import { useAtomValue } from "jotai";
-import { $dockViewApi } from "../../state";
+import { useAtomValue, useSetAtom } from "jotai";
+import { $dockViewApi, $openProject } from "../../state";
 
 import FileSystemTreeDataProvider from "./FileSystemTreeDataProvider";
 
-function FileTree({ items, treeRef }) {
+function FileTree({ items, treeRef, isProjectExplorer }) {
   /** @type {import("dockview").DockviewApi} */
   const dockViewApi = useAtomValue($dockViewApi);
-
-  const onItemSelect = (item) => {
+  const openProject = useSetAtom($openProject);
+  
+  const selectFile = (item) => {
     const panel = dockViewApi.getPanel(item.index);
 
     if (panel) {
@@ -32,15 +33,27 @@ function FileTree({ items, treeRef }) {
     });
   };
 
+  const selectProject = (item) => {
+    openProject({ title: item.title, path: item.path });
+  };
+
+  const onItemSelect = (item) => {
+    if (isProjectExplorer) selectProject(item);
+    else selectFile(item);
+  };
+
   const onRename = (item, name) => {
     dockViewApi.getPanel(item.index)?.setTitle(name);
   };
+
+  const preRenderItemTitle = (ev) =>
+    renderItemTitle(ev, isProjectExplorer ? "folder" : "insert_drive_file");
 
   return (
     <UncontrolledTreeEnvironment
       dataProvider={new FileSystemTreeDataProvider(items)}
       getItemTitle={(item) => item.title}
-      renderItemTitle={renderItemTitle}
+      renderItemTitle={preRenderItemTitle}
       onPrimaryAction={onItemSelect}
       onRenameItem={onRename}
       disableMultiselect={true}
@@ -56,7 +69,7 @@ function FileTree({ items, treeRef }) {
   );
 }
 
-function renderItemTitle(ev) {
+function renderItemTitle(ev, defaultIcon) {
   const { isFolder, title } = ev.item;
 
   let IconEl = null;
@@ -65,7 +78,7 @@ function renderItemTitle(ev) {
     const iconName = ev.context.isExpanded ? "folder_open" : "folder";
     IconEl = <Icon name={iconName} />;
   } else {
-    IconEl = getFileIcon(title) || <Icon name="insert_drive_file" />;
+    IconEl = getFileIcon(title) || <Icon name={defaultIcon} />;
   }
 
   return <ItemTitle title={title}>{IconEl}</ItemTitle>;

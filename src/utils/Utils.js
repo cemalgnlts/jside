@@ -57,12 +57,13 @@ export async function convertFilesToTree(paths, currentDir, noFolder = false) {
     root: {
       index: "root",
       isFolder: true,
-      title: currentDir.slice(1),
+      title: currentDir.slice(1).split("/")[1],
       children: []
     }
   };
 
   for (const path of paths) {
+    // We defined root above.
     if (path === `${currentDir}/`) continue;
 
     const isFolder = path.endsWith("/");
@@ -81,16 +82,11 @@ export async function convertFilesToTree(paths, currentDir, noFolder = false) {
 
     if (isFolder) format[path].children = [];
 
-    const parts = path.slice(1, -1).split("/");
+    const parentNode =
+      parent === currentDir ? format.root : format[`${parent}/`];
 
-    if (parts.length === 2) {
-      if (isFolder) format.root.children.unshift(path);
-      else format.root.children.push(path);
-    } else if (parts.length > 2 && isFolder) {
-      parts.pop();
-      const parent = `/${parts.join("/")}/`;
-      format[parent].children.push(path);
-    }
+    if (isFolder) parentNode.children.unshift(path);
+    else parentNode.children.push(path);
   }
 
   return format;

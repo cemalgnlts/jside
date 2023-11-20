@@ -5,17 +5,26 @@ import { FileSystem } from "./libs/FileSystem";
 import { convertFilesToTree } from "./utils/Utils";
 
 const store = atom({
+  isProjectExplorer: true,
   currentProject: "",
   currentDir: "/projects"
 });
 
 const $dockViewApi = atom(null);
+const $isProjectExplorer = atom((get) => get(store).isProjectExplorer);
+const $openProject = atom(null, (get, set, { title, path }) => {
+  set(store, {
+    isProjectExplorer: false,
+    currentProject: title,
+    currentDir: path
+  });
+});
 
 const $projectTree = atom({
   root: {}
 });
 
-const $updateProjectTree = atom(null, async (get, set) => {
+const $updateProjectTree = atom(null, async (_, set) => {
   const currentDir = "/projects";
 
   if (!FileSystem._fsManager) return;
@@ -24,7 +33,7 @@ const $updateProjectTree = atom(null, async (get, set) => {
   files = files.map((folder) => `${currentDir}/${folder}/`);
   const format = await convertFilesToTree(files, currentDir, true);
 
-  set($projectTree, { ...format });
+  set($projectTree, format);
 });
 
 const $fileTree = atom({
@@ -37,7 +46,7 @@ const $updateFileTree = atom(null, async (get, set) => {
   const files = await FileSystem.get().readdir(currentDir, { recursive: true });
   const format = await convertFilesToTree(files, currentDir);
 
-  set($fileTree, { ...format });
+  set($fileTree, format);
 });
 
 const $insertFile = atom(null, (get, set, info) => {
@@ -58,6 +67,8 @@ const $insertFile = atom(null, (get, set, info) => {
 
 export {
   $dockViewApi,
+  $isProjectExplorer,
+  $openProject,
   $projectTree,
   $updateProjectTree,
   $fileTree,
