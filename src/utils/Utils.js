@@ -52,7 +52,7 @@ export function getCodeLanguageFromName(name) {
   }
 }
 
-export async function convertFilesToTree(paths, currentDir) {
+export async function convertFilesToTree(paths, currentDir, noFolder = false) {
   const format = {
     root: {
       index: "root",
@@ -76,7 +76,7 @@ export async function convertFilesToTree(paths, currentDir) {
       title: base,
       path: `${parent}/${base}`,
       parent,
-      isFolder
+      isFolder: !noFolder && isFolder
     };
 
     if (isFolder) format[path].children = [];

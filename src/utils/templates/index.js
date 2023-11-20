@@ -18,10 +18,16 @@ const templates = [
   }
 ];
 
-function getTemplate(index) {
+function getTemplate(index, projectName) {
   const [tmpId, cntId] = index.split(",");
+  const files = templates[tmpId].content[cntId].files;
+  let absFiles = new Map();
 
-  return templates[tmpId].content[cntId].files;
+  for (const [path, text] of Object.entries(files)) {
+    absFiles.set(`/projects/${projectName}/${path}`, text);
+  }
+
+  return absFiles;
 }
 
 export { templates, getTemplate };

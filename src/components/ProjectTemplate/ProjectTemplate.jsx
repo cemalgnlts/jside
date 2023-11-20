@@ -4,18 +4,21 @@ import { getFileIcon } from "../../libs/languageIcons";
 import { getTemplate, templates } from "../../utils/templates";
 
 import styles from "./styles.module.css";
+import { FileSystem } from "../../libs/FileSystem";
 
-function ProjectTemplate() {
+function ProjectTemplate(props) {
   const tmpId = useRef(null);
-
   const [showPrompt, PromptUI] = usePrompt({
     title: "Project name",
     onEnter: onPromptEnter
   });
 
-  function onPromptEnter(val) {
-    const files = getTemplate(tmpId.current);
-    alert(val);
+  async function onPromptEnter(val) {
+    const files = getTemplate(tmpId.current, val);
+
+    await FileSystem.get().initFiles(Object.fromEntries(files));
+
+    props.api.panel.api.close();
   }
 
   const onSelect = (ev) => {

@@ -1,14 +1,18 @@
 import { Suspense, lazy, useEffect, useState } from "react";
 import Splash from "./components/Splash/Splash.jsx";
-import LoadingIcon from "./components/Splash/LoadingIcon.jsx";
+import { useSetAtom } from "jotai";
+
+import { $updateProjectTree } from "./state.js";
 
 const GridView = lazy(() => import("./components/GridView/GridView.jsx"));
 
 function App() {
   const [ready, setReady] = useState(false);
   const [showPermissionBtn, setShowPermissionBtn] = useState(false);
+  const refreshProjectTree = useSetAtom($updateProjectTree);
 
   const permissionGranted = () => {
+    refreshProjectTree();
     setReady(true);
   };
 
@@ -16,7 +20,6 @@ function App() {
     const treeReady = () => setShowPermissionBtn(true);
 
     document.addEventListener("grid-ready", treeReady, { once: true });
-
     return () => document.removeEventListener("grid-ready", treeReady);
   }, []);
 

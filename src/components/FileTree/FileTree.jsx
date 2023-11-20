@@ -13,21 +13,6 @@ function FileTree({ items, treeRef }) {
   /** @type {import("dockview").DockviewApi} */
   const dockViewApi = useAtomValue($dockViewApi);
 
-  const renderItemTitle = (ev) => {
-    const { isFolder, title } = ev.item;
-
-    let IconEl = null;
-
-    if (isFolder) {
-      const iconName = ev.context.isExpanded ? "folder_open" : "folder";
-      IconEl = <Icon name={iconName} />;
-    } else {
-      IconEl = getFileIcon(title) || <Icon name="insert_drive_file" />;
-    }
-
-    return <ItemTitle title={title}>{IconEl}</ItemTitle>;
-  };
-
   const onItemSelect = (item) => {
     const panel = dockViewApi.getPanel(item.index);
 
@@ -39,11 +24,11 @@ function FileTree({ items, treeRef }) {
 
     dockViewApi.addPanel({
       id: item.index,
+      component: "editor",
+      title: item.title,
       params: {
         path: item.path
-      },
-      component: "editor",
-      title: item.title
+      }
     });
   };
 
@@ -71,13 +56,26 @@ function FileTree({ items, treeRef }) {
   );
 }
 
-function ItemTitle({ title, children }) {
-  return (
-    <>
-      {children}
-      <p>{title}</p>
-    </>
-  );
+function renderItemTitle(ev) {
+  const { isFolder, title } = ev.item;
+
+  let IconEl = null;
+
+  if (isFolder) {
+    const iconName = ev.context.isExpanded ? "folder_open" : "folder";
+    IconEl = <Icon name={iconName} />;
+  } else {
+    IconEl = getFileIcon(title) || <Icon name="insert_drive_file" />;
+  }
+
+  return <ItemTitle title={title}>{IconEl}</ItemTitle>;
 }
+
+const ItemTitle = ({ title, children }) => (
+  <>
+    {children}
+    <p>{title}</p>
+  </>
+);
 
 export default memo(FileTree);

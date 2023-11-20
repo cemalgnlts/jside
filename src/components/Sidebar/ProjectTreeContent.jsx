@@ -5,21 +5,15 @@ import ProjectTree from "../ProjectTree";
 import Button from "@components/Button";
 import Icon from "../Icon";
 
-import { $dockViewApi, $projectTree, $updateProjectTree } from "../../state";
+import { $dockViewApi, $updateProjectTree } from "../../state";
 
 import styles from "./styles.module.css";
-import { useEffect } from "react";
 
 function ProjectsTreeContent() {
-  const projectTree = useAtomValue($projectTree);
   const refreshProjectTree = useSetAtom($updateProjectTree);
 
   /** @type {import("dockview").DockviewApi} */
   const dockViewApi = useAtomValue($dockViewApi);
-
-  useEffect(() => {
-    refreshProjectTree();
-  }, []);
 
   const newProject = () => {
     const panel = dockViewApi.getPanel("newProject");
@@ -58,7 +52,7 @@ function ProjectsTreeContent() {
         </div>
       </div>
       <div className="rct-dark">
-        <ProjectTree items={projectTree} />
+        <ProjectTree />
       </div>
     </>
   );

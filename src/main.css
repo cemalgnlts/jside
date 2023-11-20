@@ -150,7 +150,7 @@ section {
   font-size: 0.95rem !important;
 }
 
-.btn > .icon {
+.btn:not(.btn-icon) > .icon {
   vertical-align: middle;
   margin-right: var(--space-s);
 }
@@ -241,7 +241,7 @@ section {
   align-items: center;
   justify-content: center;
   min-width: 8em;
-  margin: 0 0.5em;
+  margin: 0 0.5em 0 1em;
   gap: 0.5em;
 }
 

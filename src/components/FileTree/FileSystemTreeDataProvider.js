@@ -1,4 +1,4 @@
-import { FileSystem } from "../../state";
+import { FileSystem } from "../../libs/FileSystem";
 
 export default class FileSystemTreeDataProvider {
   changeHandler = null;

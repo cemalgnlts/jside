@@ -21,7 +21,7 @@ function PromptDialog({ title, onEnter }) {
       else if (ev.key === "Enter") {
         const value = ev.target.value.trim();
 
-        if (onEnter && value.length > 1) onEnter();
+        if (onEnter && value.length > 1) onEnter(value);
         close();
       }
     };

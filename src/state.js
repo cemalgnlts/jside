@@ -5,16 +5,14 @@ import { FileSystem } from "./libs/FileSystem";
 import { convertFilesToTree } from "./utils/Utils";
 
 const store = atom({
-  currentProject: "test",
-  currentDir: "/test"
+  currentProject: "",
+  currentDir: "/projects"
 });
 
 const $dockViewApi = atom(null);
 
 const $projectTree = atom({
-  root: {
-    name: ""
-  }
+  root: {}
 });
 
 const $updateProjectTree = atom(null, async (get, set) => {
@@ -24,15 +22,13 @@ const $updateProjectTree = atom(null, async (get, set) => {
 
   let files = await FileSystem.get().readdir(currentDir);
   files = files.map((folder) => `${currentDir}/${folder}/`);
-  const format = await convertFilesToTree(files, currentDir);
+  const format = await convertFilesToTree(files, currentDir, true);
 
   set($projectTree, { ...format });
 });
 
 const $fileTree = atom({
-  root: {
-    name: ""
-  }
+  root: {}
 });
 
 const $updateFileTree = atom(null, async (get, set) => {

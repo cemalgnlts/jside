@@ -9,16 +9,12 @@ import styles from "./styles.module.css";
 
 const FileTree = lazy(() => import("@components/FileTree"));
 
-function ProjectsTreeContent() {
+function ProjectsTreeContent({ tree }) {
   /** @type {React.MutableRefObject<import("react-complex-tree").TreeRef>} */
   let treeRef = useRef(null);
-  const files = useAtomValue($fileTree);
+  const files = useAtomValue(tree);
   const insertFile = useSetAtom($insertFile);
   const updateFileTree = useSetAtom($updateFileTree);
-
-  useEffect(() => {
-    updateFileTree();
-  }, []);
 
   useEffect(() => {
     if (treeRef && files["new"]) {

@@ -7,33 +7,10 @@ import Icon from "../Icon";
 import { useAtomValue } from "jotai";
 import { $projectTree } from "../../state";
 
-const items = {
-  root: {
-    index: "root",
-    canMove: true,
-    isFolder: true,
-    children: ["child1", "child2"],
-    title: "Root item",
-    canRename: true
-  },
-  child1: {
-    index: "child1",
-    title: "Child item 1"
-  },
-  child2: {
-    index: "child2",
-    title: "Child item 2"
-  }
-};
+function ProjectTree() {
+  const items = useAtomValue($projectTree);
 
-function ProjectTree(items) {
-  const renderItem = (item) => {
-    return (
-      <ItemTitle title={item.title}>
-        <Icon name="folder" />
-      </ItemTitle>
-    );
-  };
+  const onItemSelect = (item) => console.log(item);
 
   return (
     <UncontrolledTreeEnvironment
@@ -46,6 +23,7 @@ function ProjectTree(items) {
       getItemTitle={(item) => item.title}
       renderItemTitle={renderItem}
       disableMultiselect={true}
+      onPrimaryAction={onItemSelect}
       viewState={{}}
     >
       <Tree treeId="projectTree" rootItem="root" treeLabel="Project Tree" />
@@ -53,13 +31,19 @@ function ProjectTree(items) {
   );
 }
 
-function ItemTitle({ title, children }) {
+const renderItem = (item) => {
   return (
-    <>
-      {children}
-      <p>{title}</p>
-    </>
+    <ItemTitle title={item.title}>
+      <Icon name="folder" />
+    </ItemTitle>
   );
-}
+};
+
+const ItemTitle = ({ title, children }) => (
+  <>
+    {children}
+    <p>{title}</p>
+  </>
+);
 
 export default ProjectTree;

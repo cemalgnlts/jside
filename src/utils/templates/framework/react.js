@@ -7,7 +7,7 @@ const files = {
 "react": "^18.2.0",
 "react-dom": "^18.2.0"
 }`,
-  "/public/index.html": `<!DOCTYPE html>
+  "public/index.html": `<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="utf-8">

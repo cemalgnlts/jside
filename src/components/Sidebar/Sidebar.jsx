@@ -1,4 +1,7 @@
 import { Suspense, lazy } from "react";
+
+import { $projectTree } from "../../state";
+
 import styles from "./styles.module.css";
 
 const FileTreeContent = lazy(() => import("./FileTreeContent.jsx"));
@@ -8,7 +11,7 @@ function Sidebar() {
   return (
     <aside className={styles.sidebar}>
       <Suspense fallback={<p>Loading...</p>}>
-        <ProjectTreeContent />
+        <FileTreeContent tree={$projectTree} />
       </Suspense>
     </aside>
   );
