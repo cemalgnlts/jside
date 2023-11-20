@@ -8,6 +8,12 @@ export default class FileSystemTreeDataProvider {
     this.items = items;
   }
 
+  update(items) {
+    this.items = items;
+
+    this.changeHandler(Object.keys(this.items));
+  }
+
   async getTreeItem(itemId) {
     return this.items[itemId];
   }

@@ -251,7 +251,7 @@ section {
   background-color: transparent;
 }
 
-.tab.inactive-tab .btn-ghost {
+.tab.inactive-tab:not(:hover) .btn-ghost {
   visibility: hidden;
 }
 

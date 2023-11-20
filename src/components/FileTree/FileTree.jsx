@@ -1,4 +1,4 @@
-import { memo, useEffect, useState } from "react";
+import { memo, useEffect, useRef, useState } from "react";
 
 import { UncontrolledTreeEnvironment, Tree } from "react-complex-tree";
 
@@ -13,7 +13,16 @@ function FileTree({ items, treeRef, isProjectExplorer }) {
   /** @type {import("dockview").DockviewApi} */
   const dockViewApi = useAtomValue($dockViewApi);
   const openProject = useSetAtom($openProject);
-  
+  const provider = useRef(null);
+
+  if (provider.current === null) {
+    provider.current = new FileSystemTreeDataProvider(items);
+  }
+
+  useEffect(() => {
+    provider.current.update(items);
+  }, [items]);
+
   const selectFile = (item) => {
     const panel = dockViewApi.getPanel(item.index);
 
@@ -51,7 +60,7 @@ function FileTree({ items, treeRef, isProjectExplorer }) {
 
   return (
     <UncontrolledTreeEnvironment
-      dataProvider={new FileSystemTreeDataProvider(items)}
+      dataProvider={provider.current}
       getItemTitle={(item) => item.title}
       renderItemTitle={preRenderItemTitle}
       onPrimaryAction={onItemSelect}

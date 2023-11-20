@@ -89,5 +89,16 @@ export async function convertFilesToTree(paths, currentDir, noFolder = false) {
     else parentNode.children.push(path);
   }
 
+  for (const file of Object.values(format)) {
+    if (!file.isFolder) continue;
+
+    file.children.sort((a, b) => {
+      if (a.endsWith("/")) return -1;
+      else if (b.endsWith("/")) return 1;
+
+      return a.localeCompare(b);
+    });
+  }
+
   return format;
 }
