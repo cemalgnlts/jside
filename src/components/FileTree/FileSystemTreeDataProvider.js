@@ -1,4 +1,4 @@
-import { fileSystem } from "../../state";
+import { FileSystem } from "../../state";
 
 export default class FileSystemTreeDataProvider {
   changeHandler = null;
@@ -23,7 +23,7 @@ export default class FileSystemTreeDataProvider {
   }
 
   async onRenameItem(item, name) {
-    await fileSystem.renameFile(item.index, name);
+    await FileSystem.get().renameFile(item.index, name);
 
     // let newPath = item.index.split("/");
     // newPath.pop();

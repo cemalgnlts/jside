@@ -1,10 +1,8 @@
 import { atom } from "jotai";
 
-import FileSystem from "./libs/FileSystem";
+import { FileSystem } from "./libs/FileSystem";
 
-import { formatProjectFilesAsTree } from "./utils";
-
-let fileSystem = null;
+import { convertFilesToTree } from "./utils/Utils";
 
 const store = atom({
   currentProject: "test",
@@ -13,6 +11,24 @@ const store = atom({
 
 const $dockViewApi = atom(null);
 
+const $projectTree = atom({
+  root: {
+    name: ""
+  }
+});
+
+const $updateProjectTree = atom(null, async (get, set) => {
+  const currentDir = "/projects";
+
+  if (!FileSystem._fsManager) return;
+
+  let files = await FileSystem.get().readdir(currentDir);
+  files = files.map((folder) => `${currentDir}/${folder}/`);
+  const format = await convertFilesToTree(files, currentDir);
+
+  set($projectTree, { ...format });
+});
+
 const $fileTree = atom({
   root: {
     name: ""
@@ -20,15 +36,10 @@ const $fileTree = atom({
 });
 
 const $updateFileTree = atom(null, async (get, set) => {
-  if (!fileSystem) {
-    fileSystem = await FileSystem.getFileSystem();
-    globalThis.fileSystem = fileSystem;
-  }
-
   const currentDir = get(store).currentDir;
 
-  const files = await fileSystem.readdir(currentDir, { recursive: true });
-  const format = await formatProjectFilesAsTree(files, currentDir);
+  const files = await FileSystem.get().readdir(currentDir, { recursive: true });
+  const format = await convertFilesToTree(files, currentDir);
 
   set($fileTree, { ...format });
 });
@@ -49,4 +60,11 @@ const $insertFile = atom(null, (get, set, info) => {
   set($fileTree, clone);
 });
 
-export { $dockViewApi, $fileTree, $updateFileTree, $insertFile, fileSystem };
+export {
+  $dockViewApi,
+  $projectTree,
+  $updateProjectTree,
+  $fileTree,
+  $updateFileTree,
+  $insertFile
+};

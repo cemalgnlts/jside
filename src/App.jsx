@@ -6,24 +6,39 @@ const GridView = lazy(() => import("./components/GridView/GridView.jsx"));
 
 function App() {
   const [ready, setReady] = useState(false);
+  const [showPermissionBtn, setShowPermissionBtn] = useState(false);
+
+  const permissionGranted = () => {
+    setReady(true);
+  };
 
   useEffect(() => {
-    const treeReady = () => {
-      setReady(true);
-    };
+    const treeReady = () => setShowPermissionBtn(true);
 
-    // Called from LoadingCircle.
-    document.addEventListener("tree-ready", treeReady);
+    document.addEventListener("grid-ready", treeReady, { once: true });
+
+    return () => document.removeEventListener("grid-ready", treeReady);
   }, []);
 
   return (
     <>
-      {!ready && <Splash />}
-      <Suspense fallback={<LoadingIcon />}>
+      {!ready && (
+        <Splash
+          showPermissionBtn={showPermissionBtn}
+          onGranted={permissionGranted}
+        />
+      )}
+      <Suspense fallback={<FallbackNotifier />}>
         <GridView />
       </Suspense>
     </>
   );
+}
+
+function FallbackNotifier() {
+  useEffect(() => {
+    return () => document.dispatchEvent(new Event("grid-ready"));
+  }, []);
 }
 
 export default App;

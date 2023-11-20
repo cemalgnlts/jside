@@ -4,6 +4,8 @@ import {
   UncontrolledTreeEnvironment
 } from "react-complex-tree";
 import Icon from "../Icon";
+import { useAtomValue } from "jotai";
+import { $projectTree } from "../../state";
 
 const items = {
   root: {
@@ -16,15 +18,15 @@ const items = {
   },
   child1: {
     index: "child1",
-    title: "Child item 1",
+    title: "Child item 1"
   },
   child2: {
     index: "child2",
-    title: "Child item 2",
+    title: "Child item 2"
   }
 };
 
-function ProjectTree() {
+function ProjectTree(items) {
   const renderItem = (item) => {
     return (
       <ItemTitle title={item.title}>

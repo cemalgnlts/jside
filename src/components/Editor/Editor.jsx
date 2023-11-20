@@ -1,8 +1,11 @@
 import { useEffect, useRef } from "react";
 import { monaco, defaultOptions } from "./monacoLoader.js";
 import { useAtomValue } from "jotai";
-import { fileSystem } from "../../state.js";
-import { getCodeLanguageFromName } from "../../utils/index.js";
+import {
+  getCodeLanguageFromName,
+  getOrCreateModel
+} from "../../utils/Utils.js";
+import { FileSystem } from "../../libs/FileSystem/index.js";
 
 /** @param {import("dockview").ISplitviewPanelProps} props*/
 function Editor(props) {
@@ -17,14 +20,7 @@ function Editor(props) {
     let viewState = null;
 
     const getContent = async (path) => {
-      const uri = monaco.Uri.file(path);
-      let model = monaco.editor.getModel(uri);
-
-      if (!model) {
-        const content = await fileSystem.readFile(path, "utf8");
-        const language = getCodeLanguageFromName(path);
-        model = monaco.editor.createModel(content, language, uri);
-      }
+      const model = await getOrCreateModel(path);
 
       options.model = model;
       editor = monaco.editor.create(editorContainerRef.current, options);

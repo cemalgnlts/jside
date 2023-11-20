@@ -1,17 +1,15 @@
 import Path from "./Path.js";
 
-class OPFileSystem {
+class FileSystemManager {
   /** @type {FileSystemDirectoryHandle} */
   _rootDirHandle = null;
 
-  constructor() {}
-
-  async requestPermission() {
-    await navigator.storage
-      .persisted()
-      .catch(() => navigator.storage.persist());
-
-    this._rootDirHandle = await navigator.storage.getDirectory();
+  /**
+   *
+   * @param {FileSystemDirectoryHandle} rootDir
+   */
+  constructor(rootDir) {
+    this._rootDirHandle = rootDir;
   }
 
   /**
@@ -22,7 +20,7 @@ class OPFileSystem {
       const dir = Path.dirname(path);
 
       if (dir !== "") await this.mkdir(dir);
-      
+
       await this.writeFile(path, text);
     }
   }
@@ -189,9 +187,6 @@ class OPFileSystem {
   }
 
   normalizePath(path = "") {
-    if (this._rootDirHandle === null)
-      throw Error("First use requestPermission() function!");
-
     let fixedPath = path.trim();
 
     if (fixedPath.length < 1) throw Error("Wrong or empty path attribute!");
@@ -204,4 +199,4 @@ class OPFileSystem {
   }
 }
 
-export default OPFileSystem;
+export default FileSystemManager;
