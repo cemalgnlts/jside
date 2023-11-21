@@ -17,7 +17,12 @@ function App() {
   };
 
   useEffect(() => {
-    const treeReady = () => setShowPermissionBtn(true);
+    const treeReady = async () => {
+      // Preload editor font.
+      await document.fonts.load("1rem Fira Code");
+
+      setShowPermissionBtn(true);
+    };
 
     document.addEventListener("grid-ready", treeReady, { once: true });
     return () => document.removeEventListener("grid-ready", treeReady);

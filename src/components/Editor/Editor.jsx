@@ -1,11 +1,6 @@
 import { useEffect, useRef } from "react";
 import { monaco, defaultOptions } from "./monacoLoader.js";
-import { useAtomValue } from "jotai";
-import {
-  getCodeLanguageFromName,
-  getOrCreateModel
-} from "../../utils/Utils.js";
-import { FileSystem } from "../../libs/FileSystem/index.js";
+import { getOrCreateModel } from "../../utils/Utils.js";
 
 /** @param {import("dockview").ISplitviewPanelProps} props*/
 function Editor(props) {
