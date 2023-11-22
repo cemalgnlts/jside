@@ -70,30 +70,6 @@
   --space-m: 16px;
 }
 
-/*:root {
-  --color-bg: #1f1f1f;
-  --color-fg: #cecdc3;
-  --color-bg-secondary: #181818;
-  --color-fg-secondary: #adaaa4;
-  --color-fg-muted: #575653;
-
-  --color-ui: #313131;
-  --color-ui-hover: #343331;
-  --color-ui-active: #403e3c;
-
-  --color-error: #af3029;
-  --color-success: #66800b;
-  --color-info: #205ea6;
-  --color-warning: #bc5215;
-  --color-active: #3aa99f;
-
-  --radius-1: 4px;
-  --radius-2: 8px;
-
-  --space-s: 8px;
-  --space-m: 16px;
-}*/
-
 html,
 body,
 #root {
@@ -217,7 +193,7 @@ section {
   --dv-floating-box-shadow: var(--color-ui-active) 0px 0px 0px 2px;
   --dv-group-view-background-color: var(--color-bg);
   --dv-tabs-and-actions-container-background-color: var(--color-ui);
-  --dv-activegroup-visiblepanel-tab-background-color: var(--color-bg);
+  --dv-activegroup-visiblepanel-tab-background-color: var(--color-bg-secondary);
   --dv-activegroup-hiddenpanel-tab-background-color: var(--color-ui);
   --dv-inactivegroup-visiblepanel-tab-background-color: var(--color-bg);
   --dv-inactivegroup-hiddenpanel-tab-background-color: var(--color-ui);
@@ -252,12 +228,17 @@ section {
   background-color: transparent;
 }
 
-.tab.inactive-tab:not(:hover) .btn-ghost {
+.tab.inactive-tab:not(:hover) .btn-ghost,
+.groupview.inactive-group:not(:hover) .btn-ghost {
   visibility: hidden;
 }
 
-.tab.inactive-tab .icon,
-.groupview.inactive-group .icon {
+.tab .btn-ghost {
+  color: var(--color-fg);
+}
+
+.tab.inactive-tab button:not(.btn-ghost) .icon,
+.groupview.inactive-group button:not(.btn-ghost) .icon {
   opacity: 0.5;
 }
 

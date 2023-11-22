@@ -56,4 +56,15 @@ monaco.languages.html.htmlDefaults.setOptions({
   }
 });
 
+monaco.editor.defineTheme("dark", {
+  base: "vs-dark",
+  inherit: true,
+  rules: [],
+  colors: {
+    "editor.background": "#1c1b1a"
+  }
+});
+
+monaco.editor.setTheme("dark");
+
 export { monaco, defaultOptions };

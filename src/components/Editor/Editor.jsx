@@ -20,6 +20,8 @@ function Editor(props) {
       options.model = model;
       editor = monaco.editor.create(editorContainerRef.current, options);
       editor.focus();
+
+      editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, () => {});
     };
 
     const activeListener = props.api.onDidActiveChange((ev) => {
