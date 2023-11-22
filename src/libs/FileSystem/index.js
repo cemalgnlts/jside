@@ -1,4 +1,5 @@
 import FileSystemManager from "./FileSystemManager.js";
+import { IDBHelper } from "./IDBHerlper.js";
 
 class FileSystem {
   static _fsManager = null;
@@ -14,15 +15,27 @@ class FileSystem {
    */
   static async requestPermission() {
     /** @type {FileSystemDirectoryHandle} */
-    let root = null;
+    let root = await IDBHelper.get("rootDirectoryHandle").catch(() => null);
 
-    if (!!window.showDirectoryPicker) {
-      root = await window.showDirectoryPicker({
-        mode: "readwrite",
-        startIn: "documents"
-      });
-    } else {
-      root = await this._privateFileSystem();
+    if (root) {
+      let isWritable = await root.queryPermission({ mode: "readwrite" });
+
+      if (isWritable !== "granted") {
+        isWritable = await root.requestPermission({ mode: "readwrite" });
+
+        if (isWritable !== "granted") throw { name: "AbortError" };
+      }
+    }
+
+    if (!root) {
+      if (!!window.showDirectoryPicker) {
+        root = await window.showDirectoryPicker({
+          mode: "readwrite",
+          startIn: "documents"
+        });
+      } else {
+        root = await this._privateFileSystem();
+      }
     }
 
     if (root.name !== "JSIDE")
@@ -32,6 +45,10 @@ class FileSystem {
     await root.getDirectoryHandle("libs", { create: true });
     await root.getDirectoryHandle("types", { create: true });
     await root.getDirectoryHandle("dist", { create: true });
+
+    await IDBHelper.set("rootDirectoryHandle", root).catch((err) =>
+      console.warn("Why didn't you allow my web app to use IndexedDB?!", err)
+    );
 
     this._fsManager = new FileSystemManager(root);
 

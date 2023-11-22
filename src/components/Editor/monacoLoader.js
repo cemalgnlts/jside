@@ -14,6 +14,7 @@ const defaultOptions = {
   fontFamily: "Fira Code",
   fontLigatures: false,
   fontSize: 16,
+
   minimap: {
     enabled: false
   },
@@ -47,5 +48,12 @@ self.MonacoEnvironment = {
 monaco.editor.setTheme("vs-dark");
 monaco.languages.typescript.javascriptDefaults.setEagerModelSync(true);
 monaco.languages.typescript.typescriptDefaults.setEagerModelSync(true);
+
+monaco.languages.html.htmlDefaults.setOptions({
+  format: {
+    indentInnerHtml: true,
+    tabSize: 2
+  }
+});
 
 export { monaco, defaultOptions };
