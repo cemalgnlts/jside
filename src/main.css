@@ -275,6 +275,7 @@ section {
 
 .rct-dark .icon {
   margin-right: var(--space-s);
+  font-size: 1.2rem;
 }
 /* #endregion */
 

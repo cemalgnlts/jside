@@ -24,19 +24,6 @@ export function explainFSError(err) {
   return err.message;
 }
 
-export async function getOrCreateModel(path) {
-  const uri = monaco.Uri.file(path);
-  let model = monaco.editor.getModel(uri);
-
-  if (!model) {
-    const content = await FileSystem.get().readFile(path, "utf8");
-    const language = getCodeLanguageFromName(path);
-    model = monaco.editor.createModel(content, language, uri);
-  }
-
-  return model;
-}
-
 export function getCodeLanguageFromName(name) {
   const ext = name.slice(name.lastIndexOf(".") + 1);
 

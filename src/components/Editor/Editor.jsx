@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import { monaco, defaultOptions } from "./monacoLoader.js";
-import { getOrCreateModel } from "../../utils/Utils.js";
+import { disposeEditor, getOrCreateModel, registerEditor } from "./utils.js";
 
 /** @param {import("dockview").ISplitviewPanelProps} props*/
 function Editor(props) {
@@ -15,13 +15,10 @@ function Editor(props) {
     let viewState = null;
 
     const getContent = async (path) => {
-      const model = await getOrCreateModel(path);
+      options.model = await getOrCreateModel(path);
 
-      options.model = model;
       editor = monaco.editor.create(editorContainerRef.current, options);
-      editor.focus();
-
-      editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, () => {});
+      registerEditor(editor);
     };
 
     const activeListener = props.api.onDidActiveChange((ev) => {
@@ -37,7 +34,7 @@ function Editor(props) {
     getContent(props.params.path);
 
     return () => {
-      if (editor) editor.dispose();
+      if (editor) disposeEditor(editor);
 
       activeListener.dispose();
     };
