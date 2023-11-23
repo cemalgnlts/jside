@@ -23,13 +23,13 @@ function ProjectsTreeContent({ tree, updateTree, title, isProjectExplorer }) {
 
   useEffect(() => {
     if (treeRef && items["new"]) {
-      setTimeout(() => treeRef.current.startRenamingItem("new"), 50);
+      requestAnimationFrame(() => treeRef.current.startRenamingItem("new"));
     }
   }, [items]);
 
   const addNewFile = () => {
     if (!isProjectExplorer) {
-      insertFile({ parent: "root" });
+      insertFile({ parentIndex: "root", relativeParentPath: "" });
       return;
     }
 

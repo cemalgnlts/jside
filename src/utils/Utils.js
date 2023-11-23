@@ -2,6 +2,8 @@ import { FileSystem } from "../libs/FileSystem";
 import Path from "../libs/FileSystem/Path";
 import { monaco } from "../components/Editor/monacoLoader";
 
+export function openFile(index, title, path) {}
+
 export function explainFSError(err) {
   switch (err.name) {
     case "AbortError":
@@ -34,6 +36,8 @@ export function getCodeLanguageFromName(name) {
     case "ts":
     case "tsx":
       return "typescript";
+    case "md":
+      return "markdown";
     default:
       return ext;
   }

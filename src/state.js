@@ -53,16 +53,18 @@ const $updateFileTree = atom(null, async (get, set) => {
 
 const $insertFile = atom(null, (get, set, info) => {
   const tree = get($fileTree);
+  const projectDir = get(currentStatus).dir;
 
   const clone = { ...tree };
   clone["new"] = {
     index: "new",
     title: "",
     path: "",
+    parent: `${projectDir}/${info.relativeParentPath}`,
     isFolder: false
   };
 
-  clone[info.parent].children.push("new");
+  clone[info.parentIndex].children.push("new");
 
   set($fileTree, clone);
 });

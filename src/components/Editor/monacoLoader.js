@@ -95,6 +95,8 @@ monaco.languages.typescript.typescriptDefaults.setEagerModelSync(true);
 /** @type {monaco.languages.typescript.CompilerOptions} */
 const jsCompilerOptions = {
   ...monaco.languages.typescript.javascriptDefaults.getCompilerOptions(),
+  target: monaco.languages.typescript.ScriptTarget.ESNext,
+  module: monaco.languages.typescript.ModuleKind.ESNext,
   typeRoots: ["/types/"],
   noSemanticValidation: false,
   noSyntaxValidation: false

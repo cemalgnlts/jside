@@ -29,15 +29,30 @@ export default class FileSystemTreeDataProvider {
   }
 
   async onRenameItem(item, name) {
-    await FileSystem.get().renameFile(item.index, name);
+    const fs = FileSystem.get();
+
+    if (item.index === "new") {
+      const path = `${item.parent}/${name}`;
+      item.path = path;
+
+      const isExists = await fs.isExists(item.path);
+
+      if (isExists) {
+        alert("File already exists.");
+        return;
+      }
+
+      await fs.writeFile(item.path, "");
+    } else {
+      await fs.renameFile(item.index, name);
+    }
 
     // let newPath = item.index.split("/");
     // newPath.pop();
     // newPath.push(name);
     // newPath = newPath.push("/");
 
-    this.items[item.index].title = name;
-    // this.item[item.index].path = newPath;
+    this.items[item.index] = item;
 
     this.changeHandler?.([item.index]);
   }

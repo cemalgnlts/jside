@@ -148,6 +148,21 @@ class FileSystemManager {
   }
 
   /**
+   * @returns {Promise<boolean>} path
+   */
+  async isExists(path) {
+    const sourceFixedPath = this.normalizePath(path);
+    const { dir, base } = Path.parse(sourceFixedPath);
+
+    const dirHandle = await this._getParentDirectoryHandle(dir);
+
+    return dirHandle
+      .getFileHandle(base)
+      .then(() => true)
+      .catch(() => false);
+  }
+
+  /**
    *
    * @param {String} path
    * @returns {Promise<FileSystemDirectoryHandle>}

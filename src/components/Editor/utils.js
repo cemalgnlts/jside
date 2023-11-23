@@ -31,8 +31,6 @@ export async function registerEditor(editor) {
     contextMenuGroupId: "modification",
     keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS],
     async run(editor) {
-      if (isSaving) return alert("wait");
-
       const model = editor.getModel();
       const path = model.uri.fsPath;
       const value = model.getValue();
