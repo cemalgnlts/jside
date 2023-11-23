@@ -4,9 +4,10 @@ import App from "./App.jsx";
 // import "./main.css";
 
 import { Provider } from "jotai";
+import { store } from "./state.js";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
-  <Provider>
+  <Provider store={store}>
     <App />
   </Provider>
 );

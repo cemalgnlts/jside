@@ -1,22 +1,24 @@
-import { atom } from "jotai";
+import { atom, createStore } from "jotai";
 
 import { FileSystem } from "./libs/FileSystem";
 
 import { convertFilesToTree } from "./utils/Utils";
 
-const store = atom({
+const store = createStore();
+
+const currentStatus = atom({
   isProjectExplorer: true,
-  currentProject: "",
-  currentDir: "/projects"
+  projectName: "",
+  dir: "/projects"
 });
 
 const $dockViewApi = atom(null);
-const $isProjectExplorer = atom((get) => get(store).isProjectExplorer);
+const $isProjectExplorer = atom((get) => get(currentStatus).isProjectExplorer);
 const $openProject = atom(null, (get, set, { title, path }) => {
-  set(store, {
+  set(currentStatus, {
     isProjectExplorer: false,
-    currentProject: title,
-    currentDir: path
+    projectName: title,
+    dir: path
   });
 });
 
@@ -41,7 +43,7 @@ const $fileTree = atom({
 });
 
 const $updateFileTree = atom(null, async (get, set) => {
-  const currentDir = get(store).currentDir;
+  const currentDir = get(currentStatus).dir;
 
   const files = await FileSystem.get().readdir(currentDir, { recursive: true });
   const format = await convertFilesToTree(files, currentDir);
@@ -73,5 +75,6 @@ export {
   $updateProjectTree,
   $fileTree,
   $updateFileTree,
-  $insertFile
+  $insertFile,
+  store
 };
