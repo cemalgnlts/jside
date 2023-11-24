@@ -34,3 +34,49 @@
 .sidebar:hover .header > .actions {
   visibility: visible;
 }
+
+/* #region Context Menu */
+.contextMenu {
+  width: 100%;
+  height: 100%;
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 6;
+  display: none;
+}
+
+.contextMenu > ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  background-color: var(--color-ui);
+  border-radius: var(--radius-1);
+  border: solid 2px var(--color-ui-hover);
+  overflow: hidden;
+  width: min-content;
+  position: absolute;
+  left: var(--left, 0);
+  top: var(--top, 0);
+  box-shadow: 0 0 8px 2px rgba(0, 0, 0, 0.4);
+}
+
+.contextMenu > ul > li:not(.divider) {
+  cursor: pointer;
+  display: flex;
+  gap: var(--space-m);
+  padding: var(--space-s) var(--space-m);
+}
+
+.contextMenu > ul > li.divider {
+  border-top: solid 1px var(--color-ui-hover);
+}
+
+.contextMenu > ul > li:hover {
+  background-color: var(--color-ui-hover);
+}
+
+.contextMenu > ul > li:active {
+  background-color: var(--color-ui-active);
+}
+/* #endregion */

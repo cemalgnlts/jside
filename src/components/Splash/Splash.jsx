@@ -29,7 +29,7 @@ function Splash({ showPermissionBtn, onGranted }) {
       {showPermissionBtn && (
         <Button style={{ marginTop: "3em" }} onClick={requestPermission}>
           <Icon name="folder" />
-          Request Permission
+          Request Storage Permission
         </Button>
       )}
 

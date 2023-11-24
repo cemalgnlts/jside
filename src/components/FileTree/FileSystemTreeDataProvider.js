@@ -32,17 +32,18 @@ export default class FileSystemTreeDataProvider {
     const fs = FileSystem.get();
 
     if (item.index === "new") {
-      const path = `${item.parent}/${name}`;
+      const path = `${item.parent}${name}`;
       item.path = path;
+      item.title = name;
 
-      const isExists = await fs.isExists(item.path);
+      const isExists = await fs.isExists(item.path).catch(alert);
 
       if (isExists) {
         alert("File already exists.");
         return;
       }
 
-      await fs.writeFile(item.path, "");
+      await fs.writeFile(item.path, "").catch(alert);
     } else {
       await fs.renameFile(item.index, name);
     }
@@ -55,6 +56,18 @@ export default class FileSystemTreeDataProvider {
     this.items[item.index] = item;
 
     this.changeHandler?.([item.index]);
+  }
+
+  async remove(itemId) {
+    try {
+      await FileSystem.get().rm(this.items[itemId].path);
+    } catch (err) {
+      console.error(err);
+      alert(err);
+      return;
+    }
+
+    delete this.items[itemId];
   }
 
   async onChangeItemChildren(itemId, newChildren) {

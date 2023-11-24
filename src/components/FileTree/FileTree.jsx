@@ -1,4 +1,4 @@
-import { memo, useEffect, useRef, useState } from "react";
+import { memo, useEffect, useLayoutEffect, useRef, useState } from "react";
 
 import { UncontrolledTreeEnvironment, Tree } from "react-complex-tree";
 
@@ -9,11 +9,10 @@ import { $dockViewApi, $openProject } from "../../state";
 
 import FileSystemTreeDataProvider from "./FileSystemTreeDataProvider";
 
-function FileTree({ items, treeRef, isProjectExplorer }) {
+function FileTree({ items, provider, treeRef, onContextMenu, isProjectExplorer }) {
   /** @type {import("dockview").DockviewApi} */
   const dockViewApi = useAtomValue($dockViewApi);
   const openProject = useSetAtom($openProject);
-  const provider = useRef(null);
 
   if (provider.current === null) {
     provider.current = new FileSystemTreeDataProvider(items);
@@ -55,8 +54,21 @@ function FileTree({ items, treeRef, isProjectExplorer }) {
     dockViewApi.getPanel(item.index)?.setTitle(name);
   };
 
-  const preRenderItemTitle = (ev) =>
-    renderItemTitle(ev, isProjectExplorer ? "folder" : "insert_drive_file");
+  const preRenderItemTitle = (ev) => {
+    if (items.root.children) {
+      const liEls = document.querySelectorAll(".rct-tree-item-li");
+      const lastItem = items.root.children.at(-1);
+
+      if (ev.item.index === lastItem) {
+        liEls.forEach((li) => (li.oncontextmenu = onContextMenu));
+      }
+    }
+
+    return renderItemTitle(
+      ev,
+      isProjectExplorer ? "folder" : "insert_drive_file"
+    );
+  };
 
   return (
     <UncontrolledTreeEnvironment
@@ -93,11 +105,13 @@ function renderItemTitle(ev, defaultIcon) {
   return <ItemTitle title={title}>{IconEl}</ItemTitle>;
 }
 
-const ItemTitle = ({ title, children }) => (
-  <>
-    {children}
-    <p>{title}</p>
-  </>
-);
+function ItemTitle({ title, children }) {
+  return (
+    <>
+      {children}
+      <p>{title}</p>
+    </>
+  );
+}
 
 export default memo(FileTree);

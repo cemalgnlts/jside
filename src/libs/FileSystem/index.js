@@ -57,7 +57,7 @@ class FileSystem {
 
   /**
    *
-   * @returns {Promise<FileSystemManager>}
+   * @returns {FileSystemManager}
    */
   static get() {
     if (this._fsManager === null) throw Error("First initialize file system.");

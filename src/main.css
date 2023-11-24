@@ -66,8 +66,10 @@
   --radius-1: 4px;
   --radius-2: 8px;
 
+  --space-xs: 4px;
   --space-s: 8px;
   --space-m: 16px;
+  --space-l: 24px;
 }
 
 html,
@@ -160,6 +162,11 @@ section {
 
 .btn-solid:hover {
   opacity: 0.9;
+}
+
+.btn:focus {
+  outline: solid 2px var(--color-info);
+  outline-offset: 1px;
 }
 
 .btn-solid:active {

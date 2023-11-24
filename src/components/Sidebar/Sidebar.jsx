@@ -11,7 +11,7 @@ import {
 import styles from "./styles.module.css";
 import { useAtomValue } from "jotai";
 
-const FileTreeContent = lazy(() => import("./FileTreeContent.jsx"));
+const TreeContent = lazy(() => import("./TreeContent.jsx"));
 
 function Sidebar() {
   const isProjectExplorer = useAtomValue($isProjectExplorer);
@@ -21,7 +21,7 @@ function Sidebar() {
   return (
     <aside className={styles.sidebar}>
       <Suspense fallback={<p>Loading...</p>}>
-        <FileTreeContent
+        <TreeContent
           title="Projects"
           tree={tree}
           updateTree={updateTree}

@@ -67,8 +67,8 @@ export async function convertFilesToTree(paths, currentDir, noFolder = false) {
       index: path,
       title: base,
       path: `${parent}/${base}`,
-      parent,
-      isFolder: !noFolder && isFolder
+      isFolder: !noFolder && isFolder,
+      parent
     };
 
     if (isFolder) format[path].children = [];
