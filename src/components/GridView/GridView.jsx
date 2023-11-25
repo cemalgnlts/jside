@@ -23,7 +23,7 @@ const serializedGridView = {
         {
           type: "leaf",
           data: {
-            id: "header-id",
+            id: "header",
             component: "header",
             minimumHeight: 25,
             maximumHeight: 25
@@ -36,7 +36,7 @@ const serializedGridView = {
               type: "leaf",
               size: 22,
               data: {
-                id: "sidebar-id",
+                id: "sidebar",
                 component: "sidebar",
                 minimumWidth: 200
               }
@@ -45,7 +45,7 @@ const serializedGridView = {
               type: "leaf",
               size: 90,
               data: {
-                id: "main-id",
+                id: "main",
                 component: "main",
                 minimumWidth: 1000,
                 priority: LayoutPriority.High
@@ -56,7 +56,7 @@ const serializedGridView = {
         {
           type: "leaf",
           data: {
-            id: "footer-id",
+            id: "footer",
             component: "footer",
             minimumHeight: 25,
             maximumHeight: 25

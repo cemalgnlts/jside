@@ -177,7 +177,6 @@ section {
   width: 100%;
   background-color: var(--color-ui);
   outline: none;
-  border: none;
   color: inherit;
   padding: var(--space-s);
   border: solid 1px var(--color-ui);
@@ -292,9 +291,37 @@ section {
   --rct-search-text-offset: calc(var(--rct-search-padding) * 2 + 16px);
 }
 
-.rct-dark .icon {
+.rct-tree-item-button > span.icon,
+.rct-tree-item-button > svg {
   margin-right: var(--space-s);
   font-size: 1.2rem;
+}
+
+.rct-tree-item-button:hover > .rct-item-actions {
+  display: block;
+}
+
+.rct-item-actions {
+  display: none;
+  position: absolute;
+  right: 0;
+}
+
+.rct-item-actions:hover {
+  background-color: var(--color-ui-hover);
+}
+
+.rct-item-actions > .btn {
+  display: inline-block;
+  vertical-align: bottom;
+}
+
+.rct-item-actions > .btn:hover {
+  color: var(--color-fg-tertiary);
+}
+
+.rct-item-actions > .btn > .icon {
+  pointer-events: none;
 }
 /* #endregion */
 

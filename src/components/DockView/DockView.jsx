@@ -20,11 +20,25 @@ function DockView() {
     setDockViewApi(ev.api);
   };
 
+  /** @param {import("dockview").DockviewDropEvent} ev */
+  const onDidDrop = (ev) => {
+    // console.log(ev);
+  };
+
+  /** @param {import("dockview").DockviewDndOverlayEvent} ev */
+  const showDndOverlay = (ev) => {
+    const { types } = ev.nativeEvent.dataTransfer;
+
+    return !types.includes("Files") && !types.includes("text/plain");
+  };
+
   return (
     <DockviewReact
       components={components}
       defaultTabComponent={PanelTab}
+      showDndOverlay={showDndOverlay}
       onReady={onReady}
+      onDidDrop={onDidDrop}
     />
   );
 }

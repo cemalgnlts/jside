@@ -56,7 +56,14 @@ export default class FileSystemTreeDataProvider {
 
       await fs.writeFile(item.path, "");
     } else {
-      const newPath = await fs.renameFile(item.path, name);
+      let newPath;
+      try {
+        newPath = await fs.renameFile(item.path, name);
+      } catch (err) {
+        alert(err);
+        return;
+      }
+
       item.title = Path.basename(newPath);
       item.path = newPath;
       item.index = newPath;

@@ -125,11 +125,16 @@ class FileSystemManager {
     const dirHandle = await this._getParentDirectoryHandle(dir);
     const file = await dirHandle.getFileHandle(base);
 
-    await file.move(newName);
+    try {
+      await file.move(newName);
+    } catch (err) {
+      if (err.name === "AbortError") throw Error("Renaming is not supported.");
+    }
 
-    const newPath = await this._rootDirHandle.resolve(file);
+    const newPathParts = await this._rootDirHandle.resolve(file);
+    const absPath = `/${newPathParts.join("/")}`;
 
-    return `/${newPath.join("/")}`;
+    return absPath;
   }
 
   /**
@@ -149,7 +154,11 @@ class FileSystemManager {
       targetFixedPath
     );
 
-    return file.move(targetDirHandle);
+    try {
+      await file.move(targetDirHandle);
+    } catch (err) {
+      if (err.name === "AbortError") throw Error("Moving is not supported.");
+    }
   }
 
   /**
@@ -178,7 +187,7 @@ class FileSystemManager {
 
     if (parts.length === 1 && parts[0] === "") return dirHandle;
 
-    for (const name of path.slice(1).split("/")) {
+    for (const name of parts) {
       dirHandle = await dirHandle.getDirectoryHandle(name);
     }
 

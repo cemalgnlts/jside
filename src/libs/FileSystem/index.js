@@ -75,3 +75,4 @@ class FileSystem {
 }
 
 export { FileSystem };
+globalThis.fs = FileSystem;
