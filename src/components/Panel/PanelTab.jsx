@@ -7,10 +7,14 @@ function PanelTab(props) {
   };
 
   return (
-    <div className="panel-tab">
+    <div
+      className={`panel-tab${
+        props.params.modified ? " panel-tab-modified" : ""
+      }`}
+    >
       {props.params.noIcon !== true &&
         (getFileIcon(props.api.title) || <Icon name="insert_drive_file" />)}
-      <small>{props.api.title}</small>
+      <small className="panel-tab-title">{props.api.title}</small>
       <button onClick={close} className="btn btn-icon btn-ghost">
         <Icon name="close" />
       </button>

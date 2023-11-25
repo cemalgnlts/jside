@@ -24,8 +24,21 @@ function App() {
       setShowPermissionBtn(true);
     };
 
+    /** @param {KeyboardEvent} ev */
+    const onKeyDown = (ev) => {
+      if (ev.ctrlKey && ev.key === "w") {
+        ev.preventDefault();
+        ev.stopPropagation();
+      }
+    };
+
     document.addEventListener("grid-ready", treeReady, { once: true });
-    return () => document.removeEventListener("grid-ready", treeReady);
+    document.addEventListener("keydown", onKeyDown);
+
+    return () => {
+      document.removeEventListener("grid-ready", treeReady);
+      document.removeEventListener("keydown", onKeyDown);
+    };
   }, []);
 
   return (

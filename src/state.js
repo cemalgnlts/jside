@@ -26,6 +26,10 @@ const $projectTree = atom({
   root: {}
 });
 
+const $fileTree = atom({
+  root: {}
+});
+
 const $updateProjectTree = atom(null, async (_, set) => {
   const currentDir = "/projects";
 
@@ -36,10 +40,6 @@ const $updateProjectTree = atom(null, async (_, set) => {
   const format = await convertFilesToTree(files, currentDir, true);
 
   set($projectTree, format);
-});
-
-const $fileTree = atom({
-  root: {}
 });
 
 const $updateFileTree = atom(null, async (get, set) => {

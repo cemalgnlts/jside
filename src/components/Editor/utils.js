@@ -23,8 +23,11 @@ export async function getOrCreateModel(path) {
   return model;
 }
 
-/** @param {monaco.editor.IStandaloneCodeEditor} editor  */
-export async function registerEditor(editor) {
+/**
+ * @param {monaco.editor.IStandaloneCodeEditor} editor
+ * @param {import("dockview").SplitviewPanelApi} panelApi
+ */
+export async function registerEditor(editor, panelApi) {
   const saveAct = editor.addAction({
     id: "save",
     label: "Save",
@@ -37,6 +40,7 @@ export async function registerEditor(editor) {
 
       await FileSystem.get()
         .writeFile(path, value)
+        .then(() => panelApi.updateParameters({ modified: false }))
         .catch((err) => {
           console.error(err);
           alert(err.toString());
@@ -44,7 +48,9 @@ export async function registerEditor(editor) {
     }
   });
 
-  const onChange = editor.onDidChangeModelContent((ev) => console.log(ev));
+  const onChange = editor.onDidChangeModelContent((ev) => {
+    panelApi.updateParameters({ modified: true });
+  });
 
   disposables.push(saveAct, onChange);
 

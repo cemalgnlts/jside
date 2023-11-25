@@ -116,6 +116,7 @@ class FileSystemManager {
    * Rename file.
    * @param {string} path
    * @param {string} newName
+   * @returns {Promise<string>} New file path.
    */
   async renameFile(path, newName) {
     const fixedPath = this.normalizePath(path);
@@ -124,7 +125,11 @@ class FileSystemManager {
     const dirHandle = await this._getParentDirectoryHandle(dir);
     const file = await dirHandle.getFileHandle(base);
 
-    return file.move(newName);
+    await file.move(newName);
+
+    const newPath = await this._rootDirHandle.resolve(file);
+
+    return `/${newPath.join("/")}`;
   }
 
   /**

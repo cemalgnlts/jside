@@ -5,7 +5,7 @@ import { disposeEditor, getOrCreateModel, registerEditor } from "./utils.js";
 /** @param {import("dockview").ISplitviewPanelProps} props*/
 function Editor(props) {
   const editorContainerRef = useRef(null);
-
+  
   useEffect(() => {
     /** @type {monaco.editor.IStandaloneCodeEditor} */
     let editor = null;
@@ -18,7 +18,7 @@ function Editor(props) {
       options.model = await getOrCreateModel(path);
 
       editor = monaco.editor.create(editorContainerRef.current, options);
-      registerEditor(editor);
+      registerEditor(editor, props.api);
     };
 
     const activeListener = props.api.onDidActiveChange((ev) => {

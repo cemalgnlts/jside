@@ -1,4 +1,11 @@
 import { FileSystem } from "../../libs/FileSystem";
+import Path from "../../libs/FileSystem/Path";
+import {
+  $isProjectExplorer,
+  $updateFileTree,
+  $updateProjectTree,
+  store
+} from "../../state";
 
 export default class FileSystemTreeDataProvider {
   changeHandler = null;
@@ -33,29 +40,31 @@ export default class FileSystemTreeDataProvider {
 
     if (item.index === "new") {
       const path = `${item.parent}${name}`;
+      item.index = path;
       item.path = path;
       item.title = name;
 
-      const isExists = await fs.isExists(item.path).catch(alert);
+      const isExists = await fs.isExists(item.path);
 
       if (isExists) {
+        delete this.items[item.index];
+        await this.refresh();
+
         alert("File already exists.");
         return;
       }
 
-      await fs.writeFile(item.path, "").catch(alert);
+      await fs.writeFile(item.path, "");
     } else {
-      await fs.renameFile(item.index, name);
+      const newPath = await fs.renameFile(item.path, name);
+      item.title = Path.basename(newPath);
+      item.path = newPath;
+      item.index = newPath;
     }
-
-    // let newPath = item.index.split("/");
-    // newPath.pop();
-    // newPath.push(name);
-    // newPath = newPath.push("/");
 
     this.items[item.index] = item;
 
-    this.changeHandler?.([item.index]);
+    await this.refresh();
   }
 
   async remove(itemId) {
@@ -68,6 +77,8 @@ export default class FileSystemTreeDataProvider {
     }
 
     delete this.items[itemId];
+
+    await this.refresh();
   }
 
   async onChangeItemChildren(itemId, newChildren) {
@@ -79,5 +90,11 @@ export default class FileSystemTreeDataProvider {
     this.changeHandler = listener;
 
     return { dispose: () => (this.changeHandler = null) };
+  }
+
+  refresh() {
+    const isProjectExplorer = store.get($isProjectExplorer);
+    const updateTree = isProjectExplorer ? $updateProjectTree : $updateFileTree;
+    return store.set(updateTree);
   }
 }

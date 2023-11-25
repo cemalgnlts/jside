@@ -53,10 +53,10 @@
   --color-ui-hover: #343331;
   --color-ui-active: #403e3c;
 
-  --color-error: #af3029;
+  --color-error: #ad8301;
   --color-success: #66800b;
   --color-info: #205ea6;
-  --color-warning: #bc5215;
+  --color-warning: #d0a215;
   --color-active: #24837b;
 
   --color-active-light: #3aa99f;
@@ -228,6 +228,18 @@ section {
   min-width: 8em;
   margin: 0 0.5em 0 1em;
   gap: 0.5em;
+}
+
+.panel-tab-modified {
+  color: var(--color-warning);
+}
+
+.panel-tab-modified > .panel-tab-title::after {
+  content: "circle";
+  font-family: "Material Icons Round";
+  font-size: 10px;
+  margin-left: var(--space-xs);
+  vertical-align: middle;
 }
 
 .split-view-container .sash-container .sash.disabled:active,
