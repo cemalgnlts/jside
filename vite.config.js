@@ -12,8 +12,8 @@ const manifest = {
   display: "fullscreen",
   description:
     "A PWA-powered IDE for the entire JS ecosystem that works completely offline.",
-  theme_color: "#222222",
-  background_color: "#222222",
+  theme_color: "#100f0f",
+  background_color: "#100f0f",
   icons: [
     {
       sizes: "512x512",
@@ -44,9 +44,9 @@ const pwa = VitePWA({
   injectRegister: "inline",
   registerType: "autoUpdate",
   workbox: {
-    globalPatterns: ["**/*"],
-    manifest
-  }
+    globPatterns: ["**/*"]
+  },
+  manifest
 });
 
 // https://vitejs.dev/config/
