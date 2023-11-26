@@ -1,22 +1,36 @@
 import { lazy, useEffect, useState, useRef } from "react";
 
-import { useAtom, useAtomValue, useSetAtom } from "jotai";
-import { $dockViewApi, $insertFile } from "../../state";
+import { useAtomValue } from "jotai";
+import { $fileTree, $projectTree } from "../../state";
 
 import Icon from "../Icon/Icon";
 import Button from "../Button/Button";
 import styles from "./styles.module.css";
 import { FileSystem } from "../../libs/FileSystem";
 import { explainFSError } from "../../utils/Utils";
+import useEvents from "../../hooks/useEvents";
 
 const FileTree = lazy(() => import("@components/FileTree"));
 
-function TreeContent({ fsType, tree, isProjectExplorer }) {
+function TreeContent({ fsType, isProjectExplorer }) {
   /** @type {React.MutableRefObject<import("react-complex-tree").TreeRef>} */
   const treeRef = useRef(null);
   const providerRef = useRef(null);
-  const items = useAtomValue(tree);
-  const [canAccessFS, setCanAccessFS] = useState(FileSystem.hasAccessDeviceFS);
+  const { onEvent } = useEvents();
+  const items = useAtomValue(isProjectExplorer ? $projectTree : $fileTree);
+  const [canAccessFS, setCanAccessFS] = useState(
+    FileSystem.checkPermission(fsType)
+  );
+
+  useEffect(() => {
+    onEvent("rct-collapse", () => {
+      if (treeRef) treeRef.current.collapseAll();
+    });
+
+    // Auto permission request for opfs.
+    if (fsType === "op")
+      FileSystem.requestPermission("op").catch((err) => alert(err));
+  }, []);
 
   useEffect(() => {
     if (treeRef && items["new"]) {
@@ -26,7 +40,7 @@ function TreeContent({ fsType, tree, isProjectExplorer }) {
 
   const requestPermission = async () => {
     try {
-      await FileSystem.requestPermission();
+      await FileSystem.requestPermission(fsType);
       setCanAccessFS(true);
     } catch (err) {
       alert(explainFSError(err));
@@ -46,6 +60,7 @@ function TreeContent({ fsType, tree, isProjectExplorer }) {
         </Button>
       ) : null}
       <FileTree
+        fsType={fsType}
         items={items}
         treeRef={treeRef}
         providerRef={providerRef}

@@ -1,19 +1,33 @@
-import { Suspense, lazy } from "react";
+import { Suspense, lazy, useEffect, useRef } from "react";
 
 import { useAtomValue } from "jotai";
 import { LayoutPriority, PaneviewReact } from "dockview";
 
 import styles from "./styles.module.css";
-import {
-  $projectTree,
-  $isProjectExplorer,
-  $updateProjectTree,
-  $updateFileTree,
-  $fileTree
-} from "../../state";
+import { $currentStatus } from "../../state";
 import PaneHeader from "./PaneHeader.jsx";
 
 const TreeContent = lazy(() => import("./TreeContent.jsx"));
+
+const components = {
+  default: ({
+    api: { id },
+    params: { tree, updateTree, isProjectExplorer }
+  }) => (
+    <Suspense>
+      <TreeContent
+        fsType={id}
+        tree={tree}
+        updateTree={updateTree}
+        isProjectExplorer={isProjectExplorer}
+      />
+    </Suspense>
+  )
+};
+
+const headerComponents = {
+  default: PaneHeader
+};
 
 /** @type {import("dockview").SerializedPaneview} */
 const serializedPaneView = {
@@ -44,22 +58,53 @@ const serializedPaneView = {
 };
 
 function Sidebar() {
-  const isProjectExplorer = useAtomValue($isProjectExplorer);
-  const tree = isProjectExplorer ? $projectTree : $fileTree;
-  const updateTree = isProjectExplorer ? $updateProjectTree : $updateFileTree;
+  const { isProjectExplorer, projectName } = useAtomValue($currentStatus);
+  /** @type {React.MutableRefObject<import("dockview").PaneviewApi>} */
+  const paneApi = useRef(null);
+
+  useEffect(() => {
+    if (isProjectExplorer) return;
+
+    paneApi.current.panels.forEach((panel) =>
+      paneApi.current.removePanel(panel)
+    );
+
+    paneApi.current.addPanel({
+      id: "explorer",
+      title: projectName,
+      component: "default",
+      headerComponent: "default",
+      isExpanded: true,
+      params: {
+        isProjectExplorer
+      }
+    });
+  }, [isProjectExplorer]);
 
   /** @param {import("dockview").PaneviewReadyEvent} ev */
   const onReady = (ev) => {
-    const params = {
-      tree,
-      updateTree,
-      isProjectExplorer
+    const commonOpts = {
+      component: "default",
+      headerComponent: "default",
+      isExpanded: true,
+      params: {
+        isProjectExplorer
+      }
     };
 
-    serializedPaneView.views[0].data.params = { ...params };
-    serializedPaneView.views[1].data.params = { ...params };
+    ev.api.addPanel({
+      id: "device",
+      title: "Device Folder",
+      ...commonOpts
+    });
 
-    ev.api.fromJSON(serializedPaneView);
+    ev.api.addPanel({
+      id: "op",
+      title: "Origin Private File System",
+      ...commonOpts
+    });
+
+    paneApi.current = ev.api;
   };
 
   return (
@@ -74,23 +119,3 @@ function Sidebar() {
 }
 
 export default Sidebar;
-
-const components = {
-  default: ({
-    api: { id },
-    params: { tree, updateTree, isProjectExplorer }
-  }) => (
-    <Suspense>
-      <TreeContent
-        fsType={id}
-        tree={tree}
-        updateTree={updateTree}
-        isProjectExplorer={isProjectExplorer}
-      />
-    </Suspense>
-  )
-};
-
-const headerComponents = {
-  default: PaneHeader
-};

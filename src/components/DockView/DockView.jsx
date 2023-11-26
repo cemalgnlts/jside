@@ -5,6 +5,7 @@ import { $dockViewApi } from "../../state";
 
 import Editor from "@components/Editor";
 import ProjectTemplate from "@components/ProjectTemplate";
+import Watermark from "./Watermark";
 
 const components = {
   default: PanelContent,
@@ -39,6 +40,7 @@ function DockView() {
       showDndOverlay={showDndOverlay}
       onReady={onReady}
       onDidDrop={onDidDrop}
+      watermarkComponent={Watermark}
     />
   );
 }

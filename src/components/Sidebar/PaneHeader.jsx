@@ -6,7 +6,14 @@ import styles from "./styles.module.css";
 
 import Button from "../Button";
 import Icon from "../Icon";
-import { $dockViewApi, $insertFile, $isProjectExplorer } from "../../state";
+import {
+  $dockViewApi,
+  $insertFile,
+  $isProjectExplorer,
+  $updateFileTree,
+  $updateProjectTree
+} from "../../state";
+import useEvents from "../../hooks/useEvents";
 
 /**
  *
@@ -16,9 +23,12 @@ function PaneHeader({ title, api, params }) {
   const [expanded, setExpanded] = useState(api.isExpanded);
   const isProjectExplorer = useAtomValue($isProjectExplorer);
   const dockViewApi = useAtomValue($dockViewApi);
+  const { dispatchEvent } = useEvents();
   const insertFile = useSetAtom($insertFile);
-  const updateFileTree = useSetAtom(params.updateTree);
-  
+  const updateFileTree = useSetAtom(
+    isProjectExplorer ? $updateProjectTree : $updateFileTree
+  );
+
   useEffect(() => {
     const disposable = api.onDidExpansionChange((ev) =>
       setExpanded(ev.isExpanded)
@@ -46,15 +56,15 @@ function PaneHeader({ title, api, params }) {
       id: "newProject",
       component: "projectTemplates",
       title: "New Project",
-      props: {
+      params: {
         noIcon: true,
-        fs: api.id
+        fsType: api.id
       }
     });
   };
 
   const collapseFolders = () => {
-    treeRef.current.collapseAll();
+    dispatchEvent("rct-collapse");
   };
 
   const refresh = () => {
@@ -83,7 +93,13 @@ function PaneHeader({ title, api, params }) {
             <Button title="New folder" icon small ghost>
               <Icon name="create_new_folder" />
             </Button>
-            <Button title="Collapse folders" icon small ghost>
+            <Button
+              title="Collapse folders"
+              onClick={collapseFolders}
+              icon
+              small
+              ghost
+            >
               <Icon name="unfold_less" />
             </Button>
           </>

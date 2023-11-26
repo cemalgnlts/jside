@@ -1,6 +1,18 @@
 import { useEffect, useRef } from "react";
 
 const eventTarget = new EventTarget();
+export const events = {
+  onEvent(name, callback) {
+    eventTarget.addEventListener(name, callback);
+  },
+  onceEvent(name, callback) {
+    eventTarget.addEventListener(name, callback, { once: true });
+  },
+  dispatchEvent(name, data) {
+    const ev = data ? new CustomEvent(name, data) : new Event(name);
+    eventTarget.dispatchEvent(ev);
+  }
+};
 
 function useEvents() {
   const mapRef = useRef();
@@ -17,16 +29,19 @@ function useEvents() {
 
   const onEvent = (name, fun) => {
     mapRef.current.set(name, fun);
-    eventTarget.addEventListener(name, fun);
+    events.onEvent(name, fun);
   };
 
-  const dispatchEvent = (name, data) => {
-    const ev = data ? new CustomEvent(name, data) : new Event(name);
-    eventTarget.dispatchEvent(ev);
+  const onceEvent = (name, fun) => {
+    mapRef.current.set(name, fun);
+    events.onceEvent(name, fun);
   };
+
+  const dispatchEvent = (name, data) => events.dispatchEvent(name, data);
 
   return {
     onEvent,
+    onceEvent,
     dispatchEvent
   };
 }

@@ -1,10 +1,6 @@
 import { memo, useEffect } from "react";
 
-import {
-  UncontrolledTreeEnvironment,
-  Tree,
-  InteractionMode
-} from "react-complex-tree";
+import { UncontrolledTreeEnvironment, Tree } from "react-complex-tree";
 
 import Icon from "@components/Icon";
 import { getFileIcon } from "../../libs/languageIcons";
@@ -13,7 +9,7 @@ import { $dockViewApi, $openProject } from "../../state";
 
 import FileSystemTreeDataProvider from "./FileSystemTreeDataProvider";
 
-function FileTree({ items, providerRef, treeRef, isProjectExplorer }) {
+function FileTree({ items, providerRef, treeRef, fsType, isProjectExplorer }) {
   /** @type {import("dockview").DockviewApi} */
   const dockViewApi = useAtomValue($dockViewApi);
   const openProject = useSetAtom($openProject);
@@ -46,7 +42,7 @@ function FileTree({ items, providerRef, treeRef, isProjectExplorer }) {
   };
 
   const selectProject = (item) => {
-    openProject({ title: item.title, path: item.path });
+    openProject({ title: item.title, path: item.path, fsType });
   };
 
   const onItemSelect = (item) => {
@@ -91,9 +87,9 @@ function FileTree({ items, providerRef, treeRef, isProjectExplorer }) {
       viewState={{}}
     >
       <Tree
-        treeId="fileTree"
+        treeId={`fileTree-${fsType}`}
         rootItem="root"
-        treeLabel="File Tree"
+        treeLabel={`${fsType === "device" ? "User" : "Private"} File Tree`}
         ref={treeRef}
       />
     </UncontrolledTreeEnvironment>

@@ -17,18 +17,26 @@ class FileSystem {
    */
   static requestPermission(type) {
     if (type === "device") return this._deviceFileSystem();
-    else return this._opFilesystem();
+    else if (type === "op") return this._opFileSystem();
+
+    throw Error("Unknown file system type.");
   }
 
   /**
-   *
+   * @param {"device"|"op"} type File system type.
    * @returns {FileSystemManager}
    */
-  static get() {
-    if (this.deviceFSManager === null)
+  static get(type) {
+    if (
+      (type === "device" && this.deviceFSManager === null) ||
+      (type === "op" && this.opFSManager === null)
+    )
       throw Error("First initialize file system.");
 
-    return this.deviceFSManager;
+    if (type === "device") return this.deviceFSManager;
+    else if (type === "op") return this.opFSManager;
+
+    throw Error("Unknown file system type.");
   }
 
   static async _deviceFileSystem() {
@@ -59,10 +67,7 @@ class FileSystem {
     if (root.name !== "JSIDE")
       root = await root.getDirectoryHandle("JSIDE", { create: true });
 
-    await root.getDirectoryHandle("projects", { create: true });
-    await root.getDirectoryHandle("libs", { create: true });
-    await root.getDirectoryHandle("types", { create: true });
-    await root.getDirectoryHandle("dist", { create: true });
+    await this._prepareRootDirectory(root);
 
     await IDBHelper.set("rootDirectoryHandle", root).catch((err) =>
       console.warn("Why didn't you allow my web app to use IndexedDB?!", err)
@@ -71,16 +76,34 @@ class FileSystem {
     this.deviceFSManager = new FileSystemManager(root);
   }
 
-  static async _opFilesystem() {
+  static async _opFileSystem() {
     this.isPersisted = await navigator.storage.persisted();
 
     if (!this.isPersisted) this.isPersisted = await navigator.storage.persist();
 
-    return navigator.storage.getDirectory();
+    const root = await navigator.storage.getDirectory();
+
+    await this._prepareRootDirectory(root);
+
+    this.opFSManager = new FileSystemManager(root);
   }
 
-  static get hasAccessDeviceFS() {
-    return FileSystem.deviceFSManager !== null;
+  static async _prepareRootDirectory(root) {
+    await root.getDirectoryHandle("projects", { create: true });
+    await root.getDirectoryHandle("libs", { create: true });
+    await root.getDirectoryHandle("types", { create: true });
+    await root.getDirectoryHandle("dist", { create: true });
+  }
+
+  /**
+   * @param {"device"|"op"} type File system type.
+   * @returns {boolean}
+   */
+  static checkPermission(type) {
+    if (type === "device") return this.deviceFSManager !== null;
+    else if (type === "op") return this.opFSManager !== null;
+
+    throw Error("Unknown file system type.");
   }
 }
 

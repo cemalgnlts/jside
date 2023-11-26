@@ -6,19 +6,22 @@ import { convertFilesToTree } from "./utils/Utils";
 
 const store = createStore();
 
-const currentStatus = atom({
+const $currentStatus = atom({
   isProjectExplorer: true,
   projectName: "",
+  fsType: "",
   dir: "/projects"
 });
 
 const $dockViewApi = atom(null);
-const $isProjectExplorer = atom((get) => get(currentStatus).isProjectExplorer);
-const $openProject = atom(null, (get, set, { title, path }) => {
-  set(currentStatus, {
+
+const $isProjectExplorer = atom((get) => get($currentStatus).isProjectExplorer);
+const $openProject = atom(null, (get, set, { title, path, fsType }) => {
+  set($currentStatus, {
     isProjectExplorer: false,
     projectName: title,
-    dir: path
+    dir: path,
+    fsType: fsType
   });
 });
 
@@ -41,7 +44,7 @@ const $updateProjectTree = atom(null, async (_, set, fsType) => {
 });
 
 const $updateFileTree = atom(null, async (get, set, fsType) => {
-  const currentDir = get(currentStatus).dir;
+  const currentDir = get($currentStatus).dir;
 
   const files = await FileSystem.get(fsType).readdir(currentDir, {
     recursive: true
@@ -53,7 +56,7 @@ const $updateFileTree = atom(null, async (get, set, fsType) => {
 
 const $insertFile = atom(null, (get, set, info) => {
   const tree = get($fileTree);
-  const projectDir = get(currentStatus).dir;
+  const projectDir = get($currentStatus).dir;
 
   const clone = { ...tree };
   clone["new"] = {
@@ -78,5 +81,6 @@ export {
   $fileTree,
   $updateFileTree,
   $insertFile,
+  $currentStatus,
   store
 };

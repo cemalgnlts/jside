@@ -6,7 +6,7 @@ import { getTemplate, templates } from "../../utils/templates";
 import styles from "./styles.module.css";
 import { FileSystem } from "../../libs/FileSystem";
 
-function ProjectTemplate(props) {
+function ProjectTemplate({ api, params }) {
   const tmpId = useRef(null);
   const [showPrompt, PromptUI] = usePrompt({
     title: "Project name",
@@ -16,9 +16,9 @@ function ProjectTemplate(props) {
   async function onPromptEnter(val) {
     const files = getTemplate(tmpId.current, val);
 
-    await FileSystem.get().initFiles(Object.fromEntries(files));
+    await FileSystem.get(params.fsType).initFiles(Object.fromEntries(files));
 
-    props.api.panel.api.close();
+    api.panel.api.close();
   }
 
   const onSelect = (ev) => {

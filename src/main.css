@@ -309,6 +309,8 @@ section {
   --rct-search-bg: #373737;
   --rct-search-text: var(--color-fg);
   --rct-search-text-offset: calc(var(--rct-search-padding) * 2 + 16px);
+
+  padding-right: var(--space-s);
 }
 
 .rct-tree-item-button > span.icon,

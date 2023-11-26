@@ -2,9 +2,9 @@
   height: 100%;
 }
 
-.sidebar > div:last-child {
-  /* margin-right: var(--space-s); */
-}
+/* .sidebar > div:last-child {
+  margin-right: var(--space-s);
+} */
 
 /* .header {
   padding: var(--space-s);
