@@ -3,10 +3,10 @@
 }
 
 .sidebar > div:last-child {
-  margin-right: var(--space-s);
+  /* margin-right: var(--space-s); */
 }
 
-.header {
+/* .header {
   padding: var(--space-s);
   background-color: var(--color-bg-secondary);
   display: flex;
@@ -25,58 +25,35 @@
 .header > .title:empty + .actions > button {
   pointer-events: none;
   opacity: 0.8;
-}
+} */
 
 .actions {
-  visibility: hidden;
+  margin-left: auto;
+  flex-shrink: 0;
 }
 
-.sidebar:hover .header > .actions {
-  visibility: visible;
-}
-
-/* #region Context Menu */
-.contextMenu {
-  width: 100%;
-  height: 100%;
-  position: fixed;
-  left: 0;
-  top: 0;
-  z-index: 6;
-  display: none;
-}
-
-.contextMenu > ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  background-color: var(--color-ui);
-  border-radius: var(--radius-1);
-  border: solid 2px var(--color-ui-hover);
-  overflow: hidden;
-  width: min-content;
-  position: absolute;
-  left: var(--left, 0);
-  top: var(--top, 0);
-  box-shadow: 0 0 8px 2px rgba(0, 0, 0, 0.4);
-}
-
-.contextMenu > ul > li:not(.divider) {
-  cursor: pointer;
+.paneHeader {
   display: flex;
-  gap: var(--space-m);
-  padding: var(--space-s) var(--space-m);
+  align-items: center;
+  height: 100%;
+  padding: 0 var(--space-s);
+  background-color: var(--color-ui);
+  overflow: hidden;
 }
 
-.contextMenu > ul > li.divider {
-  border-top: solid 1px var(--color-ui-hover);
+.paneHeader > .toggler {
+  width: 100%;
+  color: inherit;
+  text-decoration: none;
 }
 
-.contextMenu > ul > li:hover {
-  background-color: var(--color-ui-hover);
+.paneHeader > .toggler > span {
+  line-height: 22px;
+  vertical-align: middle;
 }
 
-.contextMenu > ul > li:active {
-  background-color: var(--color-ui-active);
+.paneHeader > small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
-/* #endregion */
