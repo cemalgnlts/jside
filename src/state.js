@@ -30,22 +30,22 @@ const $fileTree = atom({
   root: {}
 });
 
-const $updateProjectTree = atom(null, async (_, set) => {
+const $updateProjectTree = atom(null, async (_, set, fsType) => {
   const currentDir = "/projects";
 
-  if (!FileSystem._fsManager) return;
-
-  let files = await FileSystem.get().readdir(currentDir);
+  let files = await FileSystem.get(fsType).readdir(currentDir);
   files = files.map((folder) => `${currentDir}/${folder}/`);
   const format = await convertFilesToTree(files, currentDir, true);
 
   set($projectTree, format);
 });
 
-const $updateFileTree = atom(null, async (get, set) => {
+const $updateFileTree = atom(null, async (get, set, fsType) => {
   const currentDir = get(currentStatus).dir;
 
-  const files = await FileSystem.get().readdir(currentDir, { recursive: true });
+  const files = await FileSystem.get(fsType).readdir(currentDir, {
+    recursive: true
+  });
   const format = await convertFilesToTree(files, currentDir);
 
   set($fileTree, format);

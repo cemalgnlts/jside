@@ -1,4 +1,4 @@
-import { lazy, useEffect, useRef } from "react";
+import { lazy, useEffect, useState, useRef } from "react";
 
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { $dockViewApi, $insertFile } from "../../state";
@@ -6,21 +6,17 @@ import { $dockViewApi, $insertFile } from "../../state";
 import Icon from "../Icon/Icon";
 import Button from "../Button/Button";
 import styles from "./styles.module.css";
+import { FileSystem } from "../../libs/FileSystem";
+import { explainFSError } from "../../utils/Utils";
 
 const FileTree = lazy(() => import("@components/FileTree"));
 
-function TreeContent({ tree, updateTree, title, isProjectExplorer }) {
+function TreeContent({ fsType, tree, isProjectExplorer }) {
   /** @type {React.MutableRefObject<import("react-complex-tree").TreeRef>} */
   const treeRef = useRef(null);
   const providerRef = useRef(null);
-  const dockViewApi = useAtomValue($dockViewApi);
   const items = useAtomValue(tree);
-  const updateFileTree = useSetAtom(updateTree);
-  const insertFile = useSetAtom($insertFile);
-
-  useEffect(() => {
-    updateFileTree();
-  }, [isProjectExplorer]);
+  const [canAccessFS, setCanAccessFS] = useState(FileSystem.hasAccessDeviceFS);
 
   useEffect(() => {
     if (treeRef && items["new"]) {
@@ -28,84 +24,34 @@ function TreeContent({ tree, updateTree, title, isProjectExplorer }) {
     }
   }, [items]);
 
-  const addNewFile = () => {
-    if (!isProjectExplorer) {
-      insertFile({ parentIndex: "root", relativeParentPath: "" });
-      return;
+  const requestPermission = async () => {
+    try {
+      await FileSystem.requestPermission();
+      setCanAccessFS(true);
+    } catch (err) {
+      alert(explainFSError(err));
     }
-
-    const panel = dockViewApi.getPanel("newProject");
-
-    if (panel) return;
-
-    dockViewApi.addPanel({
-      id: "newProject",
-      component: "projectTemplates",
-      title: "New Project",
-      props: {
-        noIcon: true
-      }
-    });
-  };
-
-  const addNewFolder = () => {};
-
-  const collapseFolders = () => {
-    treeRef.current.collapseAll();
-  };
-
-  const refresh = () => {
-    updateFileTree();
   };
 
   return (
-    <>
-      <div className={styles.header}>
-        <span className={styles.name}>
-          {isProjectExplorer ? title : items.root.title}
-        </span>
-        <div className={styles.actions}>
-          <Button
-            title={isProjectExplorer ? "New project" : "New file"}
-            onClick={addNewFile}
-            icon
-            small
-            ghost
-          >
-            <Icon name={isProjectExplorer ? "add" : "note_add"} />
-          </Button>
-
-          {!isProjectExplorer && (
-            <>
-              <Button title="New folder" icon small ghost>
-                <Icon name="create_new_folder" />
-              </Button>
-              <Button
-                title="Collapse folders"
-                onClick={collapseFolders}
-                icon
-                small
-                ghost
-              >
-                <Icon name="unfold_less" />
-              </Button>
-            </>
-          )}
-
-          <Button title="Refresh" onClick={refresh} icon small ghost>
-            <Icon name="refresh" />
-          </Button>
-        </div>
-      </div>
-      <div className="rct-dark">
-        <FileTree
-          items={items}
-          treeRef={treeRef}
-          providerRef={providerRef}
-          isProjectExplorer={isProjectExplorer}
-        />
-      </div>
-    </>
+    <div className="rct-dark">
+      {!canAccessFS && fsType === "device" ? (
+        <Button
+          onClick={requestPermission}
+          className={styles.permissionReqBtn}
+          ghost
+        >
+          <Icon name="folder" />
+          <small>Request Storage Permission</small>
+        </Button>
+      ) : null}
+      <FileTree
+        items={items}
+        treeRef={treeRef}
+        providerRef={providerRef}
+        isProjectExplorer={isProjectExplorer}
+      />
+    </div>
   );
 }
 

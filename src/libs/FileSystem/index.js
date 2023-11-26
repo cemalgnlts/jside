@@ -3,6 +3,8 @@ import { IDBHelper } from "./IDBHerlper.js";
 
 class FileSystem {
   static _fsManager = null;
+  static deviceFSManager = null;
+  static opFSManager = null;
   static isPersisted = false;
 
   constructor() {
@@ -10,12 +12,28 @@ class FileSystem {
   }
 
   /**
-   *
-   * @returns {Promise<boolean>}
+   * @param {"device"|"op"} type File system type.
+   * @returns {Promise<undefined>}
    */
-  static async requestPermission() {
+  static requestPermission(type) {
+    if (type === "device") return this._deviceFileSystem();
+    else return this._opFilesystem();
+  }
+
+  /**
+   *
+   * @returns {FileSystemManager}
+   */
+  static get() {
+    if (this.deviceFSManager === null)
+      throw Error("First initialize file system.");
+
+    return this.deviceFSManager;
+  }
+
+  static async _deviceFileSystem() {
     /** @type {FileSystemDirectoryHandle} */
-    let root = await IDBHelper.get("rootDirectoryHandle").catch(() => null);
+    let root = await IDBHelper.get("rootDirectoryHandle");
 
     if (root) {
       let isWritable = await root.queryPermission({ mode: "readwrite" });
@@ -50,27 +68,19 @@ class FileSystem {
       console.warn("Why didn't you allow my web app to use IndexedDB?!", err)
     );
 
-    this._fsManager = new FileSystemManager(root);
-
-    return true;
+    this.deviceFSManager = new FileSystemManager(root);
   }
 
-  /**
-   *
-   * @returns {FileSystemManager}
-   */
-  static get() {
-    if (this._fsManager === null) throw Error("First initialize file system.");
-
-    return this._fsManager;
-  }
-
-  static async _privateFileSystem() {
-    this.isPersisted = navigator.storage.persisted();
+  static async _opFilesystem() {
+    this.isPersisted = await navigator.storage.persisted();
 
     if (!this.isPersisted) this.isPersisted = await navigator.storage.persist();
 
     return navigator.storage.getDirectory();
+  }
+
+  static get hasAccessDeviceFS() {
+    return FileSystem.deviceFSManager !== null;
   }
 }
 

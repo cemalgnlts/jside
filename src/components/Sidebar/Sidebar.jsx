@@ -24,7 +24,7 @@ const serializedPaneView = {
       priority: LayoutPriority.High,
       size: (window.innerHeight - 50) / 2,
       data: {
-        id: "folder_device",
+        id: "device",
         title: "Device Folder",
         component: "default",
         headerComponent: "default"
@@ -34,7 +34,7 @@ const serializedPaneView = {
       expanded: true,
       size: (window.innerHeight - 50) / 2,
       data: {
-        id: "folder_opfs",
+        id: "op",
         title: "Origin Private File System",
         component: "default",
         headerComponent: "default"
@@ -76,10 +76,13 @@ function Sidebar() {
 export default Sidebar;
 
 const components = {
-  default: ({ params: { tree, updateTree, isProjectExplorer } }) => (
+  default: ({
+    api: { id },
+    params: { tree, updateTree, isProjectExplorer }
+  }) => (
     <Suspense>
       <TreeContent
-        title="Projects"
+        fsType={id}
         tree={tree}
         updateTree={updateTree}
         isProjectExplorer={isProjectExplorer}

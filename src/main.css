@@ -139,6 +139,8 @@ section {
   font-size: 0.9rem;
   padding: 0;
   overflow: hidden;
+  border-radius: var(--radius-1);
+  padding: var(--space-s);
 }
 
 .btn-small > .icon {
@@ -152,26 +154,29 @@ section {
 
 .btn-ghost {
   text-align: center;
-  border-radius: 100%;
-  width: 28px;
-  height: 28px;
   flex-shrink: 0;
 }
 
+.btn-ghost.btn-icon,
 .btn-ghost > .icon {
+  width: 28px;
   height: 28px;
   line-height: 28px;
+  border-radius: 100%;
+  padding: 0;
 }
 
 .btn-ghost:hover {
   background-color: var(--color-ui-hover);
 }
 
+.btn-ghost:active {
+  background-color: var(--color-ui-active);
+}
+
 .btn-solid {
   background-color: var(--color-active);
   color: var(--color-fg-tertiary);
-  padding: var(--space-s);
-  border-radius: var(--radius-1);
   box-shadow: inset 0 0 0 1px var(--color-shadow);
 }
 
