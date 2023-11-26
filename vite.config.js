@@ -44,7 +44,8 @@ const pwa = VitePWA({
   injectRegister: "inline",
   registerType: "autoUpdate",
   workbox: {
-    globPatterns: ["**/*"]
+    globPatterns: ["**/*"],
+    includeAssets: ["**/*"]
   },
   manifest
 });
