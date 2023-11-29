@@ -103,7 +103,7 @@ class FileSystem {
     if (type === "device") return this.deviceFSManager !== null;
     else if (type === "op") return this.opFSManager !== null;
 
-    throw Error("Unknown file system type.");
+    throw Error(`Unknown file system type (${type}).`);
   }
 }
 

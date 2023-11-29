@@ -1,7 +1,12 @@
 import { lazy, useEffect, useState, useRef } from "react";
 
-import { useAtomValue } from "jotai";
-import { $fileTree, $projectTree } from "../../state";
+import { useAtomValue, useSetAtom } from "jotai";
+import {
+  $fileTree,
+  $updateFileTree,
+  $updateProjectTree,
+  projectTrees
+} from "../../state";
 
 import Icon from "../Icon/Icon";
 import Button from "../Button/Button";
@@ -17,9 +22,14 @@ function TreeContent({ fsType, isProjectExplorer }) {
   const treeRef = useRef(null);
   const providerRef = useRef(null);
   const { onEvent } = useEvents();
-  const items = useAtomValue(isProjectExplorer ? $projectTree : $fileTree);
+  const updateFileTree = useSetAtom(
+    isProjectExplorer ? $updateProjectTree : $updateFileTree
+  );
+  const items = useAtomValue(
+    isProjectExplorer ? projectTrees[fsType] : $fileTree
+  );
   const [canAccessFS, setCanAccessFS] = useState(
-    FileSystem.checkPermission(fsType)
+    !isProjectExplorer || FileSystem.checkPermission(fsType)
   );
 
   useEffect(() => {
@@ -29,18 +39,23 @@ function TreeContent({ fsType, isProjectExplorer }) {
 
     // Auto permission request for opfs.
     if (fsType === "op")
-      FileSystem.requestPermission("op").catch((err) => alert(err));
+      FileSystem.requestPermission("op")
+        .then(() => updateFileTree(fsType))
+        .catch((err) => alert(err));
   }, []);
 
   useEffect(() => {
     if (treeRef && items["new"]) {
       requestAnimationFrame(() => treeRef.current.startRenamingItem("new"));
     }
+
+    if(!isProjectExplorer) updateFileTree();
   }, [items]);
 
   const requestPermission = async () => {
     try {
       await FileSystem.requestPermission(fsType);
+      updateFileTree(fsType);
       setCanAccessFS(true);
     } catch (err) {
       alert(explainFSError(err));

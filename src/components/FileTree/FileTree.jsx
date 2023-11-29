@@ -77,7 +77,6 @@ function FileTree({ items, providerRef, treeRef, fsType, isProjectExplorer }) {
       dataProvider={providerRef.current}
       getItemTitle={(item) => item.title}
       renderItemTitle={preRenderItemTitle}
-      // defaultInteractionMode={InteractionMode.DoubleClickItemToExpand}
       onPrimaryAction={onItemSelect}
       onRenameItem={onRename}
       disableMultiselect={true}

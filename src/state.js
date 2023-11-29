@@ -25,9 +25,10 @@ const $openProject = atom(null, (get, set, { title, path, fsType }) => {
   });
 });
 
-const $projectTree = atom({
-  root: {}
-});
+const projectTrees = {
+  device: atom({ root: {} }),
+  op: atom({ root: {} })
+};
 
 const $fileTree = atom({
   root: {}
@@ -40,16 +41,16 @@ const $updateProjectTree = atom(null, async (_, set, fsType) => {
   files = files.map((folder) => `${currentDir}/${folder}/`);
   const format = await convertFilesToTree(files, currentDir, true);
 
-  set($projectTree, format);
+  set(projectTrees[fsType], format);
 });
 
-const $updateFileTree = atom(null, async (get, set, fsType) => {
-  const currentDir = get($currentStatus).dir;
+const $updateFileTree = atom(null, async (get, set, fsType_) => {
+  const { dir, fsType = fsType_ } = get($currentStatus);
 
-  const files = await FileSystem.get(fsType).readdir(currentDir, {
+  const files = await FileSystem.get(fsType).readdir(dir, {
     recursive: true
   });
-  const format = await convertFilesToTree(files, currentDir);
+  const format = await convertFilesToTree(files, dir);
 
   set($fileTree, format);
 });
@@ -76,7 +77,7 @@ export {
   $dockViewApi,
   $isProjectExplorer,
   $openProject,
-  $projectTree,
+  projectTrees,
   $updateProjectTree,
   $fileTree,
   $updateFileTree,
