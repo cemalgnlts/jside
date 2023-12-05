@@ -5,6 +5,9 @@ settings:
   excludeLinksFromLockfile: false
 
 dependencies:
+  '@codingame/monaco-vscode-configuration-service-override':
+    specifier: ^1.83.15
+    version: 1.83.15
   '@codingame/monaco-vscode-dialogs-service-override':
     specifier: ^1.83.15
     version: 1.83.15
@@ -312,6 +315,18 @@ packages:
   /@codingame/monaco-vscode-bulk-edit-service-override@1.83.15:
     resolution: {integrity: sha512-24ArjsLR0FCX99WlZugSeHxnj97/X63Xf/CUeWKjW+W4xP8TBkIIvPNbiKt9rNot51eU2rB61Pz7TiGfyeD4ng==}
     dependencies:
+      monaco-editor: 0.44.0
+      vscode: /@codingame/monaco-vscode-api@1.83.15
+    dev: false
+
+  /@codingame/monaco-vscode-configuration-service-override@1.83.15:
+    resolution: {integrity: sha512-MrWlQ/xAF96dOPm97RuIOeJ45YfJ3Dm3PeNFaXtdyZQ4cqbULAab1udmBegaq3U+QGCUo69C9L6RH6JAkHVpfw==}
+    dependencies:
+      '@codingame/monaco-vscode-environment-service-override': 1.83.15
+      '@codingame/monaco-vscode-extensions-service-override': 1.83.15
+      '@codingame/monaco-vscode-files-service-override': 1.83.15
+      '@codingame/monaco-vscode-layout-service-override': 1.83.15
+      '@codingame/monaco-vscode-quickaccess-service-override': 1.83.15
       monaco-editor: 0.44.0
       vscode: /@codingame/monaco-vscode-api@1.83.15
     dev: false

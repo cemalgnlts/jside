@@ -1,4 +1,26 @@
+html,
+body,
+#root {
+  height: 100vh;
+}
+
 body {
   margin: 0;
   font-family: Roboto, sans-serif;
+}
+
+#root {
+  display: grid;
+  grid-template-areas: "editor explorer";
+  grid-template-columns: 80vw 20vw;
+  grid-template-rows: 100vh;
+  overflow: hidden;
+}
+
+.editor {
+  grid-area: editor;
+}
+
+.explorer {
+  grid-area: explorer;
 }

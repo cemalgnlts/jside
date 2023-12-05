@@ -9,6 +9,8 @@ import getViewsServiceOverride, {
 
 import getModelServiceOverride from "@codingame/monaco-vscode-model-service-override";
 
+import getConfigurationServiceOverride from "@codingame/monaco-vscode-configuration-service-override";
+
 type Panels = Array<{
   panel: Parts;
   element: HTMLDivElement;
@@ -17,6 +19,7 @@ type Panels = Array<{
 export async function init() {
   await initializeServices({
     ...getStorageServiceOverrride(),
+    ...getConfigurationServiceOverride(),
     ...getViewsServiceOverride(),
     ...getModelServiceOverride(),
     ...getDialogsServiceOverride()

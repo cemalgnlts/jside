@@ -34,8 +34,8 @@ function App() {
 
   return (
     <>
-      <div ref={editorRef}></div>
-      <div ref={explorerRef}></div>
+      <div className="editor" ref={editorRef}></div>
+      <div className="explorer" ref={explorerRef}></div>
     </>
   );
 }
