@@ -11,9 +11,11 @@ body {
 
 #root {
   display: grid;
-  grid-template-areas: "editor explorer";
+  grid-template-areas:
+    "editor explorer"
+    "statusbar statusbar";
   grid-template-columns: 80vw 20vw;
-  grid-template-rows: 100vh;
+  grid-template-rows: calc(100vh - 22px) 22px;
   overflow: hidden;
 }
 
@@ -23,4 +25,8 @@ body {
 
 .explorer {
   grid-area: explorer;
+}
+
+.statusbar {
+  grid-area: statusbar;
 }

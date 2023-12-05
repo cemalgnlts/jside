@@ -11,6 +11,9 @@ dependencies:
   '@codingame/monaco-vscode-dialogs-service-override':
     specifier: ^1.83.15
     version: 1.83.15
+  '@codingame/monaco-vscode-extensions-service-override':
+    specifier: ^1.83.15
+    version: 1.83.15
   '@codingame/monaco-vscode-files-service-override':
     specifier: ^1.83.15
     version: 1.83.15
@@ -18,6 +21,15 @@ dependencies:
     specifier: ^1.83.15
     version: 1.83.15
   '@codingame/monaco-vscode-storage-service-override':
+    specifier: ^1.83.15
+    version: 1.83.15
+  '@codingame/monaco-vscode-theme-defaults-default-extension':
+    specifier: ^1.83.15
+    version: 1.83.15
+  '@codingame/monaco-vscode-theme-service-override':
+    specifier: ^1.83.15
+    version: 1.83.15
+  '@codingame/monaco-vscode-view-status-bar-service-override':
     specifier: ^1.83.15
     version: 1.83.15
   '@codingame/monaco-vscode-views-service-override':
@@ -43,6 +55,9 @@ devDependencies:
   '@types/react-dom':
     specifier: ^18.2.17
     version: 18.2.17
+  '@types/vscode':
+    specifier: ^1.84.2
+    version: 1.84.2
   '@typescript-eslint/eslint-plugin':
     specifier: ^6.13.2
     version: 6.13.2(@typescript-eslint/parser@6.13.2)(eslint@8.55.0)(typescript@5.3.2)
@@ -393,6 +408,27 @@ packages:
 
   /@codingame/monaco-vscode-storage-service-override@1.83.15:
     resolution: {integrity: sha512-WQBqz8c1ik43vDtIUSrGfhplvk4KAEdPvvvf3zqCDeBc8ZQkNeYjM7iG/oJ2oVEhVtnYYzjLy3wTR1XRiKewdw==}
+    dependencies:
+      monaco-editor: 0.44.0
+      vscode: /@codingame/monaco-vscode-api@1.83.15
+    dev: false
+
+  /@codingame/monaco-vscode-theme-defaults-default-extension@1.83.15:
+    resolution: {integrity: sha512-XVfY5eTf06DIF4xe8L8a5UJBL8dDGAGoJylVwt/8VYGMcRNB1WvdmXlji3Hpy6uGFg0UsV4xKZE+Jbt8GlVQQg==}
+    dependencies:
+      vscode: /@codingame/monaco-vscode-api@1.83.15
+    dev: false
+
+  /@codingame/monaco-vscode-theme-service-override@1.83.15:
+    resolution: {integrity: sha512-1XaEIBLA4BSeaX1hrali1K+RbC0NOMR5E8DAB0Z9RFCoB+IAQUX1T0HeTnyMs/nWJPcsTNtMhWCfKP0kv1lI5A==}
+    dependencies:
+      '@codingame/monaco-vscode-files-service-override': 1.83.15
+      monaco-editor: 0.44.0
+      vscode: /@codingame/monaco-vscode-api@1.83.15
+    dev: false
+
+  /@codingame/monaco-vscode-view-status-bar-service-override@1.83.15:
+    resolution: {integrity: sha512-tRiqIQ8wQsCdLE0muXaClPqOX0ItyuIrjbM4/V1NC9R7b9M/dJxWyx3uod3TWsQ6KcMKGpOP2PofBuNDONJWSw==}
     dependencies:
       monaco-editor: 0.44.0
       vscode: /@codingame/monaco-vscode-api@1.83.15
@@ -871,6 +907,10 @@ packages:
 
   /@types/semver@7.5.6:
     resolution: {integrity: sha512-dn1l8LaMea/IjDoHNd9J52uBbInB796CDffS6VdIxvqYCPSG0V0DzHp76GpaWnlhg88uYyPbXCDIowa86ybd5A==}
+    dev: true
+
+  /@types/vscode@1.84.2:
+    resolution: {integrity: sha512-LCe1FvCDMJKkPdLVGYhP0HRJ1PDop2gRVm/zFHiOKwYLBRS7vEV3uOOUId4HMV+L1IxqyS+IZXMmlSMRbZGIAw==}
     dev: true
 
   /@typescript-eslint/eslint-plugin@6.13.2(@typescript-eslint/parser@6.13.2)(eslint@8.55.0)(typescript@5.3.2):

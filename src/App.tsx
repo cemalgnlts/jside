@@ -7,6 +7,7 @@ function App() {
   const [ready, setReady] = useState<boolean>(false);
   const editorRef = useRef<HTMLDivElement>(null);
   const explorerRef = useRef<HTMLDivElement>(null);
+  const statusbarRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const setup = async () => {
@@ -18,7 +19,13 @@ function App() {
   }, []);
 
   useEffect(() => {
-    if (!editorRef.current || !explorerRef.current || !ready) return;
+    if (
+      !editorRef.current ||
+      !explorerRef.current ||
+      !statusbarRef.current ||
+      !ready
+    )
+      return;
 
     attachPanels([
       {
@@ -28,6 +35,10 @@ function App() {
       {
         panel: Parts.SIDEBAR_PART,
         element: explorerRef.current
+      },
+      {
+        panel: Parts.STATUSBAR_PART,
+        element: statusbarRef.current
       }
     ]);
   }, [ready]);
@@ -36,6 +47,7 @@ function App() {
     <>
       <div className="editor" ref={editorRef}></div>
       <div className="explorer" ref={explorerRef}></div>
+      <div className="statusbar" ref={statusbarRef}></div>
     </>
   );
 }
