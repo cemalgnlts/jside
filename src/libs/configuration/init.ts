@@ -1,6 +1,8 @@
 import {
   ILogService,
+  IThemeService,
   StandaloneServices,
+  getService,
   initialize as initializeServices
 } from "vscode/services";
 
@@ -23,12 +25,21 @@ import {
 import getExtensionsServiceOverride from "@codingame/monaco-vscode-extensions-service-override";
 import getStatusBarServiceOverride from "@codingame/monaco-vscode-view-status-bar-service-override";
 import getThemeServiceOverride from "@codingame/monaco-vscode-theme-service-override";
+import getNotificationsServiceOverride from "@codingame/monaco-vscode-notifications-service-override";
+import getLanguagesServiceOverride from "@codingame/monaco-vscode-languages-service-override";
 
 import "@codingame/monaco-vscode-theme-defaults-default-extension";
+import "@codingame/monaco-vscode-javascript-default-extension";
+import "@codingame/monaco-vscode-theme-seti-default-extension";
 
-// import workerConfig from "./extHostWorker.ts";
+import EditorWorker from "monaco-editor/esm/vs/editor/editor.worker.js?worker";
 
 import userConfig from "./userConfiguration.json?raw";
+
+import { openNewCodeEditor } from "./openNewEditor";
+import { Uri, workspace } from "vscode";
+
+// import "vscode/localExtensionHost";
 
 type Panels = Array<{
   panel: Parts;
@@ -36,13 +47,12 @@ type Panels = Array<{
 }>;
 
 window.MonacoEnvironment = {
-  getWorker: function (moduleId, label) {
-    console.log(label);
+  getWorker: (moduleId, label) => {
+    if (label === "editorWorkerService") return new EditorWorker();
+
+    throw Error(`Unimplemented worker ${label} (${moduleId})`);
   }
 };
-
-import ExtensionHostWorker from "vscode/workers/extensionHost.worker?worker";
-import { openNewCodeEditor } from "./openNewEditor";
 
 export async function init() {
   await initUserConfiguration(userConfig);
@@ -58,17 +68,15 @@ export async function init() {
       }
     })),
     ...getModelServiceOverride(),
+    ...getLanguagesServiceOverride(),
+    ...getNotificationsServiceOverride(),
     ...getDialogsServiceOverride(),
     ...getStatusBarServiceOverride(),
     ...getThemeServiceOverride(),
-    ...getExtensionsServiceOverride(ExtensionHostWorker)
+    ...getExtensionsServiceOverride()
   });
 
   await initFS();
-
-  // workspace.updateWorkspaceFolders(0, 0, {
-  //   uri: Uri.file("Origin Private File System")
-  // });
 }
 
 async function initFS() {
@@ -79,13 +87,20 @@ async function initFS() {
     "Origin Private File System",
     StandaloneServices.get(ILogService)
   );
-  opfsProvider.registerDirectoryHandle(root);
-
+  
+  await opfsProvider.registerDirectoryHandle(root);
   registerFileSystemOverlay(1, opfsProvider);
+
+  // workspace.updateWorkspaceFolders(0, 0, {
+  //   uri: Uri.file(root.name)
+  // });
 }
 
-export function attachPanels(panels: Panels) {
+export async function attachPanels(panels: Panels) {
   for (const { panel, element } of panels) {
     attachPart(panel, element);
   }
+
+  // const workbenchLayoutService = await getService(IWorkbenchLayoutService)
+  // workbenchLayoutService.setPanelPosition(1);
 }

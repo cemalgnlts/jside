@@ -17,7 +17,16 @@ dependencies:
   '@codingame/monaco-vscode-files-service-override':
     specifier: ^1.83.15
     version: 1.83.15
+  '@codingame/monaco-vscode-javascript-default-extension':
+    specifier: ^1.83.15
+    version: 1.83.15
+  '@codingame/monaco-vscode-languages-service-override':
+    specifier: ^1.83.15
+    version: 1.83.15
   '@codingame/monaco-vscode-model-service-override':
+    specifier: ^1.83.15
+    version: 1.83.15
+  '@codingame/monaco-vscode-notifications-service-override':
     specifier: ^1.83.15
     version: 1.83.15
   '@codingame/monaco-vscode-storage-service-override':
@@ -27,6 +36,9 @@ dependencies:
     specifier: ^1.83.15
     version: 1.83.15
   '@codingame/monaco-vscode-theme-service-override':
+    specifier: ^1.83.15
+    version: 1.83.15
+  '@codingame/monaco-vscode-theme-seti-default-extension':
     specifier: ^1.83.15
     version: 1.83.15
   '@codingame/monaco-vscode-view-status-bar-service-override':
@@ -377,8 +389,22 @@ packages:
       vscode: /@codingame/monaco-vscode-api@1.83.15
     dev: false
 
+  /@codingame/monaco-vscode-javascript-default-extension@1.83.15:
+    resolution: {integrity: sha512-i+xzU/25yxZkKWc00g/xChRoFdR8hwLikvlQ3lttd/UhXonOcxjq4L3/ERTqMOSqU/SdG4rQSDey1TlCKwbtgA==}
+    dependencies:
+      vscode: /@codingame/monaco-vscode-api@1.83.15
+    dev: false
+
   /@codingame/monaco-vscode-keybindings-service-override@1.83.15:
     resolution: {integrity: sha512-vkK6mMj1fpD6ZJxDVUH7IoSUeWQ35UoMXUGAv5H39tFSEHoTqf06bntLiKIlGqIwv3QPY9X1JVUugqxoUukCfA==}
+    dependencies:
+      '@codingame/monaco-vscode-files-service-override': 1.83.15
+      monaco-editor: 0.44.0
+      vscode: /@codingame/monaco-vscode-api@1.83.15
+    dev: false
+
+  /@codingame/monaco-vscode-languages-service-override@1.83.15:
+    resolution: {integrity: sha512-UET4EFde9TG+kRpC0OUz/kI5SdSL94Q3vivq9eoeqJpXdpL/29c1LpzgMzqj+Y13PfiJcWwMZFSrCphzTaM/yw==}
     dependencies:
       '@codingame/monaco-vscode-files-service-override': 1.83.15
       monaco-editor: 0.44.0
@@ -395,6 +421,14 @@ packages:
   /@codingame/monaco-vscode-model-service-override@1.83.15:
     resolution: {integrity: sha512-IJhxy075wlK8YwAyIB82db8gQ3U3g+dXrZjhHGu29PySiIJyFZL21gk/j1pl93h5Nb1JvwHaBwxT3wGZ+semtQ==}
     dependencies:
+      monaco-editor: 0.44.0
+      vscode: /@codingame/monaco-vscode-api@1.83.15
+    dev: false
+
+  /@codingame/monaco-vscode-notifications-service-override@1.83.15:
+    resolution: {integrity: sha512-M/56dqnrWYNHwmBFDzgCy2Z8dus9m/9ICWFzKj9pSbd5cfoKBmHlQE/VSykwBs3W7+JJHtNO67Xr7WegI1V2FA==}
+    dependencies:
+      '@codingame/monaco-vscode-layout-service-override': 1.83.15
       monaco-editor: 0.44.0
       vscode: /@codingame/monaco-vscode-api@1.83.15
     dev: false
@@ -424,6 +458,12 @@ packages:
     dependencies:
       '@codingame/monaco-vscode-files-service-override': 1.83.15
       monaco-editor: 0.44.0
+      vscode: /@codingame/monaco-vscode-api@1.83.15
+    dev: false
+
+  /@codingame/monaco-vscode-theme-seti-default-extension@1.83.15:
+    resolution: {integrity: sha512-vl0V7+WYB5bO80hS6dPxgaYs3Iwv9AOIaGqk1vmkePTeo7mdVYOhUbxniAt66txUilvPixfVlAFOj3rt9k9GWQ==}
+    dependencies:
       vscode: /@codingame/monaco-vscode-api@1.83.15
     dev: false
 

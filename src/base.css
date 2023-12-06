@@ -1,3 +1,7 @@
+* {
+  box-sizing: border-box
+}
+
 html,
 body,
 #root {
@@ -7,6 +11,7 @@ body,
 body {
   margin: 0;
   font-family: Roboto, sans-serif;
+  color: var(--vscode-foreground)
 }
 
 #root {
@@ -17,6 +22,12 @@ body {
   grid-template-columns: 80vw 20vw;
   grid-template-rows: calc(100vh - 22px) 22px;
   overflow: hidden;
+}
+
+.editor,
+.explorer,
+.statusbar {
+  position: relative;
 }
 
 .editor {

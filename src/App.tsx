@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { init, attachPanels } from "./libs/editor/init";
+import { init, attachPanels } from "./libs/configuration/init.ts";
 
 import { Parts } from "vscode/vscode/vs/workbench/services/layout/browser/layoutService";
 
