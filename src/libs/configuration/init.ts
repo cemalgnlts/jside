@@ -20,6 +20,7 @@ import getStatusBarServiceOverride from "@codingame/monaco-vscode-view-status-ba
 import getThemeServiceOverride from "@codingame/monaco-vscode-theme-service-override";
 import getNotificationsServiceOverride from "@codingame/monaco-vscode-notifications-service-override";
 import getLanguagesServiceOverride from "@codingame/monaco-vscode-languages-service-override";
+import getTextmateServiceOverride from "@codingame/monaco-vscode-textmate-service-override";
 
 import "@codingame/monaco-vscode-theme-defaults-default-extension";
 import "@codingame/monaco-vscode-javascript-default-extension";
@@ -33,12 +34,6 @@ import userConfig from "./userConfiguration.json?raw";
 
 import { openNewCodeEditor } from "./openNewEditor";
 import { Uri, workspace } from "vscode";
-import WebFileSystem from "../WebFileSystem";
-
-import { IExtensionService } from "vscode/vscode/vs/workbench/services/extensions/common/extensions";
-import { registerServiceInitializeParticipant } from "vscode/lifecycle";
-
-registerServiceInitializeParticipant((accessor) => accessor.get(IExtensionService));
 
 type Panels = Array<{
   panel: Parts;
@@ -72,7 +67,8 @@ export async function init() {
     ...getDialogsServiceOverride(),
     ...getStatusBarServiceOverride(),
     ...getThemeServiceOverride(),
-    ...getExtensionsServiceOverride()
+    ...getExtensionsServiceOverride(),
+    ...getTextmateServiceOverride()
   });
 
   await initFS();
