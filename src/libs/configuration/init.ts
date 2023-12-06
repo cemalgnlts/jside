@@ -1,25 +1,18 @@
-import {
-  ILogService,
-  IThemeService,
-  StandaloneServices,
-  getService,
-  initialize as initializeServices
-} from "vscode/services";
+import { ILogService, StandaloneServices, getService, initialize as initializeServices } from "vscode/services";
 
 import getDialogsServiceOverride from "@codingame/monaco-vscode-dialogs-service-override";
 import getStorageServiceOverrride from "@codingame/monaco-vscode-storage-service-override";
-import getViewsServiceOverride, {
-  Parts,
-  attachPart
-} from "@codingame/monaco-vscode-views-service-override";
+import getViewsServiceOverride, { Parts, attachPart } from "@codingame/monaco-vscode-views-service-override";
 
 import getModelServiceOverride from "@codingame/monaco-vscode-model-service-override";
 
 import getConfigurationServiceOverride, {
+  IStoredWorkspace,
   initUserConfiguration
 } from "@codingame/monaco-vscode-configuration-service-override";
 import {
   HTMLFileSystemProvider,
+  initFile,
   registerFileSystemOverlay
 } from "@codingame/monaco-vscode-files-service-override";
 import getExtensionsServiceOverride from "@codingame/monaco-vscode-extensions-service-override";
@@ -32,14 +25,20 @@ import "@codingame/monaco-vscode-theme-defaults-default-extension";
 import "@codingame/monaco-vscode-javascript-default-extension";
 import "@codingame/monaco-vscode-theme-seti-default-extension";
 
+import "vscode/localExtensionHost";
+
 import EditorWorker from "monaco-editor/esm/vs/editor/editor.worker.js?worker";
 
 import userConfig from "./userConfiguration.json?raw";
 
 import { openNewCodeEditor } from "./openNewEditor";
 import { Uri, workspace } from "vscode";
+import WebFileSystem from "../WebFileSystem";
 
-// import "vscode/localExtensionHost";
+import { IExtensionService } from "vscode/vscode/vs/workbench/services/extensions/common/extensions";
+import { registerServiceInitializeParticipant } from "vscode/lifecycle";
+
+registerServiceInitializeParticipant((accessor) => accessor.get(IExtensionService));
 
 type Panels = Array<{
   panel: Parts;
@@ -80,20 +79,20 @@ export async function init() {
 }
 
 async function initFS() {
-  const root = await navigator.storage.getDirectory();
+  const rootDirHandle = await navigator.storage.getDirectory();
+  const projectsDirHandle = await rootDirHandle.getDirectoryHandle("projects");
 
-  const opfsProvider = new HTMLFileSystemProvider(
-    undefined,
-    "Origin Private File System",
-    StandaloneServices.get(ILogService)
-  );
-  
-  await opfsProvider.registerDirectoryHandle(root);
-  registerFileSystemOverlay(1, opfsProvider);
+  const htmlFileSystemProvider = new HTMLFileSystemProvider(undefined, "opfs", StandaloneServices.get(ILogService));
+  await htmlFileSystemProvider.registerDirectoryHandle(projectsDirHandle);
 
-  // workspace.updateWorkspaceFolders(0, 0, {
-  //   uri: Uri.file(root.name)
+  registerFileSystemOverlay(1, htmlFileSystemProvider);
+  // workspace.registerFileSystemProvider("opfs", provider, {
+  //   isCaseSensitive: true
   // });
+
+  workspace.updateWorkspaceFolders(0, 0, {
+    uri: Uri.file(projectsDirHandle.name)
+  });
 }
 
 export async function attachPanels(panels: Panels) {
