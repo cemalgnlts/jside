@@ -1,8 +1,4 @@
-import {
-  IResolvedTextEditorModel,
-  IReference,
-  OpenEditor
-} from "@codingame/monaco-vscode-views-service-override";
+import { IResolvedTextEditorModel, IReference, OpenEditor } from "@codingame/monaco-vscode-views-service-override";
 import * as monaco from "monaco-editor";
 import { createConfiguredEditor } from "vscode/monaco";
 
@@ -18,23 +14,16 @@ export const openNewCodeEditor: OpenEditor = async (modelRef) => {
     currentEditor.dispose();
     currentEditor = null;
   }
+
   const container = document.createElement("div");
   container.style.position = "fixed";
   container.style.backgroundColor = "rgba(0, 0, 0, 0.5)";
-  container.style.top =
-    container.style.bottom =
-    container.style.left =
-    container.style.right =
-      "0";
+  container.style.top = container.style.bottom = container.style.left = container.style.right = "0";
   container.style.cursor = "pointer";
 
   const editorElem = document.createElement("div");
   editorElem.style.position = "absolute";
-  editorElem.style.top =
-    editorElem.style.bottom =
-    editorElem.style.left =
-    editorElem.style.right =
-      "0";
+  editorElem.style.top = editorElem.style.bottom = editorElem.style.left = editorElem.style.right = "0";
   editorElem.style.margin = "auto";
   editorElem.style.width = "80%";
   editorElem.style.height = "80%";
@@ -42,6 +31,7 @@ export const openNewCodeEditor: OpenEditor = async (modelRef) => {
   container.appendChild(editorElem);
 
   document.body.appendChild(container);
+
   try {
     const editor = createConfiguredEditor(editorElem, {
       model: modelRef.object.textEditorModel,
@@ -63,6 +53,7 @@ export const openNewCodeEditor: OpenEditor = async (modelRef) => {
     editor.onDidBlurEditorWidget(() => {
       currentEditor?.dispose();
     });
+
     container.addEventListener("mousedown", (event) => {
       if (event.target !== container) {
         return;
@@ -75,6 +66,7 @@ export const openNewCodeEditor: OpenEditor = async (modelRef) => {
   } catch (error) {
     document.body.removeChild(container);
     currentEditor = null;
+
     throw error;
   }
 };

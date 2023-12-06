@@ -8,6 +8,9 @@ dependencies:
   '@codingame/monaco-vscode-configuration-service-override':
     specifier: ^1.83.16
     version: 1.83.16
+  '@codingame/monaco-vscode-css-default-extension':
+    specifier: ^1.83.16
+    version: 1.83.16
   '@codingame/monaco-vscode-dialogs-service-override':
     specifier: ^1.83.16
     version: 1.83.16
@@ -17,7 +20,13 @@ dependencies:
   '@codingame/monaco-vscode-files-service-override':
     specifier: ^1.83.16
     version: 1.83.16
+  '@codingame/monaco-vscode-html-default-extension':
+    specifier: ^1.83.16
+    version: 1.83.16
   '@codingame/monaco-vscode-javascript-default-extension':
+    specifier: ^1.83.16
+    version: 1.83.16
+  '@codingame/monaco-vscode-json-default-extension':
     specifier: ^1.83.16
     version: 1.83.16
   '@codingame/monaco-vscode-languages-service-override':
@@ -27,6 +36,12 @@ dependencies:
     specifier: ^1.83.16
     version: 1.83.16
   '@codingame/monaco-vscode-notifications-service-override':
+    specifier: ^1.83.16
+    version: 1.83.16
+  '@codingame/monaco-vscode-quickaccess-service-override':
+    specifier: ^1.83.16
+    version: 1.83.16
+  '@codingame/monaco-vscode-snippets-service-override':
     specifier: ^1.83.16
     version: 1.83.16
   '@codingame/monaco-vscode-storage-service-override':
@@ -42,6 +57,9 @@ dependencies:
     specifier: ^1.83.16
     version: 1.83.16
   '@codingame/monaco-vscode-theme-seti-default-extension':
+    specifier: ^1.83.16
+    version: 1.83.16
+  '@codingame/monaco-vscode-typescript-basics-default-extension':
     specifier: ^1.83.16
     version: 1.83.16
   '@codingame/monaco-vscode-view-status-bar-service-override':
@@ -361,6 +379,12 @@ packages:
       vscode: /@codingame/monaco-vscode-api@1.83.16
     dev: false
 
+  /@codingame/monaco-vscode-css-default-extension@1.83.16:
+    resolution: {integrity: sha512-w/r80h8aqmh3Z+nY6uosRBiYwcP2NntQqE+QRswiY9T1E+Z65HqvMjxWroeHoxYcHSXrwUUPfjIZFjpEkfNTOg==}
+    dependencies:
+      vscode: /@codingame/monaco-vscode-api@1.83.16
+    dev: false
+
   /@codingame/monaco-vscode-dialogs-service-override@1.83.16:
     resolution: {integrity: sha512-eCzm+tck+IBlaI/kyuDXtMxnvanrr9EevoECxyp8mf3t2oL1/soQgeIKU4mN7/s3hISj7lPdftmrbfOTm8lPOw==}
     dependencies:
@@ -392,8 +416,20 @@ packages:
       vscode: /@codingame/monaco-vscode-api@1.83.16
     dev: false
 
+  /@codingame/monaco-vscode-html-default-extension@1.83.16:
+    resolution: {integrity: sha512-fYlmIbO83wc6okR9KXF3j7NWcRg8+yS5/VuBQLcn+kYgaLql4bCjg6+HnuXxODBJmk3Ig9cM1GweQEoa8WF5sQ==}
+    dependencies:
+      vscode: /@codingame/monaco-vscode-api@1.83.16
+    dev: false
+
   /@codingame/monaco-vscode-javascript-default-extension@1.83.16:
     resolution: {integrity: sha512-Q/9ueLNHIK+URDqDy51RqiQEXbz9XH/tD2YIWCCEk6OKBcgGn/JjokcqobMpJacIssO8FozVUgYyZlGcqCWN8w==}
+    dependencies:
+      vscode: /@codingame/monaco-vscode-api@1.83.16
+    dev: false
+
+  /@codingame/monaco-vscode-json-default-extension@1.83.16:
+    resolution: {integrity: sha512-q/2nENeSGNrHVCM/no6SUFACNeLmYQtu2s/ObuS7h5GK+wMinHkI9MEEoOONAQVJSk953ocDq7L+luGVEx6bGg==}
     dependencies:
       vscode: /@codingame/monaco-vscode-api@1.83.16
     dev: false
@@ -443,6 +479,14 @@ packages:
       vscode: /@codingame/monaco-vscode-api@1.83.16
     dev: false
 
+  /@codingame/monaco-vscode-snippets-service-override@1.83.16:
+    resolution: {integrity: sha512-6ttsSnsx5gC/RNKzaQwifQhtGMQoQXYB+dnWp+R15XOfusM/CVak1+6wC/EOq5TxPUhn9u3M3/eaVnHAfDs3WQ==}
+    dependencies:
+      '@codingame/monaco-vscode-files-service-override': 1.83.16
+      monaco-editor: 0.44.0
+      vscode: /@codingame/monaco-vscode-api@1.83.16
+    dev: false
+
   /@codingame/monaco-vscode-storage-service-override@1.83.16:
     resolution: {integrity: sha512-CiVPx5TWgWyvgvW5qXVHlEDfxKn8aQTMUd1Nixhfn/AoYqanGVxHK8DdA9Ljabk+xmV89StjFrRhgI0aMvYVcA==}
     dependencies:
@@ -476,6 +520,12 @@ packages:
 
   /@codingame/monaco-vscode-theme-seti-default-extension@1.83.16:
     resolution: {integrity: sha512-KzD1lNzWA8HuMhBT/EXvbF77lz36rO3Pv1irlB5LILhUVPh1hGtIFhguE6a8cBmapAP1xzPfF6eRIYj/3vv5TQ==}
+    dependencies:
+      vscode: /@codingame/monaco-vscode-api@1.83.16
+    dev: false
+
+  /@codingame/monaco-vscode-typescript-basics-default-extension@1.83.16:
+    resolution: {integrity: sha512-eC1Ic7rSERYkXNNgYi7ZcO9yJj2RWuzpc7RfebIcaE/47FSWnA3xu9iz2abWKDYXI8Drxsne4H7/1F5IO5oKDA==}
     dependencies:
       vscode: /@codingame/monaco-vscode-api@1.83.16
     dev: false

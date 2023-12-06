@@ -8,6 +8,14 @@ import url from "node:url";
 export default defineConfig({
   plugins: [react()],
   optimizeDeps: {
+    include: [
+      "vscode/extensions",
+      "vscode/services",
+      "vscode/monaco",
+      "vscode/localExtensionHost",
+      "monaco-editor/esm/vs/nls.js",
+      "monaco-editor/esm/vs/editor/editor.worker.js"
+    ],
     esbuildOptions: {
       plugins: [
         {
@@ -29,14 +37,9 @@ export default defineConfig({
                 newCode += code.slice(i, match.index);
 
                 const path = match[1].slice(1, -1);
-                const resolved = await import.meta.resolve!(
-                  path,
-                  url.pathToFileURL(args.path)
-                );
+                const resolved = await import.meta.resolve!(path, url.pathToFileURL(args.path));
 
-                newCode += `new URL(${JSON.stringify(
-                  url.fileURLToPath(resolved)
-                )}, import.meta.url)`;
+                newCode += `new URL(${JSON.stringify(url.fileURLToPath(resolved))}, import.meta.url)`;
 
                 i = assetImportMetaUrlRE.lastIndex;
               }
@@ -48,5 +51,8 @@ export default defineConfig({
         }
       ]
     }
+  },
+  resolve: {
+    dedupe: ["monaco-editor", "vscode"]
   }
 });
