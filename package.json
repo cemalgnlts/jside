@@ -11,9 +11,11 @@
     "postinstall": "monaco-treemending"
   },
   "dependencies": {
+    "@codingame/monaco-vscode-accessibility-service-override": "^1.83.16",
     "@codingame/monaco-vscode-configuration-service-override": "^1.83.16",
     "@codingame/monaco-vscode-css-default-extension": "^1.83.16",
     "@codingame/monaco-vscode-dialogs-service-override": "^1.83.16",
+    "@codingame/monaco-vscode-environment-service-override": "^1.83.16",
     "@codingame/monaco-vscode-extensions-service-override": "^1.83.16",
     "@codingame/monaco-vscode-files-service-override": "^1.83.16",
     "@codingame/monaco-vscode-html-default-extension": "^1.83.16",
@@ -21,6 +23,7 @@
     "@codingame/monaco-vscode-json-default-extension": "^1.83.16",
     "@codingame/monaco-vscode-languages-service-override": "^1.83.16",
     "@codingame/monaco-vscode-lifecycle-service-override": "^1.83.16",
+    "@codingame/monaco-vscode-log-service-override": "^1.83.16",
     "@codingame/monaco-vscode-markers-service-override": "^1.83.16",
     "@codingame/monaco-vscode-model-service-override": "^1.83.16",
     "@codingame/monaco-vscode-notifications-service-override": "^1.83.16",

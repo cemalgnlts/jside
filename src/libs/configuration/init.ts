@@ -3,12 +3,12 @@ import { IConfigurationService, getService, initialize as initializeServices } f
 // services
 import getDialogsServiceOverride from "@codingame/monaco-vscode-dialogs-service-override";
 import getStorageServiceOverrride from "@codingame/monaco-vscode-storage-service-override";
-import getViewsServiceOverride, { Parts, attachPart } from "@codingame/monaco-vscode-views-service-override";
+import getViewsServiceOverride, { Parts, attachPart, isEditorPartVisible, isPartVisibile, onPartVisibilityChange } from "@codingame/monaco-vscode-views-service-override";
 import getModelServiceOverride from "@codingame/monaco-vscode-model-service-override";
 import getConfigurationServiceOverride, {
   initUserConfiguration
 } from "@codingame/monaco-vscode-configuration-service-override";
-import { registerFileSystemOverlay } from "@codingame/monaco-vscode-files-service-override";
+import { createIndexedDBProviders, registerFileSystemOverlay } from "@codingame/monaco-vscode-files-service-override";
 import getExtensionsServiceOverride from "@codingame/monaco-vscode-extensions-service-override";
 import getStatusBarServiceOverride from "@codingame/monaco-vscode-view-status-bar-service-override";
 import getThemeServiceOverride from "@codingame/monaco-vscode-theme-service-override";
@@ -20,6 +20,9 @@ import getQuickAccessServiceOverride from "@codingame/monaco-vscode-quickaccess-
 import getOutputServiceOverride from "@codingame/monaco-vscode-output-service-override";
 import getMarkersServiceOverride from "@codingame/monaco-vscode-markers-service-override";
 import getLifecycleServiceOverride from "@codingame/monaco-vscode-lifecycle-service-override";
+import getAccessibilityServiceOverride from "@codingame/monaco-vscode-accessibility-service-override";
+import getLogServiceOverride from "@codingame/monaco-vscode-log-service-override";
+import getEnvironmentServiceOverride from "@codingame/monaco-vscode-environment-service-override";
 
 // Languages
 import "@codingame/monaco-vscode-html-default-extension";
@@ -52,6 +55,7 @@ type Panels = Array<{
 }>;
 
 const workspaceUri = Uri.file("/workspace.code-workspace");
+let userDataProvider;
 
 window.MonacoEnvironment = {
   getWorker: (moduleId, label) => {
@@ -72,6 +76,7 @@ window.MonacoEnvironment = {
 };
 
 export async function init() {
+  userDataProvider = await createIndexedDBProviders();
   await initUserConfiguration(userConfig);
 
   await initializeServices(
@@ -79,14 +84,23 @@ export async function init() {
       ...getExtensionsServiceOverride(),
       ...getStorageServiceOverrride(),
       ...getConfigurationServiceOverride(),
-      ...getViewsServiceOverride(openNewCodeEditor),
+      ...getAccessibilityServiceOverride(),
+      ...getLogServiceOverride(),
+      ...getEnvironmentServiceOverride(),
+      ...getViewsServiceOverride(openNewCodeEditor, undefined, state => ({
+        ...state,
+        editor: {
+          ...state.editor,
+          restoreEditors: true
+        }
+      })),
       ...getModelServiceOverride(),
       ...getLanguagesServiceOverride(),
       ...getTextmateServiceOverride(),
       ...getSnippetsServiceOverride(),
       ...getQuickAccessServiceOverride({
         isKeybindingConfigurationVisible: () => false,
-        shouldUseGlobalPicker: () => false
+        shouldUseGlobalPicker: (_, isStandalone) => !isStandalone && isEditorPartVisible()
       }),
       ...getNotificationsServiceOverride(),
       ...getDialogsServiceOverride(),
@@ -124,5 +138,9 @@ async function initFS() {
 export async function attachPanels(panels: Panels) {
   for (const { panel, element } of panels) {
     attachPart(panel, element);
+
+    if (!isPartVisibile(panel)) element.style.display = "none";
+
+    onPartVisibilityChange(panel, visible => element.style.display = visible ? "" : "none");
   }
 }

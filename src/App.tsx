@@ -53,8 +53,8 @@ function App() {
     <>
       <div className="editor" ref={editorRef}></div>
       <div className="explorer" ref={explorerRef}></div>
-      <div className="statusbar" ref={statusbarRef}></div>
       <div className="panel" ref={panelRef}></div>
+      <div className="statusbar" ref={statusbarRef}></div>
     </>
   );
 }

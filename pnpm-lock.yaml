@@ -5,6 +5,9 @@ settings:
   excludeLinksFromLockfile: false
 
 dependencies:
+  '@codingame/monaco-vscode-accessibility-service-override':
+    specifier: ^1.83.16
+    version: 1.83.16
   '@codingame/monaco-vscode-configuration-service-override':
     specifier: ^1.83.16
     version: 1.83.16
@@ -12,6 +15,9 @@ dependencies:
     specifier: ^1.83.16
     version: 1.83.16
   '@codingame/monaco-vscode-dialogs-service-override':
+    specifier: ^1.83.16
+    version: 1.83.16
+  '@codingame/monaco-vscode-environment-service-override':
     specifier: ^1.83.16
     version: 1.83.16
   '@codingame/monaco-vscode-extensions-service-override':
@@ -33,6 +39,9 @@ dependencies:
     specifier: ^1.83.16
     version: 1.83.16
   '@codingame/monaco-vscode-lifecycle-service-override':
+    specifier: ^1.83.16
+    version: 1.83.16
+  '@codingame/monaco-vscode-log-service-override':
     specifier: ^1.83.16
     version: 1.83.16
   '@codingame/monaco-vscode-markers-service-override':
@@ -358,6 +367,13 @@ packages:
       '@babel/helper-validator-identifier': 7.22.20
       to-fast-properties: 2.0.0
     dev: true
+
+  /@codingame/monaco-vscode-accessibility-service-override@1.83.16:
+    resolution: {integrity: sha512-maKqDNV8ZddZ0eCAPaQknQeT2cJBCr8NVxNhos+xZ1jLaqw9qchYGoO/Ny1T+chn7ZhoDa1cQgU89J20swqkWw==}
+    dependencies:
+      monaco-editor: 0.44.0
+      vscode: /@codingame/monaco-vscode-api@1.83.16
+    dev: false
 
   /@codingame/monaco-vscode-api@1.83.16:
     resolution: {integrity: sha512-8+jBcXKkvqfx5mVfaUQ+TeORIw2zGRASoKCavZCO/BSpnTCrPVTFyT2HN35+Hwun8eGqoWaNaKYunupLiBZRWg==}

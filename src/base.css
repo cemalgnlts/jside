@@ -1,7 +1,3 @@
-* {
-  box-sizing: border-box
-}
-
 html,
 body,
 #root {
@@ -18,7 +14,6 @@ body {
   display: grid;
   grid-template: 
     "editor explorer" calc(100vh - 22px) 
-    "panel panel" calc(100vh - 22px) 
     "statusbar statusbar" 22px / 80vw 20vw;
   overflow: hidden;
 }
@@ -38,10 +33,12 @@ body {
   grid-area: explorer;
 }
 
-.statusbar {
-  grid-area: statusbar;
+.panel {
+  grid-area: editor;
+  height: 40vh;
+  align-self: end;
 }
 
-.panel {
-  grid-area: panel;
+.statusbar {
+  grid-area: statusbar;
 }
