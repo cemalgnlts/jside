@@ -18,6 +18,8 @@ import getTextmateServiceOverride from "@codingame/monaco-vscode-textmate-servic
 import getSnippetsServiceOverride from "@codingame/monaco-vscode-snippets-service-override";
 import getQuickAccessServiceOverride from "@codingame/monaco-vscode-quickaccess-service-override";
 import getOutputServiceOverride from "@codingame/monaco-vscode-output-service-override";
+import getMarkersServiceOverride from "@codingame/monaco-vscode-markers-service-override";
+import getLifecycleServiceOverride from "@codingame/monaco-vscode-lifecycle-service-override";
 
 // Languages
 import "@codingame/monaco-vscode-html-default-extension";
@@ -90,7 +92,9 @@ export async function init() {
       ...getDialogsServiceOverride(),
       ...getStatusBarServiceOverride(),
       ...getThemeServiceOverride(),
-      ...getOutputServiceOverride()
+      ...getOutputServiceOverride(),
+      ...getMarkersServiceOverride(),
+      ...getLifecycleServiceOverride()
     },
     document.body,
     {

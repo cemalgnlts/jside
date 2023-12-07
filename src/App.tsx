@@ -8,6 +8,7 @@ function App() {
   const editorRef = useRef<HTMLDivElement>(null);
   const explorerRef = useRef<HTMLDivElement>(null);
   const statusbarRef = useRef<HTMLDivElement>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const setup = async () => {
@@ -23,6 +24,7 @@ function App() {
       !editorRef.current ||
       !explorerRef.current ||
       !statusbarRef.current ||
+      !panelRef.current ||
       !ready
     )
       return;
@@ -39,6 +41,10 @@ function App() {
       {
         panel: Parts.STATUSBAR_PART,
         element: statusbarRef.current
+      },
+      {
+        panel: Parts.PANEL_PART,
+        element: panelRef.current
       }
     ]);
   }, [ready]);
@@ -48,6 +54,7 @@ function App() {
       <div className="editor" ref={editorRef}></div>
       <div className="explorer" ref={explorerRef}></div>
       <div className="statusbar" ref={statusbarRef}></div>
+      <div className="panel" ref={panelRef}></div>
     </>
   );
 }

@@ -20,6 +20,8 @@
     "@codingame/monaco-vscode-javascript-default-extension": "^1.83.16",
     "@codingame/monaco-vscode-json-default-extension": "^1.83.16",
     "@codingame/monaco-vscode-languages-service-override": "^1.83.16",
+    "@codingame/monaco-vscode-lifecycle-service-override": "^1.83.16",
+    "@codingame/monaco-vscode-markers-service-override": "^1.83.16",
     "@codingame/monaco-vscode-model-service-override": "^1.83.16",
     "@codingame/monaco-vscode-notifications-service-override": "^1.83.16",
     "@codingame/monaco-vscode-output-service-override": "^1.83.16",

@@ -32,6 +32,12 @@ dependencies:
   '@codingame/monaco-vscode-languages-service-override':
     specifier: ^1.83.16
     version: 1.83.16
+  '@codingame/monaco-vscode-lifecycle-service-override':
+    specifier: ^1.83.16
+    version: 1.83.16
+  '@codingame/monaco-vscode-markers-service-override':
+    specifier: ^1.83.16
+    version: 1.83.16
   '@codingame/monaco-vscode-model-service-override':
     specifier: ^1.83.16
     version: 1.83.16
@@ -463,10 +469,24 @@ packages:
       vscode: /@codingame/monaco-vscode-api@1.83.16
     dev: false
 
+  /@codingame/monaco-vscode-lifecycle-service-override@1.83.16:
+    resolution: {integrity: sha512-PJ0ZoXo7Mmy9oCo4sn6zs1ljZVnxMHJv5gusx+QuYvmAV5UANjAUlYBxTiTR2nQzxiajpjfGpIUGz78AlU+Row==}
+    dependencies:
+      monaco-editor: 0.44.0
+      vscode: /@codingame/monaco-vscode-api@1.83.16
+    dev: false
+
   /@codingame/monaco-vscode-log-service-override@1.83.16:
     resolution: {integrity: sha512-OwtcdQeT55jUW4DBrVPqzoi0bfo9xHqQbanPPQmVr56BptQzbeDgGoquaxWMPiEan+JWLWztEEfF2Bo841n0uQ==}
     dependencies:
       '@codingame/monaco-vscode-environment-service-override': 1.83.16
+      monaco-editor: 0.44.0
+      vscode: /@codingame/monaco-vscode-api@1.83.16
+    dev: false
+
+  /@codingame/monaco-vscode-markers-service-override@1.83.16:
+    resolution: {integrity: sha512-SCeKbsdCGQYgrhnPqgZG8r/8Wlwf0tGsavdhlsOkaLfMweHL8EPIKG1x+B5iEF3fHFitGeAUBKAkTAo+5dEsFg==}
+    dependencies:
       monaco-editor: 0.44.0
       vscode: /@codingame/monaco-vscode-api@1.83.16
     dev: false
@@ -1381,6 +1401,7 @@ packages:
     resolution: {integrity: sha512-l7iffQpT2OrZfH2rXIp7/FkmaeZM0vxbxN9KfiCwGYuZqzMg/JdvX26R31Zxn/Pxvsrg3Y9N6XTcnknqDyyv4w==}
     engines: {node: '>=12'}
     hasBin: true
+    requiresBuild: true
     optionalDependencies:
       '@esbuild/android-arm': 0.19.8
       '@esbuild/android-arm64': 0.19.8

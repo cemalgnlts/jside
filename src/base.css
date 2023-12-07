@@ -16,17 +16,17 @@ body {
 
 #root {
   display: grid;
-  grid-template-areas:
-    "editor explorer"
-    "statusbar statusbar";
-  grid-template-columns: 80vw 20vw;
-  grid-template-rows: calc(100vh - 22px) 22px;
+  grid-template: 
+    "editor explorer" calc(100vh - 22px) 
+    "panel panel" calc(100vh - 22px) 
+    "statusbar statusbar" 22px / 80vw 20vw;
   overflow: hidden;
 }
 
 .editor,
 .explorer,
-.statusbar {
+.statusbar,
+.panel {
   position: relative;
 }
 
@@ -40,4 +40,8 @@ body {
 
 .statusbar {
   grid-area: statusbar;
+}
+
+.panel {
+  grid-area: panel;
 }
