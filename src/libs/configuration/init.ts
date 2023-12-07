@@ -1,4 +1,4 @@
-import { initialize as initializeServices } from "vscode/services";
+import { IConfigurationService, getService, initialize as initializeServices } from "vscode/services";
 
 // services
 import getDialogsServiceOverride from "@codingame/monaco-vscode-dialogs-service-override";
@@ -17,6 +17,7 @@ import getLanguagesServiceOverride from "@codingame/monaco-vscode-languages-serv
 import getTextmateServiceOverride from "@codingame/monaco-vscode-textmate-service-override";
 import getSnippetsServiceOverride from "@codingame/monaco-vscode-snippets-service-override";
 import getQuickAccessServiceOverride from "@codingame/monaco-vscode-quickaccess-service-override";
+import getOutputServiceOverride from "@codingame/monaco-vscode-output-service-override";
 
 // Languages
 import "@codingame/monaco-vscode-html-default-extension";
@@ -24,6 +25,7 @@ import "@codingame/monaco-vscode-css-default-extension";
 import "@codingame/monaco-vscode-javascript-default-extension";
 import "@codingame/monaco-vscode-typescript-basics-default-extension";
 import "@codingame/monaco-vscode-json-default-extension";
+import "@codingame/monaco-vscode-typescript-language-features-default-extension";
 
 // Themes
 import "@codingame/monaco-vscode-theme-defaults-default-extension";
@@ -32,7 +34,7 @@ import "@codingame/monaco-vscode-theme-seti-default-extension";
 // Workers
 import EditorWorker from "monaco-editor/esm/vs/editor/editor.worker.js?worker";
 import TextmateWorker from "@codingame/monaco-vscode-textmate-service-override/worker?worker";
-import TypeScriptWorker from "monaco-editor/esm/vs/language/typescript/ts.worker?worker";
+import OutputLinkComputer from "@codingame/monaco-vscode-output-service-override/worker?worker";
 
 import { openNewCodeEditor } from "./openNewEditor";
 import { Uri, workspace } from "vscode";
@@ -50,15 +52,17 @@ type Panels = Array<{
 const workspaceUri = Uri.file("/workspace.code-workspace");
 
 window.MonacoEnvironment = {
-  getWorker: (moduleId, label) => {console.log(label);
+  getWorker: (moduleId, label) => {
     switch (label) {
       case "editorWorkerService":
         return new EditorWorker();
       case "textMateWorker":
         return new TextmateWorker();
-      case "javascript":
-      case "typescript":
-        return new TypeScriptWorker();
+      case "outputLinkComputer":
+        return new OutputLinkComputer();
+      // case "javascript":
+      // case "typescript":
+      //   return new TypeScriptWorker();
     }
 
     throw Error(`Unimplemented worker ${label} (${moduleId})`);
@@ -70,25 +74,23 @@ export async function init() {
 
   await initializeServices(
     {
+      ...getExtensionsServiceOverride(),
       ...getStorageServiceOverrride(),
       ...getConfigurationServiceOverride(),
-      ...getViewsServiceOverride(openNewCodeEditor, undefined, (state) => ({
-        ...state,
-        editor: {
-          ...state.editor,
-          restoreEditors: false
-        }
-      })),
-      ...getExtensionsServiceOverride(),
+      ...getViewsServiceOverride(openNewCodeEditor),
       ...getModelServiceOverride(),
       ...getLanguagesServiceOverride(),
       ...getTextmateServiceOverride(),
       ...getSnippetsServiceOverride(),
-      ...getQuickAccessServiceOverride(),
+      ...getQuickAccessServiceOverride({
+        isKeybindingConfigurationVisible: () => false,
+        shouldUseGlobalPicker: () => false
+      }),
       ...getNotificationsServiceOverride(),
       ...getDialogsServiceOverride(),
       ...getStatusBarServiceOverride(),
-      ...getThemeServiceOverride()
+      ...getThemeServiceOverride(),
+      ...getOutputServiceOverride()
     },
     document.body,
     {
@@ -110,7 +112,7 @@ async function initFS() {
   const webFS = new WebFileSystem();
   await webFS.mount(projectsDirHandle);
 
-  registerFileSystemOverlay(0, webFS);
+  registerFileSystemOverlay(1, webFS);
 
   workspace.updateWorkspaceFolders(0, 0, { uri: Uri.file(projectsDirHandle.name) });
 }
@@ -119,7 +121,4 @@ export async function attachPanels(panels: Panels) {
   for (const { panel, element } of panels) {
     attachPart(panel, element);
   }
-
-  // const workbenchLayoutService = await getService(IWorkbenchLayoutService)
-  // workbenchLayoutService.setPanelPosition(1);
 }
