@@ -1,12 +1,12 @@
-import { IConfigurationService, getService, initialize as initializeServices } from "vscode/services";
+import { IConfigurationService, ILayoutService, getService, initialize as initializeServices } from "vscode/services";
 
 // services
 import getDialogsServiceOverride from "@codingame/monaco-vscode-dialogs-service-override";
 import getStorageServiceOverrride from "@codingame/monaco-vscode-storage-service-override";
-import getViewsServiceOverride, { Parts, attachPart, isEditorPartVisible, isPartVisibile, onPartVisibilityChange } from "@codingame/monaco-vscode-views-service-override";
+import getViewsServiceOverride, { Parts, attachPart, isEditorPartVisible, isPartVisibile, onPartVisibilityChange, setPartVisibility } from "@codingame/monaco-vscode-views-service-override";
 import getModelServiceOverride from "@codingame/monaco-vscode-model-service-override";
 import getConfigurationServiceOverride, {
-  initUserConfiguration
+  initUserConfiguration, updateUserConfiguration
 } from "@codingame/monaco-vscode-configuration-service-override";
 import { createIndexedDBProviders, registerFileSystemOverlay } from "@codingame/monaco-vscode-files-service-override";
 import getExtensionsServiceOverride from "@codingame/monaco-vscode-extensions-service-override";
@@ -48,6 +48,7 @@ import "vscode/localExtensionHost";
 
 import userConfig from "./userConfiguration.json?raw";
 import WebFileSystem from "../WebFileSystem";
+import { IWorkbenchLayoutService, Position } from "vscode/vscode/vs/workbench/services/layout/browser/layoutService";
 
 type Panels = Array<{
   panel: Parts;
@@ -135,7 +136,7 @@ async function initFS() {
   workspace.updateWorkspaceFolders(0, 0, { uri: Uri.file(projectsDirHandle.name) });
 }
 
-export async function attachPanels(panels: Panels) {
+export function attachPanels(panels: Panels) {
   for (const { panel, element } of panels) {
     attachPart(panel, element);
 
@@ -143,4 +144,6 @@ export async function attachPanels(panels: Panels) {
 
     onPartVisibilityChange(panel, visible => element.style.display = visible ? "" : "none");
   }
+
+  setPartVisibility(Parts.PANEL_PART, false);
 }
