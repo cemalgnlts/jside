@@ -89,6 +89,9 @@ dependencies:
   '@codingame/monaco-vscode-views-service-override':
     specifier: ^1.83.16
     version: 1.83.16
+  '@codingame/monaco-vscode-working-copy-service-override':
+    specifier: ^1.83.16
+    version: 1.83.16
   monaco-editor:
     specifier: ^0.44.0
     version: 0.44.0
@@ -611,6 +614,14 @@ packages:
       '@codingame/monaco-vscode-keybindings-service-override': 1.83.16
       '@codingame/monaco-vscode-layout-service-override': 1.83.16
       '@codingame/monaco-vscode-quickaccess-service-override': 1.83.16
+      monaco-editor: 0.44.0
+      vscode: /@codingame/monaco-vscode-api@1.83.16
+    dev: false
+
+  /@codingame/monaco-vscode-working-copy-service-override@1.83.16:
+    resolution: {integrity: sha512-+P+wFZaox24lhYVBQvdpECg3Xx+UxAmIiQGfUokvvkXsMHFOTy6lQztCk+tGZmENc+k2hrEGMjpGUV/pcqS8sg==}
+    dependencies:
+      '@codingame/monaco-vscode-files-service-override': 1.83.16
       monaco-editor: 0.44.0
       vscode: /@codingame/monaco-vscode-api@1.83.16
     dev: false

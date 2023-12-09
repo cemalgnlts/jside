@@ -30,6 +30,7 @@ import getLifecycleServiceOverride from "@codingame/monaco-vscode-lifecycle-serv
 import getAccessibilityServiceOverride from "@codingame/monaco-vscode-accessibility-service-override";
 import getLogServiceOverride from "@codingame/monaco-vscode-log-service-override";
 import getEnvironmentServiceOverride from "@codingame/monaco-vscode-environment-service-override";
+import getWorkingCopyServiceOverride from "@codingame/monaco-vscode-working-copy-service-override";
 
 // Languages
 import "@codingame/monaco-vscode-html-default-extension";
@@ -38,19 +39,26 @@ import "@codingame/monaco-vscode-javascript-default-extension";
 import "@codingame/monaco-vscode-typescript-basics-default-extension";
 import "@codingame/monaco-vscode-json-default-extension";
 import "@codingame/monaco-vscode-typescript-language-features-default-extension";
+import "monaco-editor/esm/vs/editor/contrib/format/browser/formatActions.js";
 
 // Themes
 import "@codingame/monaco-vscode-theme-defaults-default-extension";
 import "@codingame/monaco-vscode-theme-seti-default-extension";
+import "../../extensions/vsc-material-theme";
 
-import { openNewCodeEditor } from "./openNewEditor";
+// Workers
+import EditorWorkerUrl from "monaco-editor/esm/vs/editor/editor.worker.js?url";
+import TextMateWorkerUrl from "@codingame/monaco-vscode-textmate-service-override/worker?url";
+import OutputLinkComputerWorkerUrl from "@codingame/monaco-vscode-output-service-override/worker?url";
+
 import { Uri, workspace } from "vscode";
 
 import "vscode/localExtensionHost";
 
+import { openNewCodeEditor } from "./openNewEditor";
+
 import userConfig from "./userConfiguration.json?raw";
 import WebFileSystem from "../WebFileSystem";
-import { IWorkbenchLayoutService, Position } from "vscode/vscode/vs/workbench/services/layout/browser/layoutService";
 
 type Panels = Array<{
 	panel: Parts;
@@ -58,46 +66,51 @@ type Panels = Array<{
 }>;
 
 const workspaceUri = Uri.file("/workspace.code-workspace");
-let userDataProvider;
-
-type WorkerLoader = () => Worker;
-const workerLoaders: Partial<Record<string, WorkerLoader>> = {
-	editorWorkerService: () =>
-		new CrossOriginWorker(new URL("monaco-editor/esm/vs/editor/editor.worker.js", import.meta.url), { type: "module" }),
-	textMateWorker: () =>
-		new CrossOriginWorker(new URL("@codingame/monaco-vscode-textmate-service-override/worker", import.meta.url), {
-			type: "module"
-		}),
-	outputLinkComputer: () =>
-		new CrossOriginWorker(new URL("@codingame/monaco-vscode-output-service-override/worker", import.meta.url), {
-			type: "module"
-		})
-};
 
 window.MonacoEnvironment = {
-	getWorker: (moduleId, label) => {
-		const workerFactory = workerLoaders[label];
+	getWorker(moduleId, label) {
+		let url = "";
 
-		if (workerFactory != null) {
-			return workerFactory();
+		switch (label) {
+			case "editorWorkerService":
+				url = EditorWorkerUrl;
+				break;
+			case "textMateWorker":
+				url = TextMateWorkerUrl;
+				break;
+			case "outputLinkComputer":
+				url = OutputLinkComputerWorkerUrl;
+				break;
+			default:
+				throw new Error(`Unimplemented worker ${label} (${moduleId})`);
 		}
 
-		throw new Error(`Unimplemented worker ${label} (${moduleId})`);
+		return new CrossOriginWorker(new URL(url, import.meta.url), { type: "module" });
 	}
 };
 
 export async function init() {
-	userDataProvider = await createIndexedDBProviders();
+	const fakeWorker = new FakeWorker(new URL("vscode/workers/extensionHost.worker", import.meta.url), {
+		type: "module"
+	});
+
+	const workerConfig: WorkerConfig = {
+		url: fakeWorker.url.toString(),
+		options: fakeWorker.options
+	};
+
+	await createIndexedDBProviders();
 	await initUserConfiguration(userConfig);
 
 	await initializeServices(
 		{
 			...getExtensionsServiceOverride(workerConfig),
+			...getWorkingCopyServiceOverride(),
 			...getStorageServiceOverrride(),
 			...getConfigurationServiceOverride(),
-			...getAccessibilityServiceOverride(),
 			...getLogServiceOverride(),
 			...getEnvironmentServiceOverride(),
+			...getStatusBarServiceOverride(),
 			...getViewsServiceOverride(openNewCodeEditor, undefined, (state) => ({
 				...state,
 				editor: {
@@ -105,6 +118,7 @@ export async function init() {
 					restoreEditors: true
 				}
 			})),
+			...getAccessibilityServiceOverride(),
 			...getModelServiceOverride(),
 			...getLanguagesServiceOverride(),
 			...getTextmateServiceOverride(),
@@ -115,7 +129,6 @@ export async function init() {
 			}),
 			...getNotificationsServiceOverride(),
 			...getDialogsServiceOverride(),
-			...getStatusBarServiceOverride(),
 			...getThemeServiceOverride(),
 			...getOutputServiceOverride(),
 			...getMarkersServiceOverride(),
@@ -175,10 +188,3 @@ class CrossOriginWorker extends Worker {
 class FakeWorker {
 	constructor(public url: string | URL, public options?: WorkerOptions) {}
 }
-
-const fakeWorker = new FakeWorker(new URL("vscode/workers/extensionHost.worker", import.meta.url), { type: "module" });
-
-const workerConfig: WorkerConfig = {
-	url: fakeWorker.url.toString(),
-	options: fakeWorker.options
-};
