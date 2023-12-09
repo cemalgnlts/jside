@@ -48,6 +48,11 @@ registerFileUrl(
 );
 
 registerFileUrl(
+    "./icons/file.svg",
+    new URL("./icons/file.svg", import.meta.url).toString()
+);
+
+registerFileUrl(
     "./icons/javascript.svg",
     new URL("./icons/javascript.svg", import.meta.url).toString()
 );

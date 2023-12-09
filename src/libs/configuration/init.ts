@@ -41,15 +41,8 @@ import "@codingame/monaco-vscode-json-default-extension";
 import "@codingame/monaco-vscode-typescript-language-features-default-extension";
 
 // Themes
-// import "@codingame/monaco-vscode-theme-defaults-default-extension";
-// import "@codingame/monaco-vscode-theme-seti-default-extension";
 import "../../extensions/vsc-material-theme";
 import "../../extensions/material-icon-theme";
-
-// Workers
-import EditorWorkerUrl from "monaco-editor/esm/vs/editor/editor.worker.js?url";
-import TextMateWorkerUrl from "@codingame/monaco-vscode-textmate-service-override/worker?url";
-import OutputLinkComputerWorkerUrl from "@codingame/monaco-vscode-output-service-override/worker?url";
 
 import { Uri, workspace } from "vscode";
 
@@ -73,13 +66,13 @@ window.MonacoEnvironment = {
 
 		switch (label) {
 			case "editorWorkerService":
-				url = EditorWorkerUrl;
+				url = "monaco-editor/esm/vs/editor/editor.worker.js";
 				break;
 			case "textMateWorker":
-				url = TextMateWorkerUrl;
+				url = "@codingame/monaco-vscode-textmate-service-override/worker";
 				break;
 			case "outputLinkComputer":
-				url = OutputLinkComputerWorkerUrl;
+				url = "@codingame/monaco-vscode-output-service-override/worker";
 				break;
 			default:
 				throw new Error(`Unimplemented worker ${label} (${moduleId})`);
@@ -104,7 +97,7 @@ export async function init() {
 
 	await initializeServices(
 		{
-			...getExtensionsServiceOverride(),
+			...getExtensionsServiceOverride(workerConfig),
 			...getWorkingCopyServiceOverride(),
 			...getStorageServiceOverrride(),
 			...getConfigurationServiceOverride(),
