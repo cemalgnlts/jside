@@ -68,13 +68,7 @@ dependencies:
   '@codingame/monaco-vscode-textmate-service-override':
     specifier: ^1.83.16
     version: 1.83.16
-  '@codingame/monaco-vscode-theme-defaults-default-extension':
-    specifier: ^1.83.16
-    version: 1.83.16
   '@codingame/monaco-vscode-theme-service-override':
-    specifier: ^1.83.16
-    version: 1.83.16
-  '@codingame/monaco-vscode-theme-seti-default-extension':
     specifier: ^1.83.16
     version: 1.83.16
   '@codingame/monaco-vscode-typescript-basics-default-extension':
@@ -565,23 +559,11 @@ packages:
       vscode-textmate: 9.0.0
     dev: false
 
-  /@codingame/monaco-vscode-theme-defaults-default-extension@1.83.16:
-    resolution: {integrity: sha512-vCf1yIBjubLfhm6Hv8uQ0Dv5T6CvSvGwvS9BtuUQg9oesbFglAozlDGZtZKDTheywYKaqvRCLsi5ajkuik9tBg==}
-    dependencies:
-      vscode: /@codingame/monaco-vscode-api@1.83.16
-    dev: false
-
   /@codingame/monaco-vscode-theme-service-override@1.83.16:
     resolution: {integrity: sha512-re8r5MaMvPeB9eS4eNUxPeus6pZYBafq991Eu0/X0XQb3xMOu7T5Fq4QzBtLr3/xdyJ9zSiQZHUoOv4QAh7xjQ==}
     dependencies:
       '@codingame/monaco-vscode-files-service-override': 1.83.16
       monaco-editor: 0.44.0
-      vscode: /@codingame/monaco-vscode-api@1.83.16
-    dev: false
-
-  /@codingame/monaco-vscode-theme-seti-default-extension@1.83.16:
-    resolution: {integrity: sha512-KzD1lNzWA8HuMhBT/EXvbF77lz36rO3Pv1irlB5LILhUVPh1hGtIFhguE6a8cBmapAP1xzPfF6eRIYj/3vv5TQ==}
-    dependencies:
       vscode: /@codingame/monaco-vscode-api@1.83.16
     dev: false
 

@@ -1,5 +1,6 @@
 {
-	"workbench.colorTheme": "Material-Theme-Ocean-High-Contrast",
+	"workbench.colorTheme": "Material Theme Darker High Contrast",
+	"workbench.iconTheme": "material-icon-theme",
 	"workbench.sideBar.location": "right",
 	"editor.fontSize": 14,
 	"editor.tabSize": 2,

@@ -39,12 +39,12 @@ import "@codingame/monaco-vscode-javascript-default-extension";
 import "@codingame/monaco-vscode-typescript-basics-default-extension";
 import "@codingame/monaco-vscode-json-default-extension";
 import "@codingame/monaco-vscode-typescript-language-features-default-extension";
-import "monaco-editor/esm/vs/editor/contrib/format/browser/formatActions.js";
 
 // Themes
-import "@codingame/monaco-vscode-theme-defaults-default-extension";
-import "@codingame/monaco-vscode-theme-seti-default-extension";
+// import "@codingame/monaco-vscode-theme-defaults-default-extension";
+// import "@codingame/monaco-vscode-theme-seti-default-extension";
 import "../../extensions/vsc-material-theme";
+import "../../extensions/material-icon-theme";
 
 // Workers
 import EditorWorkerUrl from "monaco-editor/esm/vs/editor/editor.worker.js?url";
@@ -104,7 +104,7 @@ export async function init() {
 
 	await initializeServices(
 		{
-			...getExtensionsServiceOverride(workerConfig),
+			...getExtensionsServiceOverride(),
 			...getWorkingCopyServiceOverride(),
 			...getStorageServiceOverrride(),
 			...getConfigurationServiceOverride(),

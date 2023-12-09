@@ -1,6 +1,7 @@
 import { registerExtension, ExtensionHostKind } from "vscode/extensions";
+import { IExtensionManifest } from "vscode/vscode/vs/platform/extensions/common/extensions";
 
-const extension = {
+const extension: IExtensionManifest = {
 	name: "vsc-material-theme",
 	publisher: "Equinusocio",
 	version: "34.3.0",
@@ -10,8 +11,9 @@ const extension = {
 	contributes: {
 		themes: [
 			{
-				label: "Material Theme Ocean High Contrast",
-				path: "/Material-Theme-Ocean-High-Contrast.json",
+				label: "Material Theme Darker High Contrast",
+				/* @ts-ignore */
+				path: "/Material-Theme-Darker-High-Contrast.json",
 				uiTheme: "vs-dark"
 			}
 		]
@@ -21,6 +23,6 @@ const extension = {
 const { registerFileUrl } = registerExtension(extension, ExtensionHostKind.LocalProcess);
 
 registerFileUrl(
-	"/Material-Theme-Ocean-High-Contrast.json",
-	new URL("./Material-Theme-Ocean-High-Contrast.json", import.meta.url)
+	"/Material-Theme-Darker-High-Contrast.json",
+	new URL("./Material-Theme-Darker-High-Contrast.json", import.meta.url).toString()
 );
