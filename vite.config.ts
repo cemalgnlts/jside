@@ -4,9 +4,61 @@ import react from "@vitejs/plugin-react";
 import fs from "node:fs";
 import url from "node:url";
 
+import { VitePWA } from "vite-plugin-pwa";
+
+const manifest = {
+  name: "JSIDE",
+  id: "/",
+  start_url: "/",
+  display: "fullscreen",
+  description:
+    "A PWA-powered IDE for the entire JS ecosystem that works completely offline.",
+  theme_color: "#100f0f",
+  background_color: "#100f0f",
+  icons: [
+    {
+      sizes: "512x512",
+      type: "image/png",
+      src: "/icon-512.png"
+    },
+    {
+      sizes: "192x192",
+      type: "image/png",
+      src: "/icon-192.png"
+    },
+    {
+      sizes: "512x512",
+      type: "image/png",
+      src: "/icon-512-maskable.png",
+      purpose: "maskable"
+    },
+    {
+      sizes: "192x192",
+      type: "image/png",
+      src: "/icon-192-maskable.png",
+      purpose: "maskable"
+    }
+  ]
+};
+
+const pwa = VitePWA({
+  injectRegister: "inline",
+  registerType: "autoUpdate",
+  includeAssets: ["**/*"],
+  workbox: {
+    globPatterns: ["**/*"]
+  },
+  // @ts-ignore
+  manifest
+});
+
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [react()],
+  plugins: [react(), pwa],
+  build: {
+    target: "es2019",
+    sourcemap: false
+  },
   server: {
     headers: {
       "Cross-Origin-Embedder-Policy": "credentialless",
@@ -15,14 +67,7 @@ export default defineConfig({
     }
   },
   optimizeDeps: {
-    include: [
-      "vscode/extensions",
-      "vscode/services",
-      "vscode/monaco",
-      "vscode/localExtensionHost",
-      "monaco-editor/esm/vs/nls.js",
-      "monaco-editor/esm/vs/editor/editor.worker.js"
-    ],
+    include: ["vscode-semver"],
     esbuildOptions: {
       plugins: [
         {

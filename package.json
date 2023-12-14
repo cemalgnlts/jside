@@ -8,11 +8,12 @@
     "build": "tsc && vite build",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
+    "publish": "surge --project ./dist --domain https://jside.surge.sh",
     "postinstall": "monaco-treemending"
   },
   "dependencies": {
     "@codingame/monaco-vscode-accessibility-service-override": "^1.83.16",
-    "@codingame/monaco-vscode-configuration-service-override": "^1.83.16",
+    "@codingame/monaco-vscode-configuration-service-override": "^1.83.15",
     "@codingame/monaco-vscode-css-default-extension": "^1.83.16",
     "@codingame/monaco-vscode-dialogs-service-override": "^1.83.16",
     "@codingame/monaco-vscode-environment-service-override": "^1.83.16",
@@ -22,9 +23,13 @@
     "@codingame/monaco-vscode-javascript-default-extension": "^1.83.16",
     "@codingame/monaco-vscode-json-default-extension": "^1.83.16",
     "@codingame/monaco-vscode-languages-service-override": "^1.83.16",
+    "@codingame/monaco-vscode-layout-service-override": "^1.83.16",
     "@codingame/monaco-vscode-lifecycle-service-override": "^1.83.16",
     "@codingame/monaco-vscode-log-service-override": "^1.83.16",
+    "@codingame/monaco-vscode-markdown-basics-default-extension": "^1.83.16",
+    "@codingame/monaco-vscode-markdown-language-features-default-extension": "^1.83.16",
     "@codingame/monaco-vscode-markers-service-override": "^1.83.16",
+    "@codingame/monaco-vscode-media-preview-default-extension": "^1.83.16",
     "@codingame/monaco-vscode-model-service-override": "^1.83.16",
     "@codingame/monaco-vscode-notifications-service-override": "^1.83.16",
     "@codingame/monaco-vscode-output-service-override": "^1.83.16",
@@ -36,7 +41,8 @@
     "@codingame/monaco-vscode-typescript-basics-default-extension": "^1.83.16",
     "@codingame/monaco-vscode-typescript-language-features-default-extension": "^1.83.16",
     "@codingame/monaco-vscode-view-status-bar-service-override": "^1.83.16",
-    "@codingame/monaco-vscode-views-service-override": "^1.83.16",
+    "@codingame/monaco-vscode-view-title-bar-service-override": "^1.83.16",
+    "@codingame/monaco-vscode-views-service-override": "^1.83.15",
     "@codingame/monaco-vscode-working-copy-service-override": "^1.83.16",
     "monaco-editor": "^0.44.0",
     "react": "^18.2.0",
@@ -54,6 +60,7 @@
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.5",
     "typescript": "^5.3.2",
-    "vite": "^5.0.6"
+    "vite": "^5.0.6",
+    "vite-plugin-pwa": "^0.17.4"
   }
 }

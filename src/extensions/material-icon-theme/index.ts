@@ -27,37 +27,8 @@ registerFileUrl(
 	new URL("./material-icons.json", import.meta.url).toString()
 );
 
-registerFileUrl(
-    "./icons/folder-root.svg",
-    new URL("./icons/folder-root.svg", import.meta.url).toString()
-);
+const icons = import.meta.glob("./icons/*.svg");
 
-registerFileUrl(
-    "./icons/folder-root-open.svg",
-    new URL("./icons/folder-root-open.svg", import.meta.url).toString()
-);
-
-registerFileUrl(
-    "./icons/folder.svg",
-    new URL("./icons/folder.svg", import.meta.url).toString()
-);
-
-registerFileUrl(
-    "./icons/folder-open.svg",
-    new URL("./icons/folder-open.svg", import.meta.url).toString()
-);
-
-registerFileUrl(
-    "./icons/file.svg",
-    new URL("./icons/file.svg", import.meta.url).toString()
-);
-
-registerFileUrl(
-    "./icons/javascript.svg",
-    new URL("./icons/javascript.svg", import.meta.url).toString()
-);
-
-registerFileUrl(
-    "./icons/typescript.svg",
-    new URL("./icons/typescript.svg", import.meta.url).toString()
-);
+for (const path of Object.keys(icons)) {
+	registerFileUrl(path, new URL(path, import.meta.url).toString())
+}

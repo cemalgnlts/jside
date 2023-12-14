@@ -1,13 +1,13 @@
 {
-	"workbench.colorTheme": "Material Theme Darker High Contrast",
+	"workbench.colorTheme": "One Dark",
 	"workbench.iconTheme": "material-icon-theme",
 	"workbench.sideBar.location": "right",
 	"editor.fontSize": 14,
 	"editor.tabSize": 2,
 	"editor.scrollBeyondLastLine": false,
 	"editor.minimap.enabled": false,
-	"telemetry.enableCrashReporter": false,
-	"telemetry.enableTelemetry": false,
+	"editor.insertSpaces": false,
+	"files.autoSave": "onFocusChange",
 	"[javascript]": {
 		"editor.tabSize": 2
 	}

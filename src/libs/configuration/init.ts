@@ -1,6 +1,6 @@
 import { initialize as initializeServices } from "vscode/services";
 
-// services
+// Services
 import getDialogsServiceOverride from "@codingame/monaco-vscode-dialogs-service-override";
 import getStorageServiceOverrride from "@codingame/monaco-vscode-storage-service-override";
 import getViewsServiceOverride, {
@@ -31,18 +31,16 @@ import getAccessibilityServiceOverride from "@codingame/monaco-vscode-accessibil
 import getLogServiceOverride from "@codingame/monaco-vscode-log-service-override";
 import getEnvironmentServiceOverride from "@codingame/monaco-vscode-environment-service-override";
 import getWorkingCopyServiceOverride from "@codingame/monaco-vscode-working-copy-service-override";
+import getTitleBarServiceOverride from "@codingame/monaco-vscode-view-title-bar-service-override";
 
-// Languages
-import "@codingame/monaco-vscode-html-default-extension";
-import "@codingame/monaco-vscode-css-default-extension";
-import "@codingame/monaco-vscode-javascript-default-extension";
-import "@codingame/monaco-vscode-typescript-basics-default-extension";
-import "@codingame/monaco-vscode-json-default-extension";
-import "@codingame/monaco-vscode-typescript-language-features-default-extension";
+// Extensions
+import "./extensions.ts";
 
-// Themes
-import "../../extensions/vsc-material-theme";
-import "../../extensions/material-icon-theme";
+// Workers
+import EditorWorkerUrl from "monaco-editor/esm/vs/editor/editor.worker.js?url";
+import TextmateWorkerUrl from "@codingame/monaco-vscode-textmate-service-override/worker?url";
+import OutputLinkComputerWorker from "@codingame/monaco-vscode-output-service-override/worker?url";
+import ExtensionHostWorkerUrl from "vscode/workers/extensionHost.worker?url";
 
 import { Uri, workspace } from "vscode";
 
@@ -51,14 +49,14 @@ import "vscode/localExtensionHost";
 import { openNewCodeEditor } from "./openNewEditor";
 
 import userConfig from "./userConfiguration.json?raw";
-import WebFileSystem from "../WebFileSystem";
+import WebFileSystem from "../webFileSystem";
 
 type Panels = Array<{
 	panel: Parts;
 	element: HTMLDivElement;
 }>;
 
-const workspaceUri = Uri.file("/workspace.code-workspace");
+const workspaceUri = Uri.file("/projects.code-workspace");
 
 window.MonacoEnvironment = {
 	getWorker(moduleId, label) {
@@ -66,13 +64,13 @@ window.MonacoEnvironment = {
 
 		switch (label) {
 			case "editorWorkerService":
-				url = "monaco-editor/esm/vs/editor/editor.worker.js";
+				url = EditorWorkerUrl;
 				break;
 			case "textMateWorker":
-				url = "@codingame/monaco-vscode-textmate-service-override/worker";
+				url = TextmateWorkerUrl;
 				break;
 			case "outputLinkComputer":
-				url = "@codingame/monaco-vscode-output-service-override/worker";
+				url = OutputLinkComputerWorker;
 				break;
 			default:
 				throw new Error(`Unimplemented worker ${label} (${moduleId})`);
@@ -83,7 +81,7 @@ window.MonacoEnvironment = {
 };
 
 export async function init() {
-	const fakeWorker = new FakeWorker(new URL("vscode/workers/extensionHost.worker", import.meta.url), {
+	const fakeWorker = new FakeWorker(new URL(ExtensionHostWorkerUrl, import.meta.url), {
 		type: "module"
 	});
 
@@ -97,13 +95,14 @@ export async function init() {
 
 	await initializeServices(
 		{
-			...getExtensionsServiceOverride(workerConfig),
-			...getWorkingCopyServiceOverride(),
-			...getStorageServiceOverrride(),
-			...getConfigurationServiceOverride(),
 			...getLogServiceOverride(),
-			...getEnvironmentServiceOverride(),
-			...getStatusBarServiceOverride(),
+			...getExtensionsServiceOverride(workerConfig),
+			...getModelServiceOverride(),
+			...getNotificationsServiceOverride(),
+			...getDialogsServiceOverride(),
+			...getConfigurationServiceOverride(),
+			...getTextmateServiceOverride(),
+			...getThemeServiceOverride(),
 			...getViewsServiceOverride(openNewCodeEditor, undefined, (state) => ({
 				...state,
 				editor: {
@@ -111,21 +110,21 @@ export async function init() {
 					restoreEditors: true
 				}
 			})),
-			...getAccessibilityServiceOverride(),
-			...getModelServiceOverride(),
-			...getLanguagesServiceOverride(),
-			...getTextmateServiceOverride(),
+			...getStatusBarServiceOverride(),
 			...getSnippetsServiceOverride(),
 			...getQuickAccessServiceOverride({
 				isKeybindingConfigurationVisible: () => false,
 				shouldUseGlobalPicker: (_, isStandalone) => !isStandalone && isEditorPartVisible()
 			}),
-			...getNotificationsServiceOverride(),
-			...getDialogsServiceOverride(),
-			...getThemeServiceOverride(),
 			...getOutputServiceOverride(),
 			...getMarkersServiceOverride(),
-			...getLifecycleServiceOverride()
+			...getAccessibilityServiceOverride(),
+			...getStorageServiceOverrride(),
+			...getLifecycleServiceOverride(),
+			...getEnvironmentServiceOverride(),
+			...getWorkingCopyServiceOverride(),
+			...getLanguagesServiceOverride(),
+			...getTitleBarServiceOverride()
 		},
 		document.body,
 		{
@@ -133,6 +132,10 @@ export async function init() {
 				trusted: true,
 				open: async () => false,
 				workspace: { workspaceUri }
+			},
+			productConfiguration: {
+				enableTelemetry: false,
+				applicationName:  "jside"
 			}
 		}
 	);
@@ -142,7 +145,7 @@ export async function init() {
 
 async function initFS() {
 	const rootDirHandle = await navigator.storage.getDirectory();
-	const projectsDirHandle = await rootDirHandle.getDirectoryHandle("projects");
+	const projectsDirHandle = await rootDirHandle.getDirectoryHandle("projects", { create: true });
 
 	const webFS = new WebFileSystem();
 	await webFS.mount(projectsDirHandle);
@@ -179,5 +182,5 @@ class CrossOriginWorker extends Worker {
 }
 
 class FakeWorker {
-	constructor(public url: string | URL, public options?: WorkerOptions) {}
+	constructor(public url: string | URL, public options?: WorkerOptions) { }
 }
