@@ -1,0 +1,45 @@
+html,
+body,
+#root {
+  height: 100vh;
+}
+
+body {
+  margin: 0;
+  font-family: Roboto, sans-serif;
+  color: var(--vscode-foreground);
+  font-size: 14px;
+}
+
+#root {
+  display: grid;
+  grid-template: 
+    "editor explorer" calc(100vh - 22px) 
+    "statusbar statusbar" 22px / 80vw 20vw;
+  overflow: hidden;
+}
+
+.editor,
+.explorer,
+.statusbar,
+.panel {
+  position: relative;
+}
+
+.editor {
+  grid-area: editor;
+}
+
+.explorer {
+  grid-area: explorer;
+}
+
+.panel {
+  grid-area: editor;
+  height: 40vh;
+  align-self: end;
+}
+
+.statusbar {
+  grid-area: statusbar;
+}
