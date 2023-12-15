@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "NODE_OPTIONS=--experimental-import-meta-resolve vite",
     "build": "tsc && vite build",
-    "postbuild": "rm ./dist/assets/*.map && sed -i '/\/\/# sourceMappingURL=.*/d' ./dist/assets/*",
+    "postbuild": "rm ./dist/assets/*.map && sed -i '/\\/\\/# sourceMappingURL=.*/d' ./dist/assets/*",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
     "publish": "surge --project ./dist --domain https://jside.surge.sh",
