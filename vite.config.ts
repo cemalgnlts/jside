@@ -46,7 +46,9 @@ const pwa = VitePWA({
   registerType: "autoUpdate",
   includeAssets: ["**/*"],
   workbox: {
-    globPatterns: ["**/*"]
+    globPatterns: ["**/*"],
+    globIgnores: ["**/*.map"],
+    maximumFileSizeToCacheInBytes: 15728640, // 15 MB
   },
   // @ts-ignore
   manifest

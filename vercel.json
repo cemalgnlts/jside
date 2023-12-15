@@ -1,7 +1,7 @@
 {
 	"headers": [
 		{
-			"source": "/(.*)",
+			"source": "/.*",
 			"headers": [
 				{
 					"key": "Cross-Origin-Embedder-Policy",
@@ -16,6 +16,21 @@
 					"value": "cross-origin"
 				}
 			]
+		},
+		{
+			"source": "/assets/*",
+			"headers": [
+				{
+					"key": "Cache-Control",
+					"value": "max-age=31536000, immutable"
+				}
+			]
+		}
+	],
+	"rewrites": [
+		{
+			"source": "/((?!assets/.*).*)",
+			"destination": "/"
 		}
 	]
 }
