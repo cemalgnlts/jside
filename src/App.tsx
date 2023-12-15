@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { init } from "./libs/configuration/init.ts";
+import { init } from "./workspace/init.ts";
 import Workbench from "./components/workbench/Workbench.tsx";
 
 function App() {

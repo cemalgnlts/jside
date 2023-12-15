@@ -9,6 +9,7 @@
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
     "publish": "surge --project ./dist --domain https://jside.surge.sh",
+    "purge-sourcemap": "rm ./dist/assets/*.map && sed -i '/\/\/# sourceMappingURL=.*/d' ./dist/assets/*",
     "postinstall": "monaco-treemending"
   },
   "dependencies": {

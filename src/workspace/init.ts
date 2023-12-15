@@ -49,7 +49,7 @@ import "vscode/localExtensionHost";
 import { openNewCodeEditor } from "./openNewEditor";
 
 import userConfig from "./userConfiguration.json?raw";
-import WebFileSystem from "../webFileSystem";
+import WebFileSystem from "../libs/webFileSystem";
 
 type Panels = Array<{
 	panel: Parts;
@@ -135,7 +135,7 @@ export async function init() {
 			},
 			productConfiguration: {
 				enableTelemetry: false,
-				applicationName:  "jside"
+				applicationName: "jside"
 			}
 		}
 	);

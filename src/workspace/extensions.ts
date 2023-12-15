@@ -11,8 +11,8 @@ import "@codingame/monaco-vscode-typescript-language-features-default-extension"
 import "@codingame/monaco-vscode-markdown-language-features-default-extension";
 
 // Themes
-import "../../extensions/one-dark-theme";
-import "../../extensions/material-icon-theme";
+import "../extensions/one-dark-theme";
+import "../extensions/material-icon-theme";
 
 // Other
 import "@codingame/monaco-vscode-media-preview-default-extension";
