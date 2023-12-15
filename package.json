@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "NODE_OPTIONS=--experimental-import-meta-resolve vite",
     "build": "tsc && vite build",
-    "postbuild": "rm ./dist/assets/*.map && sed -i '/\\/\\/# sourceMappingURL=.*/d' ./dist/assets/*",
+    "postbuild": "rm ./dist/assets/*.map && sed -i '/\\/\\/# sourceMappingURL=.*/d' ./dist/assets/*.js",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
     "publish": "surge --project ./dist --domain https://jside.surge.sh",
@@ -48,7 +48,8 @@
     "monaco-editor": "^0.44.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "vscode": "npm:@codingame/monaco-vscode-api@^1.83.16"
+    "vscode": "npm:@codingame/monaco-vscode-api@^1.83.16",
+    "vscode-semver": "npm:semver@5.5.0"
   },
   "devDependencies": {
     "@types/react": "^18.2.42",
