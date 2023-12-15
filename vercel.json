@@ -1,7 +1,7 @@
 {
 	"headers": [
 		{
-			"source": "/.*",
+			"source": "/(.*)",
 			"headers": [
 				{
 					"key": "Cross-Origin-Embedder-Policy",
@@ -18,7 +18,7 @@
 			]
 		},
 		{
-			"source": "/assets/*",
+			"source": "/(assets/*)",
 			"headers": [
 				{
 					"key": "Cache-Control",
@@ -29,7 +29,7 @@
 	],
 	"rewrites": [
 		{
-			"source": "/((?!assets/.*).*)",
+			"source": "/((?!assets.*).*)",
 			"destination": "/"
 		}
 	]
