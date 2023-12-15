@@ -51,6 +51,8 @@ import { openNewCodeEditor } from "./openNewEditor";
 import userConfig from "./userConfiguration.json?raw";
 import WebFileSystem from "../libs/webFileSystem";
 
+import { Sash, ISashEvent } from "monaco-editor/esm/vs/base/browser/ui/sash/sash.js";
+
 type Panels = Array<{
 	panel: Parts;
 	element: HTMLDivElement;
@@ -162,9 +164,28 @@ export function attachPanels(panels: Panels) {
 		if (!isPartVisibile(panel)) element.style.display = "none";
 
 		onPartVisibilityChange(panel, (visible) => (element.style.display = visible ? "" : "none"));
+
+		if(panel === Parts.SIDEBAR_PART) attachSidebarSash(element);
 	}
 
 	setPartVisibility(Parts.PANEL_PART, false);
+}
+
+function attachSidebarSash(container: HTMLDivElement) {
+	const sash = new Sash(container, {
+		getVerticalSashLeft() { return 1; }
+	}, {
+		orientation: 0
+	});
+
+	sash.onDidReset(() => {
+		document.documentElement.style.removeProperty("--sidebar-width");
+	});
+
+	sash.onDidChange((ev: ISashEvent) => {
+		const width = document.body.clientWidth - ev.currentX;
+		document.documentElement.style.setProperty("--sidebar-width", `${width}px`);
+	});
 }
 
 /**

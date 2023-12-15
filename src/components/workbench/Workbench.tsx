@@ -3,19 +3,24 @@ import { attachPanels } from "../../workspace/init.ts";
 
 import { Parts } from "vscode/vscode/vs/workbench/services/layout/browser/layoutService";
 
-function Workbench({ ready }: { ready: boolean }) {
+interface props {
+    servicesReady: boolean;
+    setAppReady: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+function Workbench({ servicesReady, setAppReady }: props) {
     const editorRef = useRef<HTMLDivElement>(null);
-    const explorerRef = useRef<HTMLDivElement>(null);
+    const sidebarRef = useRef<HTMLDivElement>(null);
     const statusbarRef = useRef<HTMLDivElement>(null);
     const panelRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         if (
             !editorRef.current ||
-            !explorerRef.current ||
+            !sidebarRef.current ||
             !statusbarRef.current ||
             !panelRef.current ||
-            !ready
+            !servicesReady
         )
             return;
 
@@ -28,7 +33,7 @@ function Workbench({ ready }: { ready: boolean }) {
             {
                 /** @ts-ignore */
                 panel: Parts.SIDEBAR_PART,
-                element: explorerRef.current
+                element: sidebarRef.current
             },
             {
                 /** @ts-ignore */
@@ -41,12 +46,14 @@ function Workbench({ ready }: { ready: boolean }) {
                 element: panelRef.current
             }
         ]);
-    }, [ready]);
+
+        setAppReady(true);
+    }, [servicesReady]);
 
     return (
         <>
             <div className="editor" ref={editorRef}></div>
-            <div className="explorer" ref={explorerRef}></div>
+            <div className="sidebar" ref={sidebarRef}></div>
             <div className="panel" ref={panelRef}></div>
             <div className="statusbar" ref={statusbarRef}></div>
         </>

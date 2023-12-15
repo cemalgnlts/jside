@@ -1,22 +1,28 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, lazy, Suspense } from "react";
 import { init } from "./workspace/init.ts";
-import Workbench from "./components/workbench/Workbench.tsx";
+import Splash from "./components/splash/Splash.tsx";
+
+const Workbench = lazy(() => import("./components/workbench/Workbench.tsx"));
 
 function App() {
-  const [ready, setReady] = useState<boolean>(false);
+  const [servicesReady, setServicesReady] = useState<boolean>(false);
+  const [appReady, setAppReady] = useState<boolean>(false);
 
   useEffect(() => {
     const setup = async () => {
       await init();
-      setReady(true);
+      setServicesReady(true);
     };
 
-    if (!ready) setup();
+    if (!servicesReady) setup();
   }, []);
 
   return (
     <>
-      <Workbench ready={ready} />
+      <Suspense>
+        { !appReady && <Splash /> }
+        <Workbench setAppReady={setAppReady} servicesReady={servicesReady} />
+      </Suspense>
     </>
   );
 }

@@ -1,3 +1,9 @@
+:root {
+  --color-bg: #282c34;
+
+  --sidebar-width: 20vw;
+}
+
 html,
 body,
 #root {
@@ -9,18 +15,19 @@ body {
   font-family: Roboto, sans-serif;
   color: var(--vscode-foreground);
   font-size: 14px;
+  user-select: none;
+  background: var(--color-bg);
 }
 
 #root {
   display: grid;
-  grid-template: 
-    "editor explorer" calc(100vh - 22px) 
-    "statusbar statusbar" 22px / 80vw 20vw;
+  grid-template:
+    "editor sidebar" calc(100vh - 22px) "statusbar statusbar" 22px / calc(100vw - var(--sidebar-width)) var(--sidebar-width);
   overflow: hidden;
 }
 
 .editor,
-.explorer,
+.sidebar,
 .statusbar,
 .panel {
   position: relative;
@@ -30,16 +37,47 @@ body {
   grid-area: editor;
 }
 
-.explorer {
-  grid-area: explorer;
+.sidebar {
+  grid-area: sidebar;
 }
 
 .panel {
   grid-area: editor;
-  height: 40vh;
+  height: 45vh;
   align-self: end;
 }
 
 .statusbar {
   grid-area: statusbar;
+}
+
+.splash {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+  background: var(--color-bg);
+}
+
+.splash > .app-icon {
+  width: 100px;
+  height: 100px;
+  background-image: url("/icon-192.png");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 100px;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.splash > .loading-icon {
+  position: absolute;
+  left: 3em;
+  bottom: 3em;
+  width: 48px;
+  height: 48px;
 }
