@@ -2,10 +2,13 @@ import { registerSW } from "virtual:pwa-register";
 
 const updateSW = registerSW({
   onNeedRefresh() {
-    if (confirm("New version available. Update?")) {
+    if (confirm("New version available. Upgrade?")) {
       updateSW(true);
     }
   },
+  onOfflineReady() {
+
+  }
 });
 
 import ReactDOM from "react-dom/client";

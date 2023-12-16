@@ -43,7 +43,6 @@ const manifest = {
 
 const pwa = VitePWA({
   injectRegister: "inline",
-  registerType: "autoUpdate",
   includeAssets: ["**/*"],
   workbox: {
     globPatterns: ["**/*"],
@@ -107,6 +106,6 @@ export default defineConfig({
     }
   },
   resolve: {
-    dedupe: ["monaco-editor", "vscode"]
+    dedupe: ["monaco-editor", "vscode", "vscode-semver"]
   }
 });
