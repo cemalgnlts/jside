@@ -60,7 +60,7 @@ export default defineConfig({
     format: "es"
   },
   build: {
-    target: "es2019",
+    target: "esnext",
     sourcemap: false
   },
   server: {
