@@ -24,7 +24,6 @@
     "@codingame/monaco-vscode-javascript-default-extension": "^1.83.16",
     "@codingame/monaco-vscode-json-default-extension": "^1.83.16",
     "@codingame/monaco-vscode-languages-service-override": "^1.83.16",
-    "@codingame/monaco-vscode-layout-service-override": "^1.83.16",
     "@codingame/monaco-vscode-lifecycle-service-override": "^1.83.16",
     "@codingame/monaco-vscode-log-service-override": "^1.83.16",
     "@codingame/monaco-vscode-markdown-basics-default-extension": "^1.83.16",

@@ -2,13 +2,9 @@ import { useRef, useEffect } from "react";
 import { attachPanels } from "../../workspace/init.ts";
 
 import { Parts } from "vscode/vscode/vs/workbench/services/layout/browser/layoutService";
+import { freeTask, TaskType } from "../../utils/prepareTaskTail.ts";
 
-interface props {
-    servicesReady: boolean;
-    setAppReady: React.Dispatch<React.SetStateAction<boolean>>;
-}
-
-function Workbench({ servicesReady, setAppReady }: props) {
+function Workbench({ servicesReady }: { servicesReady: boolean }) {
     const editorRef = useRef<HTMLDivElement>(null);
     const sidebarRef = useRef<HTMLDivElement>(null);
     const statusbarRef = useRef<HTMLDivElement>(null);
@@ -47,7 +43,7 @@ function Workbench({ servicesReady, setAppReady }: props) {
             }
         ]);
 
-        setAppReady(true);
+        freeTask(TaskType.LAYOUT);
     }, [servicesReady]);
 
     return (

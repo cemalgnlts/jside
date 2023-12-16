@@ -2,6 +2,8 @@ import { useEffect, useState, lazy, Suspense } from "react";
 import { init } from "./workspace/init.ts";
 import Splash from "./components/splash/Splash.tsx";
 
+import { freeTask, TaskType, waitTailComplete } from "./utils/prepareTaskTail.ts";
+
 const Workbench = lazy(() => import("./components/workbench/Workbench.tsx"));
 
 function App() {
@@ -12,16 +14,34 @@ function App() {
     const setup = async () => {
       await init();
       setServicesReady(true);
+
+      freeTask(TaskType.SERVICE);
     };
 
-    if (!servicesReady) setup();
+    const preload = async () => {
+      await document.fonts.load("1rem Fira Code");
+
+      freeTask(TaskType.PRELOAD);
+    };
+
+    const trackIsAppReady = async () => {
+      await waitTailComplete();
+
+      setAppReady(true);
+    };
+
+    if (!servicesReady) {
+      setup();
+      preload();
+      trackIsAppReady();
+    }
   }, []);
 
   return (
     <>
       <Suspense>
-        { !appReady && <Splash /> }
-        <Workbench setAppReady={setAppReady} servicesReady={servicesReady} />
+        {!appReady && <Splash />}
+        <Workbench servicesReady={servicesReady} />
       </Suspense>
     </>
   );
