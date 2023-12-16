@@ -6,6 +6,10 @@ import url from "node:url";
 
 import { VitePWA } from "vite-plugin-pwa";
 
+import pkg from "./package.json" assert { type: "json" }
+
+const mvaDeps = Object.keys(pkg.dependencies).filter(name => name.startsWith("@codingame"));
+
 const manifest = {
   name: "JSIDE",
   id: "/",
@@ -109,6 +113,6 @@ export default defineConfig({
     }
   },
   resolve: {
-    dedupe: ["monaco-editor", "vscode", "vscode-semver"]
+    dedupe: ["monaco-editor", "vscode", "vscode-semver", ...mvaDeps]
   }
 });
