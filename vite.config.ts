@@ -7,8 +7,8 @@ import url from "node:url";
 
 import { VitePWA } from "vite-plugin-pwa";
 
-import { minify as htmlMinifier } from "html-minifier-terser";
-import { minify as terserMinifier } from "terser";
+// import { minify as htmlMinifier } from "html-minifier-terser";
+// import { minify as terserMinifier } from "terser";
 
 import pkg from "./package.json" assert { type: "json" }
 
@@ -63,11 +63,12 @@ const pwa = VitePWA({
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [react(), AssetsMinifier(), pwa],
+  plugins: [react(), pwa],
   worker: {
     format: "es"
   },
   build: {
+    minify: true,
     target: "esnext",
     sourcemap: false
   },
@@ -121,40 +122,46 @@ export default defineConfig({
   }
 });
 
-function AssetsMinifier() {
-  return {
-    name: "JSON minify",
-    async closeBundle() {
-      let files = await fs.promises.readdir(path.resolve("dist", "assets"));
-      files = files.filter(file => /\.(html|css|js)$/.test(file));
+// function AssetsMinifier() {
+//   return {
+//     name: "JSON minify",
+//     async closeBundle() {
+//       let files = await fs.promises.readdir(path.resolve("dist", "assets"));
+//       files = files.filter(file => /\.(html|css|js)$/.test(file));
 
-      for (const file of files) {
-        const filePath = path.resolve("dist", "assets", file);
+//       for (const file of files) {
+//         const filePath = path.resolve("dist", "assets", file);
 
-        let content = await fs.promises.readFile(filePath, "utf-8");
+//         let content = await fs.promises.readFile(filePath, "utf-8");
 
-        if (/\.(js)$/.test(file)) {
-          const { code } = await terserMinifier(content);
-          content = code;
-        } else {
-          content = await htmlMinifier(content, {
-            collapseBooleanAttributes: true,
-            collapseWhitespace: true,
-            decodeEntities: true,
-            minifyCSS: true,
-            minifyJS: true,
-            removeComments: true,
-            removeEmptyAttributes: true,
-            removeRedundantAttributes: true,
-            removeScriptTypeAttributes: true,
-            removeStyleLinkTypeAttributes: true,
-            trimCustomFragments: true,
-            useShortDoctype: true
-          });
-        }
+//         if (/\.(js)$/.test(file)) {
+//           const { code } = await terserMinifier(content, {
+//             ecma: "2019",
+//             keep_classnames: true,
+//             keep_fnames: true,
+//             compress: false,
+//             mangle: false
+//           });
+          
+//           content = code;
+//         } else {
+//           content = await htmlMinifier(content, {
+//             collapseBooleanAttributes: true,
+//             collapseWhitespace: true,
+//             minifyCSS: true,
+//             minifyJS: true,
+//             removeComments: true,
+//             removeEmptyAttributes: true,
+//             removeRedundantAttributes: true,
+//             removeScriptTypeAttributes: true,
+//             removeStyleLinkTypeAttributes: true,
+//             trimCustomFragments: true,
+//             useShortDoctype: true
+//           });
+//         }
 
-        await fs.promises.writeFile(filePath, content, "utf-8");
-      }
-    }
-  }
-}
+//         await fs.promises.writeFile(filePath, content, "utf-8");
+//       }
+//     }
+//   }
+// }
