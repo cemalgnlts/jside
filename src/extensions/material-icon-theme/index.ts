@@ -1,5 +1,6 @@
 import { registerExtension, ExtensionHostKind } from "vscode/extensions";
 import { IExtensionManifest } from "vscode/vscode/vs/platform/extensions/common/extensions";
+import { encodeSVG } from "../../utils/utils";
 
 const extension: IExtensionManifest = {
 	name: "vsc-material-theme",
@@ -27,8 +28,11 @@ registerFileUrl(
 	new URL("./material-icons.json", import.meta.url).toString()
 );
 
-const icons = import.meta.glob("./icons/*.svg");
+const icons = import.meta.glob("./icons/*.svg", {
+	as: "raw",
+	eager: true
+});
 
-for (const path of Object.keys(icons)) {
-	registerFileUrl(path, new URL(path, import.meta.url).toString())
+for (const [path, svg] of Object.entries(icons)) {
+	registerFileUrl(path, encodeSVG(svg));
 }

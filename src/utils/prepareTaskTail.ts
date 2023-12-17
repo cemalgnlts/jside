@@ -20,7 +20,6 @@ const tail: Record<TaskType, ITask> = {
 
 function freeTask(type: TaskType) {
     tail[type].resolve();
-    console.log(tail);
 }
 
 async function waitTailComplete() {

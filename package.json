@@ -6,10 +6,12 @@
   "scripts": {
     "dev": "NODE_OPTIONS=--experimental-import-meta-resolve vite",
     "build": "tsc && vite build",
-    "postbuild": "rm ./dist/assets/*.map && sed -i '/\\/\\/# sourceMappingURL=.*/d' ./dist/assets/*.js",
+    "postbuild": "npm run purge && npm run minimize",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
     "publish": "surge --project ./dist --domain https://jside.surge.sh",
+    "purge": "rm ./dist/assets/*.map && sed -i '/\\/\\/# sourceMappingURL=.*/d' ./dist/assets/*.js",
+    "minimize": "find ./dist/assets -name '*.json' -exec sh -c 'jq . -c {} > min.json && mv min.json {}' \\;",
     "postinstall": "monaco-treemending"
   },
   "dependencies": {
