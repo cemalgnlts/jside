@@ -13,6 +13,7 @@ import { VitePWA } from "vite-plugin-pwa";
 import pkg from "./package.json" assert { type: "json" }
 
 const mvaDeps = Object.keys(pkg.dependencies).filter(name => name.startsWith("@codingame"));
+const mvaChunks = Object.fromEntries(mvaDeps.map(dep => ([dep.replace("@codingame/", ""), [dep]])));
 
 const manifest = {
   name: "JSIDE",
@@ -63,14 +64,22 @@ const pwa = VitePWA({
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [react(), pwa],
+  plugins: [react()/*, pwa*/],
   worker: {
     format: "es"
   },
   build: {
-    minify: true,
-    target: "esnext",
-    sourcemap: false
+    target: "es2020",
+    sourcemap: false,
+    chunkSizeWarningLimit: 1500,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          ...mvaChunks,
+          "monaco-editor": ["monaco-editor"]
+        }
+      }
+    }
   },
   server: {
     headers: {
@@ -118,7 +127,7 @@ export default defineConfig({
     }
   },
   resolve: {
-    dedupe: ["monaco-editor", "vscode", "vscode-semver", ...mvaDeps]
+    dedupe: ["monaco-editor", "vscode", ...mvaDeps]
   }
 });
 
