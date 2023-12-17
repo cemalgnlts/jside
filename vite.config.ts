@@ -72,6 +72,9 @@ export default defineConfig({
     target: "es2020",
     sourcemap: false,
     chunkSizeWarningLimit: 1500,
+    modulePreload: {
+      resolveDependencies: () => [],
+    },
     rollupOptions: {
       output: {
         manualChunks: {
