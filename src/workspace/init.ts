@@ -37,10 +37,10 @@ import getTitleBarServiceOverride from "@codingame/monaco-vscode-view-title-bar-
 import "./extensions.ts";
 
 // Workers
-import EditorWorkerUrl from "monaco-editor/esm/vs/editor/editor.worker.js?url";
-import TextmateWorkerUrl from "@codingame/monaco-vscode-textmate-service-override/worker?url";
-import OutputLinkComputerWorker from "@codingame/monaco-vscode-output-service-override/worker?url";
-import ExtensionHostWorkerUrl from "vscode/workers/extensionHost.worker?url";
+import ExtensionHostWorkerUrl from "vscode/workers/extensionHost.worker?worker&url";
+import EditorWorkerServiceUrl from "monaco-editor/esm/vs/editor/editor.worker.js?worker&url";
+import TextMateWorkerUrl from "@codingame/monaco-vscode-textmate-service-override/worker?worker&url";
+import OutputLinkComputerWorkerUrl from "@codingame/monaco-vscode-output-service-override/worker?worker&url";
 
 import { Uri, workspace } from "vscode";
 
@@ -66,13 +66,13 @@ window.MonacoEnvironment = {
 
 		switch (label) {
 			case "editorWorkerService":
-				url = EditorWorkerUrl;
+				url = EditorWorkerServiceUrl;
 				break;
 			case "textMateWorker":
-				url = TextmateWorkerUrl;
+				url = TextMateWorkerUrl;
 				break;
 			case "outputLinkComputer":
-				url = OutputLinkComputerWorker;
+				url = OutputLinkComputerWorkerUrl;
 				break;
 			default:
 				throw new Error(`Unimplemented worker ${label} (${moduleId})`);
@@ -83,9 +83,7 @@ window.MonacoEnvironment = {
 };
 
 export async function init() {
-	const fakeWorker = new FakeWorker(new URL(ExtensionHostWorkerUrl, import.meta.url), {
-		type: "module"
-	});
+	const fakeWorker = new FakeWorker(new URL(ExtensionHostWorkerUrl, import.meta.url), { type: "module" });
 
 	const workerConfig: WorkerConfig = {
 		url: fakeWorker.url.toString(),
@@ -165,7 +163,7 @@ export function attachPanels(panels: Panels) {
 
 		onPartVisibilityChange(panel, (visible) => (element.style.display = visible ? "" : "none"));
 
-		if(panel === Parts.SIDEBAR_PART) attachSidebarSash(element);
+		if (panel === Parts.SIDEBAR_PART) attachSidebarSash(element);
 	}
 
 	setPartVisibility(Parts.PANEL_PART, false);
