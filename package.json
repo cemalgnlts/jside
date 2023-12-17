@@ -6,12 +6,10 @@
   "scripts": {
     "dev": "NODE_OPTIONS=--experimental-import-meta-resolve vite",
     "build": "tsc && vite build",
-    "postbuild": "npm run purge && npm run minimize",
+    "postbuild": "rm ./dist/assets/*.map && sed -i '/\\/\\/# sourceMappingURL=.*/d' ./dist/assets/*.js",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
     "publish": "surge --project ./dist --domain https://jside.surge.sh",
-    "purge": "rm ./dist/assets/*.map && sed -i '/\\/\\/# sourceMappingURL=.*/d' ./dist/assets/*.js",
-    "minimize": "find ./dist/assets -name '*.json' -exec sh -c 'jq . -c {} > min.json && mv min.json {}' \\;",
     "postinstall": "monaco-treemending"
   },
   "dependencies": {
@@ -62,6 +60,8 @@
     "eslint": "^8.55.0",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.5",
+    "html-minifier-terser": "^7.2.0",
+    "terser": "^5.26.0",
     "typescript": "^5.3.2",
     "vite": "^5.0.6",
     "vite-plugin-pwa": "^0.17.4"
