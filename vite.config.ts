@@ -12,16 +12,6 @@ import { VitePWA } from "vite-plugin-pwa";
 import pkg from "./package.json" assert { type: "json" }
 
 const mvaDeps = Object.keys(pkg.dependencies).filter(name => name.startsWith("@codingame"));
-// Cut the biggest packages into chunks.
-const mvaChunks = {
-  "monaco-vscode-configuration-service-override": ["@codingame/monaco-vscode-configuration-service-override"],
-  "monaco-vscode-view-title-bar-service-override": ["@codingame/monaco-vscode-view-title-bar-service-override"],
-  "monaco-vscode-markers-service-override": ["@codingame/monaco-vscode-markers-service-override"],
-  "monaco-vscode-view-status-bar-service-override": ["@codingame/monaco-vscode-view-status-bar-service-override"],
-  "monaco-vscode-theme-service-override": ["@codingame/monaco-vscode-theme-service-override"],
-  "monaco-vscode-textmate-service-override": ["@codingame/monaco-vscode-textmate-service-override"],
-  "monaco-vscode-accessibility-service-override": ["@codingame/monaco-vscode-accessibility-service-override"]
-};
 
 const manifest = {
   name: "JSIDE",
@@ -83,14 +73,6 @@ export default defineConfig({
     assetsInlineLimit: 1024,
     modulePreload: {
       resolveDependencies: () => [],
-    },
-    rollupOptions: {
-      output: {
-        manualChunks: {
-          "monaco-editor": ["monaco-editor"],
-          ...mvaChunks
-        }
-      }
     }
   },
   server: {
