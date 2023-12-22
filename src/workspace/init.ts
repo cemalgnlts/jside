@@ -3,14 +3,7 @@ import { initialize as initializeServices } from "vscode/services";
 // Services
 import getDialogsServiceOverride from "@codingame/monaco-vscode-dialogs-service-override";
 import getStorageServiceOverrride from "@codingame/monaco-vscode-storage-service-override";
-import getViewsServiceOverride, {
-	Parts,
-	attachPart,
-	isEditorPartVisible,
-	isPartVisibile,
-	onPartVisibilityChange,
-	setPartVisibility
-} from "@codingame/monaco-vscode-views-service-override";
+import getViewsServiceOverride, { Parts, isEditorPartVisible } from "@codingame/monaco-vscode-views-service-override";
 import getModelServiceOverride from "@codingame/monaco-vscode-model-service-override";
 import getConfigurationServiceOverride, {
 	initUserConfiguration
@@ -42,7 +35,7 @@ import EditorWorkerServiceUrl from "monaco-editor/esm/vs/editor/editor.worker.js
 import TextMateWorkerUrl from "@codingame/monaco-vscode-textmate-service-override/worker?worker&url";
 import OutputLinkComputerWorkerUrl from "@codingame/monaco-vscode-output-service-override/worker?worker&url";
 
-import { Uri, workspace } from "vscode";
+import { StatusBarAlignment, Uri, window } from "vscode";
 
 import "vscode/localExtensionHost";
 
@@ -51,17 +44,12 @@ import { openNewCodeEditor } from "./openNewEditor";
 import userConfig from "./userConfiguration.json?raw";
 import WebFileSystem from "../libs/webFileSystem";
 
-import { Sash, ISashEvent } from "monaco-editor/esm/vs/base/browser/ui/sash/sash.js";
+import { activateDefaultExtensions } from "./extensions.ts";
 
-type Panels = Array<{
-	panel: Parts;
-	element: HTMLDivElement;
-}>;
+const workspaceUri = Uri.file("/project.code-workspace");
 
-const workspaceUri = Uri.file("/projects.code-workspace");
-
-window.MonacoEnvironment = {
-	getWorker(moduleId, label) {
+self.MonacoEnvironment = {
+	getWorker(moduleId: string, label: string) {
 		let url = "";
 
 		switch (label) {
@@ -134,56 +122,41 @@ export async function init() {
 				workspace: { workspaceUri }
 			},
 			productConfiguration: {
-				enableTelemetry: false,
-				applicationName: "jside"
+				nameLong: "JSIDE",
+				enableTelemetry: false
 			}
 		}
 	);
 
+	const statusBarItem = window.createStatusBarItem(StatusBarAlignment.Right, 0);
+	statusBarItem.text = "$(bell)";
+	statusBarItem.command = "notifications.showList";
+	statusBarItem.show();
+
 	await initFS();
+
+	await activateDefaultExtensions();
 }
 
 async function initFS() {
 	const rootDirHandle = await navigator.storage.getDirectory();
-	const projectsDirHandle = await rootDirHandle.getDirectoryHandle("projects", { create: true });
+
+	const isPersisted = await navigator.storage.persisted();
+
+	if (!isPersisted) {
+		const isPersist = await navigator.storage.persist();
+
+		if (!isPersist)
+			window.showWarningMessage(`Persistent file storage permission for OPFS is denied!
+		Your files may be deleted by the browser! Enabling PWA can help to make it persistent.`);
+	}
 
 	const webFS = new WebFileSystem();
-	await webFS.mount(projectsDirHandle);
+	await webFS.mount(rootDirHandle);
 
 	registerFileSystemOverlay(1, webFS);
 
-	workspace.updateWorkspaceFolders(0, 0, { uri: Uri.file(projectsDirHandle.name) });
-}
-
-export function attachPanels(panels: Panels) {
-	for (const { panel, element } of panels) {
-		attachPart(panel, element);
-
-		if (!isPartVisibile(panel)) element.style.display = "none";
-
-		onPartVisibilityChange(panel, (visible) => (element.style.display = visible ? "" : "none"));
-
-		if (panel === Parts.SIDEBAR_PART) attachSidebarSash(element);
-	}
-
-	setPartVisibility(Parts.PANEL_PART, false);
-}
-
-function attachSidebarSash(container: HTMLDivElement) {
-	const sash = new Sash(container, {
-		getVerticalSashLeft() { return 1; }
-	}, {
-		orientation: 0
-	});
-
-	sash.onDidReset(() => {
-		document.documentElement.style.removeProperty("--sidebar-width");
-	});
-
-	sash.onDidChange((ev: ISashEvent) => {
-		const width = document.body.clientWidth - ev.currentX;
-		document.documentElement.style.setProperty("--sidebar-width", `${width}px`);
-	});
+	// workspace.updateWorkspaceFolders(0, 0, { uri: Uri.file(projectsDirHandle.name) });
 }
 
 /**
@@ -193,7 +166,7 @@ function attachSidebarSash(container: HTMLDivElement) {
  */
 class CrossOriginWorker extends Worker {
 	constructor(url: string | URL, options: WorkerOptions = {}) {
-		const fullUrl = new URL(url, window.location.href).href;
+		const fullUrl = new URL(url, location.href).href;
 		const js = options.type === "module" ? `import '${fullUrl}';` : `importScripts('${fullUrl}');`;
 		const blob = new Blob([js], { type: "application/javascript" });
 		super(URL.createObjectURL(blob), options);
@@ -201,5 +174,5 @@ class CrossOriginWorker extends Worker {
 }
 
 class FakeWorker {
-	constructor(public url: string | URL, public options?: WorkerOptions) { }
+	constructor(public url: string | URL, public options?: WorkerOptions) {}
 }

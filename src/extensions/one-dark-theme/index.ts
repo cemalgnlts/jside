@@ -1,7 +1,7 @@
 import { registerExtension, ExtensionHostKind } from "vscode/extensions";
 import { IExtensionManifest } from "vscode/vscode/vs/platform/extensions/common/extensions";
 
-const extension: IExtensionManifest = {
+const manifest: IExtensionManifest = {
 	name: "one-dark",
 	version: "3.16.2",
 	publisher: "zhuangtongfa",
@@ -20,7 +20,7 @@ const extension: IExtensionManifest = {
 	}
 };
 
-const { registerFileUrl } = registerExtension(extension, ExtensionHostKind.LocalProcess);
+const { registerFileUrl } = registerExtension(manifest, ExtensionHostKind.LocalProcess);
 
 registerFileUrl(
 	"/one-dark.json",

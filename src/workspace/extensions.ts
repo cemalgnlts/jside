@@ -16,3 +16,14 @@ import "../extensions/material-icon-theme";
 
 // Other
 import "@codingame/monaco-vscode-media-preview-default-extension";
+import activateProjectManager from "../extensions/project-manager";
+
+async function activateDefaultExtensions() {
+    await Promise.all([
+        activateProjectManager()
+    ]);
+}
+
+export {
+    activateDefaultExtensions
+}

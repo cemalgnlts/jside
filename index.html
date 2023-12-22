@@ -1,20 +1,49 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="A PWA-powered IDE for the entire JS ecosystem that works completely offline." />
-    <meta property="og:title" content="JSIDE">
-    <meta property="og:description" content="A PWA-powered IDE for the entire JS ecosystem that works completely offline." />
-    <meta property="og:image" content="/icon-512.png">
-    <meta name="theme-color" content="#100f0f" />
-    <title>JSIDE</title>
-    <link rel="preload" href="/FiraCode-Regular.woff2" as="font" type="font/woff2" crossorigin />
-    <link rel="icon" href="/favicon.ico" sizes="any" />
-    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<meta name="description" content="A PWA-powered IDE for the entire JS ecosystem that works completely offline." />
+		<meta property="og:title" content="JSIDE" />
+		<meta
+			property="og:description"
+			content="A PWA-powered IDE for the entire JS ecosystem that works completely offline." />
+		<meta property="og:image" content="/icon-512.png" />
+		<meta name="theme-color" content="#100f0f" />
+		<title>JSIDE</title>
+		<link rel="preload" href="/FiraCode-Regular.woff2" as="font" type="font/woff2" crossorigin />
+		<link rel="icon" href="/favicon.ico" sizes="any" />
+		<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+		<link rel="stylesheet" href="src/base.css">
+	</head>
+	<body>
+		<div id="app">
+			<div id="editor"></div>
+			<div id="sidebar"></div>
+			<div id="panel"></div>
+			<div id="statusbar"></div>
+		</div>
+
+		<div class="splash">
+			<div class="app-icon"></div>
+			<svg viewBox="0 0 38 38" stroke="#ffca28" class="loading-icon">
+				<g fill="none" fill-rule="evenodd">
+					<g transform="translate(1 1)" stroke-width="2">
+						<circle stroke-opacity=".5" cx="18" cy="18" r="18" />
+						<path d="M36 18c0-9.94-8.06-18-18-18">
+							<animateTransform
+								attributeName="transform"
+								type="rotate"
+								from="0 18 18"
+								to="360 18 18"
+								dur="1s"
+								repeatCount="indefinite" />
+						</path>
+					</g>
+				</g>
+			</svg>
+		</div>
+
+		<script type="module" src="/src/main.ts"></script>
+	</body>
 </html>

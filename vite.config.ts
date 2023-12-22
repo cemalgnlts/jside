@@ -1,5 +1,4 @@
 import { defineConfig } from "vite";
-import react from "@vitejs/plugin-react";
 
 import fs from "node:fs";
 import url from "node:url";
@@ -9,120 +8,138 @@ import { VitePWA } from "vite-plugin-pwa";
 // import { minify as htmlMinifier } from "html-minifier-terser";
 // import { minify as terserMinifier } from "terser";
 
-import pkg from "./package.json" assert { type: "json" }
+import pkg from "./package.json" assert { type: "json" };
 
-const mvaDeps = Object.keys(pkg.dependencies).filter(name => name.startsWith("@codingame"));
+const mvaDeps = Object.keys(pkg.dependencies).filter((name) => name.startsWith("@codingame"));
+// Cut the biggest packages into chunks.
+const mvaChunks = {
+	"monaco-vscode-configuration-service-override": ["@codingame/monaco-vscode-configuration-service-override"],
+	"monaco-vscode-view-title-bar-service-override": ["@codingame/monaco-vscode-view-title-bar-service-override"],
+	"monaco-vscode-markers-service-override": ["@codingame/monaco-vscode-markers-service-override"],
+	"monaco-vscode-view-status-bar-service-override": ["@codingame/monaco-vscode-view-status-bar-service-override"],
+	"monaco-vscode-theme-service-override": ["@codingame/monaco-vscode-theme-service-override"],
+	"monaco-vscode-textmate-service-override": ["@codingame/monaco-vscode-textmate-service-override"],
+	"monaco-vscode-accessibility-service-override": ["@codingame/monaco-vscode-accessibility-service-override"]
+};
 
 const manifest = {
-  name: "JSIDE",
-  id: "/",
-  start_url: "/",
-  display: "fullscreen",
-  description:
-    "A PWA-powered IDE for the entire JS ecosystem that works completely offline.",
-  theme_color: "#100f0f",
-  background_color: "#100f0f",
-  icons: [
-    {
-      sizes: "512x512",
-      type: "image/png",
-      src: "/icon-512.png"
-    },
-    {
-      sizes: "192x192",
-      type: "image/png",
-      src: "/icon-192.png"
-    },
-    {
-      sizes: "512x512",
-      type: "image/png",
-      src: "/icon-512-maskable.png",
-      purpose: "maskable"
-    },
-    {
-      sizes: "192x192",
-      type: "image/png",
-      src: "/icon-192-maskable.png",
-      purpose: "maskable"
-    }
-  ]
+	name: "JSIDE",
+	id: "/",
+	start_url: "/",
+	display: "fullscreen",
+	description: "A PWA-powered IDE for the entire JS ecosystem that works completely offline.",
+	theme_color: "#100f0f",
+	background_color: "#100f0f",
+	icons: [
+		{
+			sizes: "512x512",
+			type: "image/png",
+			src: "/icon-512.png"
+		},
+		{
+			sizes: "192x192",
+			type: "image/png",
+			src: "/icon-192.png"
+		},
+		{
+			sizes: "512x512",
+			type: "image/png",
+			src: "/icon-512-maskable.png",
+			purpose: "maskable"
+		},
+		{
+			sizes: "192x192",
+			type: "image/png",
+			src: "/icon-192-maskable.png",
+			purpose: "maskable"
+		}
+	]
 };
 
 const pwa = VitePWA({
-  injectRegister: "inline",
-  includeAssets: ["**/*"],
-  workbox: {
-    globPatterns: ["**/*"],
-    globIgnores: ["**/*.map"],
-    maximumFileSizeToCacheInBytes: 15728640, // 15 MB
-  },
-  // @ts-ignore
-  manifest
+	injectRegister: "inline",
+	// includeAssets: ["**/*"],
+	workbox: {
+		globPatterns: ["**/*"],
+		globIgnores: ["**/*.map"],
+		maximumFileSizeToCacheInBytes: 15728640 // 15 MB
+	},
+	// @ts-ignore
+	manifest
 });
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [react(), pwa],
-  worker: {
-    format: "es"
-  },
-  build: {
-    target: "es2020",
-    sourcemap: false,
-    chunkSizeWarningLimit: 1500,
-    assetsInlineLimit: 1024,
-    modulePreload: {
-      resolveDependencies: () => [],
-    }
-  },
-  server: {
-    headers: {
-      "Cross-Origin-Embedder-Policy": "credentialless",
-      "Cross-Origin-Opener-Policy": "same-origin",
-      "Cross-Origin-Resource-Policy": "cross-origin"
-    }
-  },
-  optimizeDeps: {
-    include: ["vscode-semver"],
-    esbuildOptions: {
-      plugins: [
-        {
-          name: "import.meta.url",
-          setup({ onLoad }) {
-            // Help vite that bundles/move files in dev mode without touching `import.meta.url` which breaks asset urls
-            onLoad({ filter: /.*\.js/, namespace: "file" }, async (args) => {
-              const code = fs.readFileSync(args.path, "utf8");
+	plugins: [pwa],
+	worker: {
+		format: "es"
+	},
+	assetsInclude: ["@codingame/monaco-vscode-views-service-override/assets/index.html", "@codingame/monaco-vscode-views-service-override/assets/0.js"],
+	build: {
+		target: "es2020",
+		sourcemap: false,
+		chunkSizeWarningLimit: 1500,
+		assetsInlineLimit: 1024,
+		modulePreload: {
+			resolveDependencies: () => []
+		},
+		rollupOptions: {
+			output: {
+				manualChunks: {
+					"monaco-editor": ["monaco-editor"],
+					...mvaChunks
+				}
+			}
+		}
+	},
+	server: {
+		headers: {
+			"Cross-Origin-Embedder-Policy": "credentialless",
+			"Cross-Origin-Opener-Policy": "same-origin",
+			"Cross-Origin-Resource-Policy": "cross-origin"
+		}
+	},
+	optimizeDeps: {
+		include: ["vscode-semver", ...mvaDeps],
+		esbuildOptions: {
+			plugins: [
+				{
+					name: "import.meta.url",
+					setup({ onLoad }) {
+						// Help vite that bundles/move files in dev mode without touching `import.meta.url` which breaks asset urls
+						onLoad({ filter: /.*\.js/, namespace: "file" }, async (args) => {
+							const code = fs.readFileSync(args.path, "utf8");
 
-              const assetImportMetaUrlRE =
-                /\bnew\s+URL\s*\(\s*('[^']+'|"[^"]+"|`[^`]+`)\s*,\s*import\.meta\.url\s*(?:,\s*)?\)/g;
-              let i = 0;
-              let newCode = "";
-              for (
-                let match = assetImportMetaUrlRE.exec(code);
-                match != null;
-                match = assetImportMetaUrlRE.exec(code)
-              ) {
-                newCode += code.slice(i, match.index);
+							const assetImportMetaUrlRE =
+								/\bnew\s+URL\s*\(\s*('[^']+'|"[^"]+"|`[^`]+`)\s*,\s*import\.meta\.url\s*(?:,\s*)?\)/g;
+							let i = 0;
+							let newCode = "";
+							for (
+								let match = assetImportMetaUrlRE.exec(code);
+								match != null;
+								match = assetImportMetaUrlRE.exec(code)
+							) {
+								newCode += code.slice(i, match.index);
 
-                const path = match[1].slice(1, -1);
-                const resolved = await import.meta.resolve!(path, url.pathToFileURL(args.path));
+								const path = match[1].slice(1, -1);
+								const resolved = await import.meta.resolve!(path, url.pathToFileURL(args.path));
 
-                newCode += `new URL(${JSON.stringify(url.fileURLToPath(resolved))}, import.meta.url)`;
+								newCode += `new URL(${JSON.stringify(url.fileURLToPath(resolved))}, import.meta.url)`;
 
-                i = assetImportMetaUrlRE.lastIndex;
-              }
-              newCode += code.slice(i);
+								i = assetImportMetaUrlRE.lastIndex;
+							}
+							newCode += code.slice(i);
 
-              return { contents: newCode };
-            });
-          }
-        }
-      ]
-    }
-  },
-  resolve: {
-    dedupe: ["monaco-editor", "vscode", ...mvaDeps]
-  }
+							return { contents: newCode };
+						});
+					}
+				}
+			]
+		}
+	},
+	resolve: {
+		dedupe: ["monaco-editor", "vscode", ...mvaDeps]
+	}
 });
 
 // function AssetsMinifier() {
@@ -145,7 +162,7 @@ export default defineConfig({
 //             compress: false,
 //             mangle: false
 //           });
-          
+
 //           content = code;
 //         } else {
 //           content = await htmlMinifier(content, {

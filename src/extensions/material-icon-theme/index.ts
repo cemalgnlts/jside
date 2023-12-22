@@ -2,7 +2,7 @@ import { registerExtension, ExtensionHostKind } from "vscode/extensions";
 import { IExtensionManifest } from "vscode/vscode/vs/platform/extensions/common/extensions";
 import { encodeSVG } from "../../utils/utils";
 
-const extension: IExtensionManifest = {
+const manifest: IExtensionManifest = {
 	name: "vsc-material-theme",
 	publisher: "Philipp Kief",
 	version: "4.32.0",
@@ -21,12 +21,9 @@ const extension: IExtensionManifest = {
 	}
 };
 
-const { registerFileUrl } = registerExtension(extension, ExtensionHostKind.LocalProcess);
+const { registerFileUrl } = registerExtension(manifest, ExtensionHostKind.LocalProcess);
 
-registerFileUrl(
-	"/material-icons.json",
-	new URL("./material-icons.json", import.meta.url).toString()
-);
+registerFileUrl("/material-icons.json", new URL("./material-icons.json", import.meta.url).toString());
 
 const icons = import.meta.glob("./icons/*.svg", {
 	as: "raw",

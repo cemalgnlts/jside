@@ -1,100 +1,95 @@
 @font-face {
-  font-family: "Fira Code";
-  src: url("/FiraCode-Regular.woff2") format("woff2");
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
+	font-family: "Fira Code";
+	src: url("/FiraCode-Regular.woff2") format("woff2");
+	font-weight: 400;
+	font-style: normal;
+	font-display: swap;
 }
 
 :root {
-  --color-bg: #21252b;
+	--color-bg: #21252b;
 
-  --sidebar-width: 20vw;
+	--sidebar-width: 20vw;
 }
 
 html,
 body,
-#root {
-  height: 100vh;
+#app {
+	width: 100vw;
+	height: 100vh;
 }
 
 body {
-  margin: 0;
-  font-family: Roboto, sans-serif;
-  color: var(--vscode-foreground);
-  font-size: 14px;
-  user-select: none;
-  background: var(--color-bg);
+	margin: 0;
+	font-family: Roboto, sans-serif;
+	color: var(--vscode-foreground);
+	font-size: 14px;
+	user-select: none;
+	background: var(--color-bg);
 }
 
-#root {
-  display: grid;
-  grid-template:
-    "editor sidebar" calc(100vh - 22px)
-    "statusbar statusbar" 22px / calc(100vw - var(--sidebar-width)) var(--sidebar-width);
-  overflow: hidden;
+/* Parts */
+#app {
+	display: grid;
+	grid-template:
+		"editor sidebar" calc(100vh - 22px)
+		"statusbar statusbar" 22px / calc(100vw - var(--sidebar-width)) var(--sidebar-width);
+	overflow: hidden;
 }
 
-
-#root:empty {
-background-image:
-    url("data:image/svg+xml,%3Csvg stroke='%232196F3' viewBox='0 0 38 38'%3E%3Cg fill='none' transform='translate(1 1)'%3E%3Ccircle cx='18' cy='18' r='18' stroke-opacity='.5'/%3E%3Cpath d='M36 18c0-9.94-8.06-18-18-18'%3E%3CanimateTransform attributeName='transform' dur='1s' from='0 18 18' repeatCount='indefinite' to='360 18 18' type='rotate'/%3E%3C/path%3E%3C/g%3E%3C/svg%3E");
-  background-size: 48px;
-  background-position: 3em calc(100% - 3em);
+#editor,
+#sidebar,
+#panel,
+#statusbar {
+	position: relative;
 }
 
-.editor,
-.sidebar,
-.statusbar,
-.panel {
-  position: relative;
+#editor {
+	grid-area: editor;
 }
 
-.editor {
-  grid-area: editor;
+#sidebar {
+	grid-area: sidebar;
 }
 
-.sidebar {
-  grid-area: sidebar;
+#panel {
+	grid-area: editor;
+	height: 45vh;
+	align-self: end;
 }
 
-.panel {
-  grid-area: editor;
-  height: 45vh;
-  align-self: end;
+#statusbar {
+	grid-area: statusbar;
 }
 
-.statusbar {
-  grid-area: statusbar;
-}
-
+/* Spash */
 .splash {
-  position: fixed;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 2;
-  background: var(--color-bg);
+	position: fixed;
+	left: 0;
+	top: 0;
+	width: 100%;
+	height: 100%;
+	z-index: 1001;
+	background: var(--color-bg);
 }
 
 .splash > .app-icon {
-  width: 100px;
-  height: 100px;
-  background-image: url("/icon-192.png");
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: 100px;
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
+	width: 100px;
+	height: 100px;
+	background-image: url("/icon-192.png");
+	background-repeat: no-repeat;
+	background-position: center;
+	background-size: 100px;
+	position: absolute;
+	left: 50%;
+	top: 50%;
+	transform: translate(-50%, -50%);
 }
 
 .splash > .loading-icon {
-  position: absolute;
-  left: 3em;
-  bottom: 3em;
-  width: 48px;
-  height: 48px;
+	position: absolute;
+	left: 3em;
+	bottom: 3em;
+	width: 48px;
+	height: 48px;
 }
