@@ -1,5 +1,5 @@
 import { editor } from "monaco-editor";
-import { FileSearchQuery, FileSearchOptions, CancellationToken, ProviderResult, Uri } from "vscode";
+import { ProviderResult, Uri } from "vscode";
 import { ExtensionHostKind, registerExtension } from "vscode/extensions";
 
 const manifest = {
@@ -18,11 +18,7 @@ async function activate() {
 	const api = await getApi();
 
 	api.workspace.registerFileSearchProvider("file", {
-		provideFileSearchResults: function (
-			query: FileSearchQuery,
-			options: FileSearchOptions,
-			token: CancellationToken
-		): ProviderResult<Uri[]> {
+		provideFileSearchResults: function (): ProviderResult<Uri[]> {
 			return editor
 				.getModels()
 				.map((model) => model.uri)

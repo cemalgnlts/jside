@@ -128,7 +128,7 @@ const { getApi } = registerExtension(manifest, ExtensionHostKind.LocalProcess);
 
 async function activate() {
 	const api = await getApi();
-	globalThis.vscode = api;
+
 	try {
 		await requestOPFSPersistentPermission();
 	} catch (err) {
@@ -141,9 +141,6 @@ async function activate() {
 	await opfs.initFS();
 
 	const dfs = new WebFileSystem("dfs");
-	
-	globalThis.opfs = opfs;
-	globalThis.dfs = dfs;
 
 	// Data providers
 	const opfsTreeDataProvider = new ProjectTreeDataProvider(opfs);
@@ -213,10 +210,10 @@ async function activate() {
 		try {
 			await dfs.initFS();
 			dfsTreeDataProvider.refresh();
-		} catch(err) {
+		} catch (err) {
 			window.showErrorMessage((err as Error).toString());
 		}
-	})
+	});
 }
 
 function showCreateProjectQuickPick(fsType: WebFileSystemType) {
