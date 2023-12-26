@@ -70,11 +70,14 @@ const pwa = VitePWA({
 
 // https://vitejs.dev/config/
 export default defineConfig({
-	plugins: [pwa],
+	// plugins: [pwa],
 	worker: {
 		format: "es"
 	},
-	assetsInclude: ["@codingame/monaco-vscode-views-service-override/assets/index.html", "@codingame/monaco-vscode-views-service-override/assets/0.js"],
+	assetsInclude: [
+		"@codingame/monaco-vscode-views-service-override/assets/index.html",
+		"@codingame/monaco-vscode-views-service-override/assets/0.js"
+	],
 	build: {
 		target: "es2020",
 		sourcemap: false,
