@@ -3,12 +3,12 @@ import { initialize as initializeServices } from "vscode/services";
 // Services
 import getDialogsServiceOverride from "@codingame/monaco-vscode-dialogs-service-override";
 import getStorageServiceOverrride from "@codingame/monaco-vscode-storage-service-override";
-import getViewsServiceOverride, { Parts, isEditorPartVisible } from "@codingame/monaco-vscode-views-service-override";
+import getViewsServiceOverride, { isEditorPartVisible } from "@codingame/monaco-vscode-views-service-override";
 import getModelServiceOverride from "@codingame/monaco-vscode-model-service-override";
 import getConfigurationServiceOverride, {
 	initUserConfiguration
 } from "@codingame/monaco-vscode-configuration-service-override";
-import { createIndexedDBProviders, registerFileSystemOverlay } from "@codingame/monaco-vscode-files-service-override";
+import { initFile } from "@codingame/monaco-vscode-files-service-override";
 import getExtensionsServiceOverride, { WorkerConfig } from "@codingame/monaco-vscode-extensions-service-override";
 import getStatusBarServiceOverride from "@codingame/monaco-vscode-view-status-bar-service-override";
 import getThemeServiceOverride from "@codingame/monaco-vscode-theme-service-override";
@@ -25,6 +25,7 @@ import getLogServiceOverride from "@codingame/monaco-vscode-log-service-override
 import getEnvironmentServiceOverride from "@codingame/monaco-vscode-environment-service-override";
 import getWorkingCopyServiceOverride from "@codingame/monaco-vscode-working-copy-service-override";
 import getTitleBarServiceOverride from "@codingame/monaco-vscode-view-title-bar-service-override";
+import getSearchServiceOverride from "@codingame/monaco-vscode-search-service-override";
 
 // Extensions
 import "./extensions.ts";
@@ -39,14 +40,10 @@ import { StatusBarAlignment, Uri, window } from "vscode";
 
 import "vscode/localExtensionHost";
 
-import { openNewCodeEditor } from "./openNewEditor";
-
 import userConfig from "./userConfiguration.json?raw";
-import WebFileSystem from "../libs/webFileSystem";
 
 import { activateDefaultExtensions } from "./extensions.ts";
-
-const workspaceUri = Uri.file("/project.code-workspace");
+import { createIndexedDBProviders } from "./fileSystem.ts";
 
 self.MonacoEnvironment = {
 	getWorker(moduleId: string, label: string) {
@@ -70,6 +67,8 @@ self.MonacoEnvironment = {
 	}
 };
 
+const workspaceUri = Uri.file("/project.code-workspace");
+
 export async function init() {
 	const fakeWorker = new FakeWorker(new URL(ExtensionHostWorkerUrl, import.meta.url), { type: "module" });
 
@@ -79,6 +78,7 @@ export async function init() {
 	};
 
 	await createIndexedDBProviders();
+	await initFile(workspaceUri, JSON.stringify({ folders: [] }, null, 2));
 	await initUserConfiguration(userConfig);
 
 	await initializeServices(
@@ -91,13 +91,7 @@ export async function init() {
 			...getConfigurationServiceOverride(),
 			...getTextmateServiceOverride(),
 			...getThemeServiceOverride(),
-			...getViewsServiceOverride(openNewCodeEditor, undefined, (state) => ({
-				...state,
-				editor: {
-					...state.editor,
-					restoreEditors: true
-				}
-			})),
+			...getViewsServiceOverride(undefined, undefined, (state) => ({ ...state })),
 			...getStatusBarServiceOverride(),
 			...getSnippetsServiceOverride(),
 			...getQuickAccessServiceOverride({
@@ -112,7 +106,8 @@ export async function init() {
 			...getEnvironmentServiceOverride(),
 			...getWorkingCopyServiceOverride(),
 			...getLanguagesServiceOverride(),
-			...getTitleBarServiceOverride()
+			...getTitleBarServiceOverride(),
+			...getSearchServiceOverride()
 		},
 		document.body,
 		{
@@ -133,30 +128,7 @@ export async function init() {
 	statusBarItem.command = "notifications.showList";
 	statusBarItem.show();
 
-	await initFS();
-
 	await activateDefaultExtensions();
-}
-
-async function initFS() {
-	const rootDirHandle = await navigator.storage.getDirectory();
-
-	const isPersisted = await navigator.storage.persisted();
-
-	if (!isPersisted) {
-		const isPersist = await navigator.storage.persist();
-
-		if (!isPersist)
-			window.showWarningMessage(`Persistent file storage permission for OPFS is denied!
-		Your files may be deleted by the browser! Enabling PWA can help to make it persistent.`);
-	}
-
-	const webFS = new WebFileSystem();
-	await webFS.mount(rootDirHandle);
-
-	registerFileSystemOverlay(1, webFS);
-
-	// workspace.updateWorkspaceFolders(0, 0, { uri: Uri.file(projectsDirHandle.name) });
 }
 
 /**

@@ -14,7 +14,7 @@
 	},
 	"dependencies": {
 		"@codingame/monaco-vscode-accessibility-service-override": "^1.83.16",
-		"@codingame/monaco-vscode-configuration-service-override": "^1.83.15",
+		"@codingame/monaco-vscode-configuration-service-override": "^1.83.16",
 		"@codingame/monaco-vscode-css-default-extension": "^1.83.16",
 		"@codingame/monaco-vscode-dialogs-service-override": "^1.83.16",
 		"@codingame/monaco-vscode-environment-service-override": "^1.83.16",
@@ -34,6 +34,8 @@
 		"@codingame/monaco-vscode-notifications-service-override": "^1.83.16",
 		"@codingame/monaco-vscode-output-service-override": "^1.83.16",
 		"@codingame/monaco-vscode-quickaccess-service-override": "^1.83.16",
+		"@codingame/monaco-vscode-search-result-default-extension": "^1.83.16",
+		"@codingame/monaco-vscode-search-service-override": "^1.83.16",
 		"@codingame/monaco-vscode-snippets-service-override": "^1.83.16",
 		"@codingame/monaco-vscode-storage-service-override": "^1.83.16",
 		"@codingame/monaco-vscode-textmate-service-override": "^1.83.16",
@@ -42,13 +44,13 @@
 		"@codingame/monaco-vscode-typescript-language-features-default-extension": "^1.83.16",
 		"@codingame/monaco-vscode-view-status-bar-service-override": "^1.83.16",
 		"@codingame/monaco-vscode-view-title-bar-service-override": "^1.83.16",
-		"@codingame/monaco-vscode-views-service-override": "^1.83.15",
+		"@codingame/monaco-vscode-views-service-override": "^1.83.16",
 		"@codingame/monaco-vscode-working-copy-service-override": "^1.83.16",
-		"monaco-editor": "^0.44.0",
-		"vscode": "npm:@codingame/monaco-vscode-api@^1.83.16"
+		"monaco-editor": "^0.44.0"
 	},
 	"devDependencies": {
 		"@types/vscode": "^1.84.2",
+		"@types/wicg-file-system-access": "^2020.9.8",
 		"@typescript-eslint/eslint-plugin": "^6.13.2",
 		"@typescript-eslint/parser": "^6.13.2",
 		"eslint": "^8.55.0",

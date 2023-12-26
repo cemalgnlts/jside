@@ -16,11 +16,16 @@ import "../extensions/material-icon-theme";
 
 // Other
 import "@codingame/monaco-vscode-media-preview-default-extension";
+import "@codingame/monaco-vscode-search-result-default-extension";
+
+// Custom
 import activateProjectManager from "../extensions/project-manager";
+import activateSearch from "../extensions/search";
 
 async function activateDefaultExtensions() {
     await Promise.all([
-        activateProjectManager()
+        activateProjectManager(),
+        activateSearch()
     ]);
 }
 
