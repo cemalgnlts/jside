@@ -11,11 +11,14 @@
 	"editor.scrollbar.useShadows": false,
 	"editor.minimap.enabled": false,
 	"editor.minimap.renderCharacters": false,
-    "editor.guides.indentation": false,
-    "editor.renderLineHighlightOnlyWhenFocus": true,
-    "editor.overviewRulerBorder": false,
-    "editor.fixedOverflowWidgets": true,
+	"editor.guides.indentation": false,
+	"editor.renderLineHighlightOnlyWhenFocus": true,
+	"editor.overviewRulerBorder": false,
+	"editor.fixedOverflowWidgets": true,
 	"files.autoSave": "onFocusChange",
+	"workbench.activityBar.location": "top",
+	"javascript.preferences.importModuleSpecifierEnding": "js",
+	"typescript.preferences.importModuleSpecifierEnding": "js",
 	"[javascript]": {
 		"editor.tabSize": 2
 	}

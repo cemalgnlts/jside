@@ -12,9 +12,11 @@ const manifest = {
 	enabledApiProposals: ["fileSearchProvider"]
 };
 
-const { getApi } = registerExtension(manifest, ExtensionHostKind.LocalProcess);
+const { getApi, setAsDefaultApi } = registerExtension(manifest, ExtensionHostKind.LocalProcess);
 
 async function activate() {
+	await setAsDefaultApi();
+	
 	const api = await getApi();
 
 	api.workspace.registerFileSearchProvider("file", {

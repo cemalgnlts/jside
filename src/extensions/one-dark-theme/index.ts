@@ -1,5 +1,4 @@
-import { registerExtension, ExtensionHostKind } from "vscode/extensions";
-import { IExtensionManifest } from "vscode/vscode/vs/platform/extensions/common/extensions";
+import { registerExtension, IExtensionManifest, ExtensionHostKind } from "vscode/extensions";
 
 const manifest: IExtensionManifest = {
 	name: "one-dark",
@@ -12,7 +11,7 @@ const manifest: IExtensionManifest = {
 		themes: [
 			{
 				label: "One Dark",
-				// @ts-ignore 
+				// @ts-ignore
 				path: "/one-dark.json",
 				uiTheme: "vs-dark"
 			}
@@ -22,7 +21,4 @@ const manifest: IExtensionManifest = {
 
 const { registerFileUrl } = registerExtension(manifest, ExtensionHostKind.LocalProcess);
 
-registerFileUrl(
-	"/one-dark.json",
-	new URL("./one-dark.json", import.meta.url).toString()
-);
+registerFileUrl("/one-dark.json", new URL("./one-dark.json", import.meta.url).toString());

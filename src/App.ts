@@ -8,6 +8,8 @@ import {
 import { Sash, ISashEvent } from "monaco-editor/esm/vs/base/browser/ui/sash/sash.js";
 
 import { init } from "./workspace/init";
+import { commands } from "vscode";
+import { renderProjectManagerWelcomeView } from "./extensions/project-manager/index.ts";
 
 async function App() {
 	await init();
@@ -22,6 +24,11 @@ async function App() {
 
 		onPartVisibilityChange(part, (isVisible) => {
 			el.style.display = isVisible ? "" : "none";
+
+			if (part === Parts.SIDEBAR_PART) {
+				if(isVisible) document.documentElement.style.removeProperty("--sidebar-width");
+				else document.documentElement.style.setProperty("--sidebar-width", "0px");
+			}
 		});
 
 		if (!isPartVisibile(part)) el.style.display = "none";
@@ -29,6 +36,9 @@ async function App() {
 		if (part === Parts.PANEL_PART) setPartVisibility(Parts.PANEL_PART, false);
 		else if (part === Parts.SIDEBAR_PART) addSash(el, "--sidebar-width");
 	}
+
+	await commands.executeCommand("workbench.view.extension.project-manager");
+	renderProjectManagerWelcomeView();
 
 	document.querySelector(".splash")?.remove();
 }

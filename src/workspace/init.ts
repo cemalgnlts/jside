@@ -1,4 +1,4 @@
-import { initialize as initializeServices } from "vscode/services";
+import { INotificationService, getService, initialize as initializeServices } from "vscode/services";
 
 // Services
 import getDialogsServiceOverride from "@codingame/monaco-vscode-dialogs-service-override";
@@ -44,6 +44,7 @@ import userConfig from "./userConfiguration.json?raw";
 
 import { activateDefaultExtensions } from "./extensions.ts";
 import { createIndexedDBProviders } from "./fileSystem.ts";
+import { CrossOriginWorker, FakeWorker } from "./workers.ts";
 
 self.MonacoEnvironment = {
 	getWorker(moduleId: string, label: string) {
@@ -67,9 +68,8 @@ self.MonacoEnvironment = {
 	}
 };
 
-const workspaceUri = Uri.file("/project.code-workspace");
-
 export async function init() {
+	const workspaceUri = Uri.file("/project.code-workspace");
 	const fakeWorker = new FakeWorker(new URL(ExtensionHostWorkerUrl, import.meta.url), { type: "module" });
 
 	const workerConfig: WorkerConfig = {
@@ -123,28 +123,28 @@ export async function init() {
 		}
 	);
 
-	const statusBarItem = window.createStatusBarItem(StatusBarAlignment.Right, 0);
-	statusBarItem.text = "$(bell)";
-	statusBarItem.command = "notifications.showList";
-	statusBarItem.show();
+	await extras();
 
 	await activateDefaultExtensions();
 }
 
-/**
- * Cross origin workers don't work
- * The workaround used by vscode is to start a worker on a blob url containing a short script calling 'importScripts'
- * importScripts accepts to load the code inside the blob worker
- */
-class CrossOriginWorker extends Worker {
-	constructor(url: string | URL, options: WorkerOptions = {}) {
-		const fullUrl = new URL(url, location.href).href;
-		const js = options.type === "module" ? `import '${fullUrl}';` : `importScripts('${fullUrl}');`;
-		const blob = new Blob([js], { type: "application/javascript" });
-		super(URL.createObjectURL(blob), options);
-	}
-}
+async function extras() {
+	// Notification status bar item.
+	const notifyService = await getService(INotificationService);
 
-class FakeWorker {
-	constructor(public url: string | URL, public options?: WorkerOptions) {}
+	const getIcon = () => `$(bell${notifyService.doNotDisturbMode ? "-slash" : ""})`;
+
+	const statusBarItem = window.createStatusBarItem(StatusBarAlignment.Right, 0);
+	statusBarItem.command = "notifications.showList";
+	statusBarItem.name = "Notifications";
+	statusBarItem.text = getIcon();
+
+	notifyService.onDidChangeDoNotDisturbMode(() => (statusBarItem.text = getIcon()));
+	notifyService.onDidRemoveNotification(() => (statusBarItem.text = getIcon()));
+	notifyService.onDidAddNotification(() => {
+		const afterIcon = notifyService.doNotDisturbMode ? "-slash" : "";
+		statusBarItem.text = `$(bell${afterIcon}-dot)`;
+	});
+
+	statusBarItem.show();
 }

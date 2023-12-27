@@ -3,7 +3,7 @@ import { defineConfig } from "vite";
 import fs from "node:fs";
 import url from "node:url";
 
-import { VitePWA } from "vite-plugin-pwa";
+import { ManifestOptions, VitePWA } from "vite-plugin-pwa";
 
 // import { minify as htmlMinifier } from "html-minifier-terser";
 // import { minify as terserMinifier } from "terser";
@@ -22,11 +22,12 @@ const mvaChunks = {
 	"monaco-vscode-accessibility-service-override": ["@codingame/monaco-vscode-accessibility-service-override"]
 };
 
-const manifest = {
+const manifest: Partial<ManifestOptions> = {
 	name: "JSIDE",
 	id: "/",
 	start_url: "/",
 	display: "fullscreen",
+	display_override: ["window-controls-overlay"],
 	description: "A PWA-powered IDE for the entire JS ecosystem that works completely offline.",
 	theme_color: "#100f0f",
 	background_color: "#100f0f",
@@ -53,7 +54,7 @@ const manifest = {
 			src: "/icon-192-maskable.png",
 			purpose: "maskable"
 		}
-	]
+	],
 };
 
 const pwa = VitePWA({
@@ -65,12 +66,13 @@ const pwa = VitePWA({
 		maximumFileSizeToCacheInBytes: 15728640 // 15 MB
 	},
 	// @ts-ignore
-	manifest
+	manifest,
+	minify: true
 });
 
 // https://vitejs.dev/config/
 export default defineConfig({
-	// plugins: [pwa],
+	plugins: [pwa],
 	worker: {
 		format: "es"
 	},

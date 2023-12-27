@@ -18,6 +18,15 @@ const manifest: IRelaxedExtensionManifest = {
 		vscode: "*"
 	},
 	contributes: {
+		viewsContainers: {
+			activitybar: [
+				{
+					id: "project-manager",
+					title: "Project Manager",
+					icon: "$(home)"
+				}
+			]
+		},
 		commands: [
 			{
 				command: "projectManager.refresh.opfs",
@@ -44,6 +53,12 @@ const manifest: IRelaxedExtensionManifest = {
 				icon: "$(add)"
 			},
 			{
+				command: "projectManager.rename",
+				title: "Rename",
+				// @ts-expect-error Missing type
+				icon: "$(edit)"
+			},
+			{
 				command: "projectManager.delete",
 				title: "Delete",
 				// @ts-expect-error Missing type
@@ -51,7 +66,7 @@ const manifest: IRelaxedExtensionManifest = {
 			}
 		],
 		views: {
-			explorer: [
+			"project-manager": [
 				{
 					id: "deviceFileSystem",
 					name: "Device File System Projects"
@@ -87,9 +102,14 @@ const manifest: IRelaxedExtensionManifest = {
 			],
 			"view/item/context": [
 				{
-					command: "projectManager.delete",
-					when: "view == originPrivateFileSystem",
+					command: "projectManager.rename",
+					when: "view == deviceFileSystem || view == originPrivateFileSystem",
 					group: "inline"
+				},
+				{
+					command: "projectManager.delete",
+					when: "view == deviceFileSystem || view == originPrivateFileSystem",
+					group: "inline@2"
 				}
 			],
 			commandPalette: [
@@ -110,6 +130,10 @@ const manifest: IRelaxedExtensionManifest = {
 					when: "false"
 				},
 				{
+					command: "projectManager.rename",
+					when: "false"
+				},
+				{
 					command: "projectManager.delete",
 					when: "false"
 				}
@@ -117,16 +141,18 @@ const manifest: IRelaxedExtensionManifest = {
 		},
 		viewsWelcome: [
 			{
-				view: "deviceFileSystem",
+				view: "project-manager",
 				contents: "Hello World"
 			}
 		]
 	}
 };
 
-const { getApi } = registerExtension(manifest, ExtensionHostKind.LocalProcess);
+const { getApi, setAsDefaultApi } = registerExtension(manifest, ExtensionHostKind.LocalProcess);
 
 async function activate() {
+	await setAsDefaultApi();
+
 	const api = await getApi();
 
 	try {
@@ -154,8 +180,6 @@ async function activate() {
 	api.window.createTreeView("originPrivateFileSystem", {
 		treeDataProvider: opfsTreeDataProvider
 	});
-
-	setTimeout(renderWelcomeView);
 
 	// Commands
 	api.commands.registerCommand(
@@ -191,6 +215,27 @@ async function activate() {
 			uri: projectFolderUri,
 			id: projectFolderUri.toString()
 		});
+
+		await commands.executeCommand("workbench.view.explorer");
+	});
+
+	api.commands.registerCommand("projectManager.rename", async (item: ProjectTreeItem) => {
+		const [fsType, projectName] = item.command!.arguments as [WebFileSystemType, string];
+		const provider = fsType === "opfs" ? opfsTreeDataProvider : dfsTreeDataProvider;
+		const fs = provider.fs!;
+
+		// await removeProject(projectName, provider);
+		const newName = await showFileNamePrompt({ title: "Rename project", value: projectName});
+
+		if(!newName || projectName === newName) return;
+
+		const projectsUri = Uri.file("/JSIDE/projects");
+
+		await fs.rename(Uri.joinPath(projectsUri, projectName), Uri.joinPath(projectsUri, newName), {
+			overwrite: false
+		});
+
+		provider.refresh();
 	});
 
 	api.commands.registerCommand("projectManager.delete", async (item: ProjectTreeItem) => {
@@ -200,12 +245,6 @@ async function activate() {
 		await removeProject(projectName, provider);
 	});
 
-	api.commands.registerCommand("projectManager.add.opfs", () => showCreateProjectQuickPick("opfs"));
-	api.commands.registerCommand("projectManager.add.dfs", () => showCreateProjectQuickPick("dfs"));
-
-	api.commands.registerCommand("projectManager.refresh.opfs", () => opfsTreeDataProvider.refresh());
-	api.commands.registerCommand("projectManager.refresh.dfs", () => dfsTreeDataProvider.refresh());
-
 	api.commands.registerCommand("projectManager.dfsPermissionRequest", async () => {
 		try {
 			await dfs.initFS();
@@ -214,6 +253,12 @@ async function activate() {
 			window.showErrorMessage((err as Error).toString());
 		}
 	});
+
+	api.commands.registerCommand("projectManager.add.opfs", () => showCreateProjectQuickPick("opfs"));
+	api.commands.registerCommand("projectManager.add.dfs", () => showCreateProjectQuickPick("dfs"));
+
+	api.commands.registerCommand("projectManager.refresh.opfs", () => opfsTreeDataProvider.refresh());
+	api.commands.registerCommand("projectManager.refresh.dfs", () => dfsTreeDataProvider.refresh());
 }
 
 function showCreateProjectQuickPick(fsType: WebFileSystemType) {
@@ -243,14 +288,7 @@ function showCreateProjectQuickPick(fsType: WebFileSystemType) {
 	quickPick.items = stepData[quickPick.step - 1].items;
 
 	const showProjectNameInputBox = async (template: string) => {
-		const projectName = await window.showInputBox({
-			title: "Create Project (3/3)",
-			prompt: "Project Folder Name",
-			validateInput(value) {
-				if (value.length < 3) return "Minimum 3 character.";
-				else if (!/^[\w\-. ]+$/.test(value.trim())) return "Please choose a valid folder name.";
-			}
-		});
+		const projectName = await showFileNamePrompt({ title: "Create Project (3/3)", prompt: "Project Folder Name" });
 
 		if (!projectName) return;
 
@@ -350,7 +388,17 @@ async function removeProject(projectName: string, provider: ProjectTreeDataProvi
 	window.withProgress(options, task);
 }
 
-function renderWelcomeView() {
+function showFileNamePrompt(opts: { title: string, prompt?: string, value?: string }) {
+	return window.showInputBox({
+		...opts,
+		validateInput(value) {
+			if (value.length < 3) return "Minimum 3 character.";
+			else if (!/^[\w\-. ]+$/.test(value.trim())) return "Please choose a valid folder name.";
+		}
+	});
+}
+
+export function renderProjectManagerWelcomeView() {
 	const pane = (document.querySelector("[aria-label='Device File System Projects Section']") as HTMLDivElement)
 		.parentElement as HTMLDivElement;
 	pane.querySelector(".pane-body")!.classList.add("welcome");

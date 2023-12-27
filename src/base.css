@@ -41,7 +41,7 @@ small {
 
 .monaco-workbench .part.editor > .content .editor-group-container > .editor-group-watermark > .letterpress,
 .monaco-workbench.vs-dark .part.editor > .content .editor-group-container .editor-group-watermark > .letterpress {
-	background-image: url("/webide-icon.svg") !important;
+	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%0Aheight='24' fill='%231c1f25' viewBox='0 -960 960 960' width='24'%3E%3Cpath d='M320-240 80-480l240-240 57 57-184 184 183 183-56 56Zm320 0-57-57 184-184-183-183 56-56 240 240-240 240Z'/%3E%3C/svg%3E") !important;
 }
 
 /* #endregion */
@@ -157,22 +157,7 @@ small {
 /* #endregion template */
 
 /* #region helper */
-.container {
-	max-width: 1000px;
-	margin: 0 auto;
-	padding: 2em 1em;
-}
-
 .monaco-button-custom:hover {
 	--vscode-button-background: var(--vscode-button-hoverBackground);
-}
-
-.caption {
-	padding: 5px 0 0;
-	margin: 0;
-	border: none;
-	font-weight: 400;
-	font-size: 2.7em;
-	white-space: nowrap;
 }
 /* #endregion */
