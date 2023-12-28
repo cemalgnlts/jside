@@ -65,6 +65,7 @@
 		"json": "json",
 		"jsonc": "json",
 		"xml": "xml",
+		"svg": "svg",
 		"png": "image",
 		"jpeg": "image",
 		"jpg": "image",
@@ -96,12 +97,15 @@
 		"xml": "xml",
 		"json": "json",
 		"jsonc": "json",
+		"jsonl": "json",
 		"javascript": "javascript",
 		"typescript": "typescript",
 		"css": "css",
 		"javascriptreact": "react",
+		"typescriptreact": "react_ts",
 		"html": "html",
-		"markdown": "markdown"
+		"markdown": "markdown",
+		"svg": "svg"
 	},
 	"light": {},
 	"highContrast": {

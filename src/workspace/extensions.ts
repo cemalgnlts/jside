@@ -21,7 +21,7 @@ import "@codingame/monaco-vscode-search-result-default-extension";
 // Custom
 import activateProjectManager from "../extensions/project-manager";
 import activateSearch from "../extensions/search";
-import "../extensions/esbuild";
+// import "../extensions/esbuild";
 
 async function activateDefaultExtensions() {
 	await Promise.all([

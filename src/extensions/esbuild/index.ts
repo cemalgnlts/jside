@@ -1,7 +1,5 @@
 import { ExtensionHostKind, IExtensionManifest, registerExtension } from "vscode/extensions";
 
-import workerUrl from "./worker.js?url";
-
 const manifest: IExtensionManifest = {
 	name: "esbuild",
 	publisher: "JSIDE",
@@ -9,8 +7,11 @@ const manifest: IExtensionManifest = {
 	browser: "/worker.js",
 	engines: {
 		vscode: "*"
-	}
+	},
+	activationEvents: [
+		"onStartupFinished"
+	]
 };
 
 const { registerFileUrl } = registerExtension(manifest, ExtensionHostKind.LocalWebWorker);
-registerFileUrl("/worker.js", new URL(workerUrl, import.meta.url).toString());
+registerFileUrl("/worker.js", new URL("./worker.ts", import.meta.url).toString());

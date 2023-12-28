@@ -1,7 +1,8 @@
-import { defineConfig } from "vite";
+import { PluginOption, defineConfig, transformWithEsbuild } from "vite";
 
 import fs from "node:fs";
 import url from "node:url";
+import { buildSync } from "esbuild";
 
 import { ManifestOptions, VitePWA } from "vite-plugin-pwa";
 
@@ -54,7 +55,7 @@ const manifest: Partial<ManifestOptions> = {
 			src: "/icon-192-maskable.png",
 			purpose: "maskable"
 		}
-	],
+	]
 };
 
 const pwa = VitePWA({
@@ -65,21 +66,13 @@ const pwa = VitePWA({
 		globIgnores: ["**/*.map"],
 		maximumFileSizeToCacheInBytes: 15728640 // 15 MB
 	},
-	// @ts-ignore
-	manifest,
-	minify: true
+	minify: true,
+	manifest
 });
 
 // https://vitejs.dev/config/
 export default defineConfig({
-	plugins: [pwa],
-	worker: {
-		format: "es"
-	},
-	assetsInclude: [
-		"@codingame/monaco-vscode-views-service-override/assets/index.html",
-		"@codingame/monaco-vscode-views-service-override/assets/0.js"
-	],
+	plugins: [extensionWorkerTranformer(), pwa],
 	build: {
 		target: "es2020",
 		sourcemap: false,
@@ -146,6 +139,31 @@ export default defineConfig({
 		dedupe: ["monaco-editor", "vscode", ...mvaDeps]
 	}
 });
+
+function extensionWorkerTranformer(): PluginOption {
+	return {
+		name: "ExtensionWorker",
+		enforce: "post",
+		apply: () => true,
+		transform(code, id) {
+			if (/extensions\/[\w]+\/worker.ts$/.test(id)) {
+				const {
+					outputFiles: [file]
+				} = buildSync({
+					stdin: { contents: code },
+					write: false,
+					platform: "node",
+					format: "cjs",
+					external: ["vscode"],
+					bundle: true,
+					minify: true
+				});
+
+				return { code: file.text };
+			}
+		}
+	};
+}
 
 // function AssetsMinifier() {
 //   return {

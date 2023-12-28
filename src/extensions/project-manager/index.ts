@@ -23,6 +23,7 @@ const manifest: IRelaxedExtensionManifest = {
 				{
 					id: "project-manager",
 					title: "Project Manager",
+					// @ts-expect-error Missing type
 					icon: "$(home)"
 				}
 			]
