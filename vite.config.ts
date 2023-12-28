@@ -60,11 +60,11 @@ const manifest: Partial<ManifestOptions> = {
 
 const pwa = VitePWA({
 	injectRegister: "inline",
-	includeAssets: ["**/*"],
+	// includeAssets: ["**/*"],
 	workbox: {
-		globPatterns: ["**/*"],
+		// globPatterns: ["**/*"],
 		globIgnores: ["**/*.map"],
-		maximumFileSizeToCacheInBytes: 20971520 // 20 MB
+		maximumFileSizeToCacheInBytes: 15728640 // 15 MB
 	},
 	minify: true,
 
