@@ -1,4 +1,4 @@
-import { PluginOption, defineConfig, transformWithEsbuild } from "vite";
+import { PluginOption, defineConfig } from "vite";
 
 import fs from "node:fs";
 import url from "node:url";
@@ -60,13 +60,14 @@ const manifest: Partial<ManifestOptions> = {
 
 const pwa = VitePWA({
 	injectRegister: "inline",
-	// includeAssets: ["**/*"],
+	includeAssets: ["**/*"],
 	workbox: {
 		globPatterns: ["**/*"],
 		globIgnores: ["**/*.map"],
-		maximumFileSizeToCacheInBytes: 15728640 // 15 MB
+		maximumFileSizeToCacheInBytes: 20971520 // 20 MB
 	},
 	minify: true,
+
 	manifest
 });
 
