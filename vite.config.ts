@@ -62,7 +62,7 @@ const pwa = VitePWA({
 	injectRegister: "inline",
 	// includeAssets: ["**/*"],
 	workbox: {
-		// globPatterns: ["**/*"],
+		globPatterns: ["**/*"],
 		globIgnores: ["**/*.map"],
 		maximumFileSizeToCacheInBytes: 15728640 // 15 MB
 	},

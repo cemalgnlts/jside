@@ -1,3 +1,5 @@
+import { commands } from "vscode";
+
 import {
 	Parts,
 	attachPart,
@@ -7,8 +9,9 @@ import {
 } from "@codingame/monaco-vscode-views-service-override";
 import { Sash, ISashEvent } from "monaco-editor/esm/vs/base/browser/ui/sash/sash.js";
 
+import { registerSW } from "virtual:pwa-register";
+
 import { init } from "./workspace/init";
-import { commands } from "vscode";
 import { renderProjectManagerWelcomeView } from "./extensions/project-manager/index.ts";
 
 async function App() {
@@ -26,7 +29,7 @@ async function App() {
 			el.style.display = isVisible ? "" : "none";
 
 			if (part === Parts.SIDEBAR_PART) {
-				if(isVisible) document.documentElement.style.removeProperty("--sidebar-width");
+				if (isVisible) document.documentElement.style.removeProperty("--sidebar-width");
 				else document.documentElement.style.setProperty("--sidebar-width", "0px");
 			}
 		});
@@ -39,6 +42,22 @@ async function App() {
 
 	await commands.executeCommand("workbench.view.extension.project-manager");
 	renderProjectManagerWelcomeView();
+
+	const updateSW = registerSW({
+		immediate: true,
+		onNeedRefresh() {
+			console.log("onNeedRefresh()");
+			if (confirm("New version available. Update?")) {
+				updateSW(true);
+			}
+		},
+		onRegisteredSW() {
+			console.log("onRegisteredSW");
+		},
+		onOfflineReady() {
+			console.log("onOfflineReady");
+		}
+	});
 
 	document.querySelector(".splash")?.remove();
 }
