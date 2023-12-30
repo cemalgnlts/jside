@@ -59,6 +59,7 @@ const manifest: Partial<ManifestOptions> = {
 };
 
 const pwa = VitePWA({
+	mode: 'development',
 	// includeAssets: ["**/*"],
 	workbox: {
 		globPatterns: ["**/*"],
@@ -67,7 +68,7 @@ const pwa = VitePWA({
 		skipWaiting: true,
 		maximumFileSizeToCacheInBytes: 15728640 // 15 MB
 	},
-	minify: true,
+	minify: false,
 	manifest
 });
 
@@ -75,8 +76,10 @@ const pwa = VitePWA({
 export default defineConfig({
 	plugins: [extensionWorkerTranformer(), pwa],
 	build: {
+		minify: false,
+		sourcemap: true,
 		target: "es2020",
-		sourcemap: false,
+		// sourcemap: false,
 		chunkSizeWarningLimit: 1500,
 		assetsInlineLimit: 1024,
 		modulePreload: {

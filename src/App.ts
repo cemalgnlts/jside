@@ -1,3 +1,4 @@
+/*
 import { commands } from "vscode";
 
 import {
@@ -66,3 +67,4 @@ function addSash(el: HTMLDivElement, propertyName: string) {
 }
 
 export default App;
+*/

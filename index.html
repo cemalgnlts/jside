@@ -15,6 +15,26 @@
 		<link rel="icon" href="/favicon.ico" sizes="any" />
 		<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
 		<link rel="stylesheet" href="src/base.css">
+		<script type="module">
+			import('virtual:pwa-register').then(({ registerSW }) => {
+				console.log('CALLING PWA REGISTER')
+				const updateSW = registerSW({
+					immediate: true,
+					onNeedRefresh() {
+						console.log("onNeedRefresh()");
+						if (confirm("New version available. Update?")) {
+							updateSW(true);
+						}
+					},
+					onRegisteredSW() {
+						console.log("onRegisteredSW");
+					},
+					onOfflineReady() {
+						console.log("onOfflineReady");
+					}
+				});
+			});
+		</script>
 	</head>
 	<body>
 		<div id="app">
@@ -45,5 +65,6 @@
 		</div>
 
 		<script type="module" src="/src/main.ts"></script>
+		<div id="monaco-editor"></div>
 	</body>
 </html>
