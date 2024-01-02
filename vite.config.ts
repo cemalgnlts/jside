@@ -60,7 +60,7 @@ function importMetaResolver() {
 		name: "import.meta.url",
 		setup({ onLoad }) {
 			// Help vite that bundles/move files in dev mode without touching `import.meta.url` which breaks asset urls
-			onLoad({ filter: /.*\.js/, namespace: "file" }, async (args: any) => {
+			onLoad({ filter: /.*\.js/, namespace: "file" }, async (args: { path: string }) => {
 				const code = fs.readFileSync(args.path, "utf8");
 
 				const assetImportMetaUrlRE =
@@ -130,37 +130,29 @@ function MinifyCompressPWA(): PluginOption {
 			return { code: res.code };
 		},
 		async closeBundle() {
+			await removeSomeFiles();
+
 			setupPWA();
+
 			await extraMinify(minifiedFiles);
+
 			compressAssets();
 		}
 	};
 }
 
-// function SetupPWA(): PluginOption {
-// 	return {
-// 		name: "SetupPWA",
-// 		enforce: "post",
-// 		apply: "build",
-// 		closeBundle() {
-// 			let assets = fastGlob.sync(["./dist/**", "!./dist/sw.js"]);
-// 			assets = assets.map((path) => path.slice("./dist".length));
+async function removeSomeFiles() {
+	const files = fastGlob.sync("./dist/**/lib.es{2,5,6}*");
+	const promises = files.map((file) => fs.promises.rm(file));
 
-// 			const contents = fs.readFileSync("./dist/sw.js", "utf-8").split("\n");
-// 			contents[0] = `const VERSION = "${pkg.version}";`;
-// 			contents[1] = `const files = ${JSON.stringify(assets)};`;
-
-// 			fs.writeFileSync("./dist/sw.js", contents.join("\n"), "utf-8");
-
-// 			console.log("PWA builded.");
-// 		}
-// 	};
-// }
+	await Promise.all(promises);
+}
 
 function setupPWA() {
-	let assets = fastGlob.sync(["./dist/**", "!./dist/sw.js"], {
-		exclude: ["./dist/**.map"]
+	let assets: string[] = fastGlob.sync("./dist/**", {
+		ignore: ["./dist/sw.js", "./dist/**/*.map"]
 	});
+
 	assets = assets.map((path) => path.slice("./dist".length));
 
 	const contents = fs.readFileSync("./dist/sw.js", "utf-8").split("\n");
@@ -172,65 +164,8 @@ function setupPWA() {
 	console.log("PWA builded.");
 }
 
-// function Minifier(): PluginOption {
-// 	const minifiedFiles = [];
-
-// 	return {
-// 		name: "Minifier",
-// 		apply: "build",
-// 		enforce: "post",
-// 		async renderChunk(code, _chunk, outputOptions) {
-// 			const res = await minify(code, {
-// 				ecma: 2020,
-// 				format: {
-// 					comments: false
-// 				}
-// 			});
-
-// 			minifiedFiles.push(_chunk.fileName);
-
-// 			return { code: res.code };
-// 		},
-// 		async closeBundle() {
-// 			let exclude = minifiedFiles.map((file) => file.replace(/assets\/([^-]+).*.js/, "**/$1*.js"));
-// 			let assets = fastGlob.sync("./dist/**", {
-// 				ignore: exclude
-// 			});
-
-// 			assets = assets.filter((file) => /\.(css|js|json)$/.test(file));
-
-// 			for (const filePath of assets) {
-// 				let content = fs.readFileSync(filePath, "utf-8");
-
-// 				if (filePath.endsWith(".js")) {
-// 					const { code } = await minify(content, {
-// 						ecma: 2020,
-// 						format: {
-// 							comments: false
-// 						}
-// 					});
-
-// 					content = code;
-// 				} else if (filePath.endsWith(".css")) {
-// 					content = buildSync({
-// 						entryPoints: [filePath],
-// 						write: false,
-// 						minify: true
-// 					}).outputFiles[0].text;
-// 				} else if (filePath.endsWith(".json")) {
-// 					content = JSON.stringify(JSONC.parse(content));
-// 				}
-
-// 				fs.writeFileSync(filePath, content, "utf-8");
-// 			}
-
-// 			console.log("\nAssets minimized.");
-// 		}
-// 	};
-// }
-
 async function extraMinify(minifiedFiles: string[]) {
-	let exclude = minifiedFiles.map((file) => file.replace(/assets\/([^-]+).*.js/, "**/$1*.js"));
+	const exclude = minifiedFiles.map((file) => file.replace(/assets\/([^-]+).*.js/, "**/$1*.js"));
 	let assets = fastGlob.sync("./dist/**", {
 		ignore: exclude
 	});
@@ -266,7 +201,7 @@ async function extraMinify(minifiedFiles: string[]) {
 }
 
 function compressAssets() {
-	let assets = fastGlob.sync("./dist/**");
+	const assets = fastGlob.sync("./dist/**");
 
 	for (const filePath of assets) {
 		const contents = fs.readFileSync(filePath);

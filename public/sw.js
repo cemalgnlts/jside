@@ -1,5 +1,5 @@
-const VERSION = "0.0.1";
-const files = [];
+const VERSION = "0.0.1"; // It will be updated automatically in the build process.
+const files = []; // It will be updated automatically in the build process.
 
 const CACHE_NAME = `file-${VERSION}`;
 
