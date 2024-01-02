@@ -11,7 +11,7 @@ const manifest: IExtensionManifest = {
 		themes: [
 			{
 				label: "One Dark",
-				// @ts-ignore
+				// @ts-expect-error Unknown type.
 				path: "/one-dark.json",
 				uiTheme: "vs-dark"
 			}

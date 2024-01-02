@@ -1,20 +1,7 @@
 import App from "./App.ts";
 
-import { registerSW } from "virtual:pwa-register";
+if (import.meta.env.PROD) {
+	navigator.serviceWorker.register("/sw.js");
+}
 
-const updateSW = registerSW({
-    immediate: true,
-    onNeedRefresh() {
-        console.log("onNeedRefresh()");
-        if (confirm("New version available. Update?")) {
-            updateSW(true);
-        }
-    },
-    onRegisteredSW() {
-        console.log("onRegisteredSW");
-        App();
-    },
-    onOfflineReady() {
-        console.log("onOfflineReady");
-    }
-});
+App();

@@ -12,7 +12,7 @@ const manifest: IExtensionManifest = {
 	contributes: {
 		iconThemes: [
 			{
-				/* @ts-ignore */
+				// @ts-expect-error Unknown type.
 				id: "material-icon-theme",
 				label: "Material Icon Theme",
 				path: "./material-icons.json"

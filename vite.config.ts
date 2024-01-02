@@ -1,83 +1,29 @@
-import { PluginOption, defineConfig } from "vite";
-
 import fs from "node:fs";
 import url from "node:url";
+import zlib from "node:zlib";
+
+import { defineConfig } from "vite";
+import type { PluginOption } from "vite";
+
 import { buildSync } from "esbuild";
+import fastGlob from "fast-glob";
 
-import { ManifestOptions, VitePWA } from "vite-plugin-pwa";
+import { minify } from "terser";
 
-// import { minify as htmlMinifier } from "html-minifier-terser";
-// import { minify as terserMinifier } from "terser";
+import JSONC from "jsonc-simple-parser";
 
 import pkg from "./package.json" assert { type: "json" };
 
 const mvaDeps = Object.keys(pkg.dependencies).filter((name) => name.startsWith("@codingame"));
-// Cut the biggest packages into chunks.
-const mvaChunks = {
-	"monaco-vscode-configuration-service-override": ["@codingame/monaco-vscode-configuration-service-override"],
-	"monaco-vscode-view-title-bar-service-override": ["@codingame/monaco-vscode-view-title-bar-service-override"],
-	"monaco-vscode-markers-service-override": ["@codingame/monaco-vscode-markers-service-override"],
-	"monaco-vscode-view-status-bar-service-override": ["@codingame/monaco-vscode-view-status-bar-service-override"],
-	"monaco-vscode-theme-service-override": ["@codingame/monaco-vscode-theme-service-override"],
-	"monaco-vscode-textmate-service-override": ["@codingame/monaco-vscode-textmate-service-override"],
-	"monaco-vscode-accessibility-service-override": ["@codingame/monaco-vscode-accessibility-service-override"]
-};
-
-const manifest: Partial<ManifestOptions> = {
-	name: "JSIDE",
-	id: "/",
-	start_url: "/",
-	display: "fullscreen",
-	display_override: ["window-controls-overlay"],
-	description: "A PWA-powered IDE for the entire JS ecosystem that works completely offline.",
-	theme_color: "#100f0f",
-	background_color: "#100f0f",
-	icons: [
-		{
-			sizes: "512x512",
-			type: "image/png",
-			src: "/icon-512.png"
-		},
-		{
-			sizes: "192x192",
-			type: "image/png",
-			src: "/icon-192.png"
-		},
-		{
-			sizes: "512x512",
-			type: "image/png",
-			src: "/icon-512-maskable.png",
-			purpose: "maskable"
-		},
-		{
-			sizes: "192x192",
-			type: "image/png",
-			src: "/icon-192-maskable.png",
-			purpose: "maskable"
-		}
-	]
-};
-
-const pwa = VitePWA({
-	// includeAssets: ["**/*"],
-	workbox: {
-		globPatterns: ["**/*"],
-		globIgnores: ["**/*.map"],
-		clientsClaim: true,
-		skipWaiting: true,
-		maximumFileSizeToCacheInBytes: 15728640 // 15 MB
-	},
-	minify: true,
-	manifest
-});
 
 // https://vitejs.dev/config/
 export default defineConfig({
-	plugins: [extensionWorkerTranformer(), pwa],
+	plugins: [extensionWorkerTranformer(), MinifyCompressPWA()],
 	build: {
 		target: "es2020",
+		minify: false,
 		sourcemap: false,
-		chunkSizeWarningLimit: 1500,
+		reportCompressedSize: false,
 		assetsInlineLimit: 1024,
 		modulePreload: {
 			resolveDependencies: () => []
@@ -85,8 +31,8 @@ export default defineConfig({
 		rollupOptions: {
 			output: {
 				manualChunks: {
-					"monaco-editor": ["monaco-editor"],
-					...mvaChunks
+					monaco: ["monaco-editor"],
+					vscode: [...mvaDeps]
 				}
 			}
 		}
@@ -101,45 +47,43 @@ export default defineConfig({
 	optimizeDeps: {
 		include: ["vscode-semver", ...mvaDeps],
 		esbuildOptions: {
-			plugins: [
-				{
-					name: "import.meta.url",
-					setup({ onLoad }) {
-						// Help vite that bundles/move files in dev mode without touching `import.meta.url` which breaks asset urls
-						onLoad({ filter: /.*\.js/, namespace: "file" }, async (args) => {
-							const code = fs.readFileSync(args.path, "utf8");
-
-							const assetImportMetaUrlRE =
-								/\bnew\s+URL\s*\(\s*('[^']+'|"[^"]+"|`[^`]+`)\s*,\s*import\.meta\.url\s*(?:,\s*)?\)/g;
-							let i = 0;
-							let newCode = "";
-							for (
-								let match = assetImportMetaUrlRE.exec(code);
-								match != null;
-								match = assetImportMetaUrlRE.exec(code)
-							) {
-								newCode += code.slice(i, match.index);
-
-								const path = match[1].slice(1, -1);
-								const resolved = await import.meta.resolve!(path, url.pathToFileURL(args.path));
-
-								newCode += `new URL(${JSON.stringify(url.fileURLToPath(resolved))}, import.meta.url)`;
-
-								i = assetImportMetaUrlRE.lastIndex;
-							}
-							newCode += code.slice(i);
-
-							return { contents: newCode };
-						});
-					}
-				}
-			]
+			plugins: [importMetaResolver()]
 		}
 	},
 	resolve: {
 		dedupe: ["monaco-editor", "vscode", ...mvaDeps]
 	}
 });
+
+function importMetaResolver() {
+	return {
+		name: "import.meta.url",
+		setup({ onLoad }) {
+			// Help vite that bundles/move files in dev mode without touching `import.meta.url` which breaks asset urls
+			onLoad({ filter: /.*\.js/, namespace: "file" }, async (args: any) => {
+				const code = fs.readFileSync(args.path, "utf8");
+
+				const assetImportMetaUrlRE =
+					/\bnew\s+URL\s*\(\s*('[^']+'|"[^"]+"|`[^`]+`)\s*,\s*import\.meta\.url\s*(?:,\s*)?\)/g;
+				let i = 0;
+				let newCode = "";
+				for (let match = assetImportMetaUrlRE.exec(code); match != null; match = assetImportMetaUrlRE.exec(code)) {
+					newCode += code.slice(i, match.index);
+
+					const path = match[1].slice(1, -1);
+					const resolved = import.meta.resolve!(path, url.pathToFileURL(args.path));
+
+					newCode += `new URL(${JSON.stringify(url.fileURLToPath(resolved))}, import.meta.url)`;
+
+					i = assetImportMetaUrlRE.lastIndex;
+				}
+				newCode += code.slice(i);
+
+				return { contents: newCode };
+			});
+		}
+	};
+}
 
 function extensionWorkerTranformer(): PluginOption {
 	return {
@@ -166,46 +110,175 @@ function extensionWorkerTranformer(): PluginOption {
 	};
 }
 
-// function AssetsMinifier() {
-//   return {
-//     name: "JSON minify",
-//     async closeBundle() {
-//       let files = await fs.promises.readdir(path.resolve("dist", "assets"));
-//       files = files.filter(file => /\.(html|css|js)$/.test(file));
+function MinifyCompressPWA(): PluginOption {
+	const minifiedFiles = [];
 
-//       for (const file of files) {
-//         const filePath = path.resolve("dist", "assets", file);
+	return {
+		name: "MinifyCompressPWA",
+		enforce: "post",
+		apply: "build",
+		async renderChunk(code, chunk) {
+			const res = await minify(code, {
+				ecma: 2020,
+				format: {
+					comments: false
+				}
+			});
 
-//         let content = await fs.promises.readFile(filePath, "utf-8");
+			minifiedFiles.push(chunk.fileName);
 
-//         if (/\.(js)$/.test(file)) {
-//           const { code } = await terserMinifier(content, {
-//             ecma: "2019",
-//             keep_classnames: true,
-//             keep_fnames: true,
-//             compress: false,
-//             mangle: false
-//           });
+			return { code: res.code };
+		},
+		async closeBundle() {
+			setupPWA();
+			await extraMinify(minifiedFiles);
+			compressAssets();
+		}
+	};
+}
 
-//           content = code;
-//         } else {
-//           content = await htmlMinifier(content, {
-//             collapseBooleanAttributes: true,
-//             collapseWhitespace: true,
-//             minifyCSS: true,
-//             minifyJS: true,
-//             removeComments: true,
-//             removeEmptyAttributes: true,
-//             removeRedundantAttributes: true,
-//             removeScriptTypeAttributes: true,
-//             removeStyleLinkTypeAttributes: true,
-//             trimCustomFragments: true,
-//             useShortDoctype: true
-//           });
-//         }
+// function SetupPWA(): PluginOption {
+// 	return {
+// 		name: "SetupPWA",
+// 		enforce: "post",
+// 		apply: "build",
+// 		closeBundle() {
+// 			let assets = fastGlob.sync(["./dist/**", "!./dist/sw.js"]);
+// 			assets = assets.map((path) => path.slice("./dist".length));
 
-//         await fs.promises.writeFile(filePath, content, "utf-8");
-//       }
-//     }
-//   }
+// 			const contents = fs.readFileSync("./dist/sw.js", "utf-8").split("\n");
+// 			contents[0] = `const VERSION = "${pkg.version}";`;
+// 			contents[1] = `const files = ${JSON.stringify(assets)};`;
+
+// 			fs.writeFileSync("./dist/sw.js", contents.join("\n"), "utf-8");
+
+// 			console.log("PWA builded.");
+// 		}
+// 	};
 // }
+
+function setupPWA() {
+	let assets = fastGlob.sync(["./dist/**", "!./dist/sw.js"]);
+	assets = assets.map((path) => path.slice("./dist".length));
+
+	const contents = fs.readFileSync("./dist/sw.js", "utf-8").split("\n");
+	contents[0] = `const VERSION = "${pkg.version}";`;
+	contents[1] = `const files = ${JSON.stringify(assets)};`;
+
+	fs.writeFileSync("./dist/sw.js", contents.join("\n"), "utf-8");
+
+	console.log("PWA builded.");
+}
+
+// function Minifier(): PluginOption {
+// 	const minifiedFiles = [];
+
+// 	return {
+// 		name: "Minifier",
+// 		apply: "build",
+// 		enforce: "post",
+// 		async renderChunk(code, _chunk, outputOptions) {
+// 			const res = await minify(code, {
+// 				ecma: 2020,
+// 				format: {
+// 					comments: false
+// 				}
+// 			});
+
+// 			minifiedFiles.push(_chunk.fileName);
+
+// 			return { code: res.code };
+// 		},
+// 		async closeBundle() {
+// 			let exclude = minifiedFiles.map((file) => file.replace(/assets\/([^-]+).*.js/, "**/$1*.js"));
+// 			let assets = fastGlob.sync("./dist/**", {
+// 				ignore: exclude
+// 			});
+
+// 			assets = assets.filter((file) => /\.(css|js|json)$/.test(file));
+
+// 			for (const filePath of assets) {
+// 				let content = fs.readFileSync(filePath, "utf-8");
+
+// 				if (filePath.endsWith(".js")) {
+// 					const { code } = await minify(content, {
+// 						ecma: 2020,
+// 						format: {
+// 							comments: false
+// 						}
+// 					});
+
+// 					content = code;
+// 				} else if (filePath.endsWith(".css")) {
+// 					content = buildSync({
+// 						entryPoints: [filePath],
+// 						write: false,
+// 						minify: true
+// 					}).outputFiles[0].text;
+// 				} else if (filePath.endsWith(".json")) {
+// 					content = JSON.stringify(JSONC.parse(content));
+// 				}
+
+// 				fs.writeFileSync(filePath, content, "utf-8");
+// 			}
+
+// 			console.log("\nAssets minimized.");
+// 		}
+// 	};
+// }
+
+async function extraMinify(minifiedFiles: string[]) {
+	let exclude = minifiedFiles.map((file) => file.replace(/assets\/([^-]+).*.js/, "**/$1*.js"));
+	let assets = fastGlob.sync("./dist/**", {
+		ignore: exclude
+	});
+
+	assets = assets.filter((file) => /\.(css|js|json)$/.test(file));
+
+	for (const filePath of assets) {
+		let content = fs.readFileSync(filePath, "utf-8");
+
+		if (filePath.endsWith(".js")) {
+			const { code } = await minify(content, {
+				ecma: 2020,
+				format: {
+					comments: false
+				}
+			});
+
+			content = code;
+		} else if (filePath.endsWith(".css")) {
+			content = buildSync({
+				entryPoints: [filePath],
+				write: false,
+				minify: true
+			}).outputFiles[0].text;
+		} else if (filePath.endsWith(".json")) {
+			content = JSON.stringify(JSONC.parse(content));
+		}
+
+		fs.writeFileSync(filePath, content, "utf-8");
+	}
+
+	console.log("Assets minimized.");
+}
+
+function compressAssets() {
+	let assets = fastGlob.sync("./dist/**");
+
+	for (const filePath of assets) {
+		const contents = fs.readFileSync(filePath);
+		const compressed = zlib.brotliCompressSync(contents, {
+			params: {
+				[zlib.constants.BROTLI_PARAM_MODE]: zlib.constants.BROTLI_MODE_TEXT,
+				[zlib.constants.BROTLI_PARAM_QUALITY]: zlib.constants.BROTLI_MAX_QUALITY
+			}
+		});
+
+		if (compressed.length >= contents.length) continue;
+
+		fs.writeFileSync(filePath, compressed);
+	}
+
+	console.log("Assets Compressed.");
+}

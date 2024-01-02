@@ -1,4 +1,13 @@
-import { Event, EventEmitter, ThemeIcon, FileType, TreeDataProvider, TreeItem, TreeItemCollapsibleState, Uri } from "vscode";
+import {
+	Event,
+	EventEmitter,
+	ThemeIcon,
+	FileType,
+	TreeDataProvider,
+	TreeItem,
+	TreeItemCollapsibleState,
+	Uri
+} from "vscode";
 import WebFileSystem from "../../libs/webFileSystem/WebFileSystem";
 import { WebFileSystemType } from "../../libs/webFileSystem";
 
@@ -20,16 +29,15 @@ class ProjectTreeDataProvider implements TreeDataProvider<ProjectTreeItem> {
 	getChildren(): Thenable<ProjectTreeItem[]> {
 		if (this.fs === null) return Promise.resolve([]);
 
-		return new Promise(async (resolve) => {
-			const dirs = await this.fs!.readdir(Uri.file("/JSIDE/projects"));
-			let items: ProjectTreeItem[] = [];
+		let items: ProjectTreeItem[] = [];
 
+		return this.fs!.readdir(Uri.file("/JSIDE/projects")).then((dirs) => {
 			if (dirs.length > 0) {
-				const folders = dirs.filter(([_, type]) => type === FileType.Directory);
+				const folders = dirs.filter(([, type]) => type === FileType.Directory);
 				items = folders.map(([folderName]) => new ProjectTreeItem(folderName, this.fs!.type));
 			}
 
-			resolve(items);
+			return items;
 		});
 	}
 

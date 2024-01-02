@@ -9,6 +9,7 @@ let userDataProvier: IndexedDBFileSystemProvider;
 
 const fileHandlesStoreName = "filehandles-store";
 
+// eslint-disable-next-line @typescript-eslint/no-namespace
 namespace Schemas {
 	export const file = "file";
 	export const vscodeUserData = "vscode-userdata";

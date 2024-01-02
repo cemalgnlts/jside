@@ -23,8 +23,6 @@ import getLifecycleServiceOverride from "@codingame/monaco-vscode-lifecycle-serv
 import getAccessibilityServiceOverride from "@codingame/monaco-vscode-accessibility-service-override";
 import getLogServiceOverride from "@codingame/monaco-vscode-log-service-override";
 import getEnvironmentServiceOverride from "@codingame/monaco-vscode-environment-service-override";
-import getWorkingCopyServiceOverride from "@codingame/monaco-vscode-working-copy-service-override";
-import getTitleBarServiceOverride from "@codingame/monaco-vscode-view-title-bar-service-override";
 import getSearchServiceOverride from "@codingame/monaco-vscode-search-service-override";
 
 // Extensions
@@ -104,9 +102,7 @@ export async function init() {
 			...getStorageServiceOverrride(),
 			...getLifecycleServiceOverride(),
 			...getEnvironmentServiceOverride(),
-			...getWorkingCopyServiceOverride(),
 			...getLanguagesServiceOverride(),
-			...getTitleBarServiceOverride(),
 			...getSearchServiceOverride()
 		},
 		document.body,

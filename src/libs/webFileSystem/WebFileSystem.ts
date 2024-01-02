@@ -74,7 +74,7 @@ class WebFileSystem extends HTMLFileSystemProvider {
 
 	async createDirectory(resource: Uri) {
 		// /projects/test/src -> [/projects/test/src, /projects, test/src]
-		const [_, head, tail] = resource.path.match(/(\w+)\/(.*)/) as [string, string, string];
+		const [, head, tail] = resource.path.match(/(\w+)\/(.*)/) as [string, string, string];
 		const promises = [];
 
 		const paths = tail.split("/");
