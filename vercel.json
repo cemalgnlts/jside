@@ -15,6 +15,10 @@
 				{
 					"key": "Cross-Origin-Resource-Policy",
 					"value": "cross-origin"
+				},
+				{
+					"key": "Content-Encoding",
+					"value": "br"
 				}
 			]
 		},
