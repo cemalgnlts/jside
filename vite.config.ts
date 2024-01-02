@@ -158,7 +158,9 @@ function MinifyCompressPWA(): PluginOption {
 // }
 
 function setupPWA() {
-	let assets = fastGlob.sync(["./dist/**", "!./dist/sw.js"]);
+	let assets = fastGlob.sync(["./dist/**", "!./dist/sw.js"], {
+		exclude: ["./dist/**.map"]
+	});
 	assets = assets.map((path) => path.slice("./dist".length));
 
 	const contents = fs.readFileSync("./dist/sw.js", "utf-8").split("\n");
