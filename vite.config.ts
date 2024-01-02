@@ -275,8 +275,6 @@ function compressAssets() {
 			}
 		});
 
-		if (compressed.length >= contents.length) continue;
-
 		fs.writeFileSync(filePath, compressed);
 	}
 
