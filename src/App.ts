@@ -39,7 +39,7 @@ async function App() {
 	}
 
 	await commands.executeCommand("workbench.view.extension.project-manager");
-	// renderProjectManagerWelcomeView();
+	renderProjectManagerWelcomeView();
 
 	document.querySelector(".splash")?.remove();
 }
