@@ -22,7 +22,7 @@ export default defineConfig({
 	define: {
 		__APP_NAME: "'JSIDE'",
 		__APP_VERSION: JSON.stringify(pkg.version),
-		__APP_DATE: "new Date().toLocaleDateString()"
+		__APP_DATE: JSON.stringify(new Date().toLocaleDateString())
 	},
 	build: {
 		target: "es2020",
@@ -149,7 +149,6 @@ function MinifyCompressPWA(): PluginOption {
 async function removeSomeFiles() {
 	// const files = fastGlob.sync("./dist/**/lib.es{2,5,6}*");
 	// const promises = files.map((file) => fs.promises.rm(file));
-
 	// await Promise.all(promises);
 }
 
