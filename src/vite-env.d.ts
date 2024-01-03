@@ -1,6 +1,10 @@
 /// <reference types="vite/client" />
 /// <reference types="vite-plugin-pwa/client" />
 
+declare const __APP_NAME: string;
+declare const __APP_VERSION: string;
+declare const __APP_DATE: string;
+
 declare module "monaco-editor/esm/vs/base/browser/ui/sash/sash.js" {
 	/**
 	 * A vertical sash layout provider provides position and height for a sash.

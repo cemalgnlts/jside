@@ -89,7 +89,11 @@ export async function init() {
 			...getConfigurationServiceOverride(),
 			...getTextmateServiceOverride(),
 			...getThemeServiceOverride(),
-			...getViewsServiceOverride(undefined, undefined, (state) => ({ ...state })),
+			...getViewsServiceOverride(undefined, undefined, (_state) => ({
+				editor: { restoreEditors: false, editorsToOpen: Promise.resolve([]) },
+				views: { containerToRestore: { auxiliaryBar: "", panel: "", sideBar: "" }, defaults: [] },
+				layout: { editors: undefined }
+			})),
 			...getStatusBarServiceOverride(),
 			...getSnippetsServiceOverride(),
 			...getQuickAccessServiceOverride({
@@ -113,7 +117,9 @@ export async function init() {
 				workspace: { workspaceUri }
 			},
 			productConfiguration: {
-				nameLong: "JSIDE",
+				nameLong: __APP_NAME,
+				version: __APP_VERSION,
+				date: __APP_DATE,
 				enableTelemetry: false
 			}
 		}
@@ -128,7 +134,14 @@ async function extras() {
 	// Notification status bar item.
 	const notifyService = await getService(INotificationService);
 
-	const getIcon = () => `$(bell${notifyService.doNotDisturbMode ? "-slash" : ""})`;
+	const getIcon = (dotIcon: boolean = false) => {
+		const icon = ["bell"];
+
+		if (notifyService.doNotDisturbMode) icon.push("-slash");
+		if (dotIcon) icon.push("-dot");
+
+		return `$(${icon.join("")})`;
+	};
 
 	const statusBarItem = window.createStatusBarItem(StatusBarAlignment.Right, 0);
 	statusBarItem.command = "notifications.showList";
@@ -137,10 +150,7 @@ async function extras() {
 
 	notifyService.onDidChangeDoNotDisturbMode(() => (statusBarItem.text = getIcon()));
 	notifyService.onDidRemoveNotification(() => (statusBarItem.text = getIcon()));
-	notifyService.onDidAddNotification(() => {
-		const afterIcon = notifyService.doNotDisturbMode ? "-slash" : "";
-		statusBarItem.text = `$(bell${afterIcon}-dot)`;
-	});
+	notifyService.onDidAddNotification(() => (statusBarItem.text = getIcon(true)));
 
 	statusBarItem.show();
 }

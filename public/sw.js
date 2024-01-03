@@ -4,9 +4,9 @@ const files = []; // It will be updated automatically in the build process.
 const CACHE_NAME = `file-${VERSION}`;
 
 self.addEventListener("install", (ev) => {
+	self.skipWaiting();
+	
 	const handle = async () => {
-		self.skipWaiting();
-
 		const cache = await caches.open(CACHE_NAME);
 		await cache.addAll(files);
 	};
@@ -15,9 +15,9 @@ self.addEventListener("install", (ev) => {
 });
 
 self.addEventListener("activate", (ev) => {
+	self.clients.claim();
+
 	const handle = async () => {
-		clients.claim();
-		
 		const keys = await caches.keys();
 		const oldCaches = keys.filter((key) => key.startsWith("file-") && key !== CACHE_NAME);
 
@@ -29,12 +29,12 @@ self.addEventListener("activate", (ev) => {
 
 self.addEventListener("fetch", (ev) => {
 	const handle = async () => {
-		const resFromCache = await caches.match(ev.request, { ignoreSearch: true });
-		if (resFromCache) return resFromCache;
+		// const resFromCache = await caches.match(ev.request, { ignoreSearch: true });
+		// if (resFromCache) return resFromCache;
 
 		const res = await fetch(ev.request);
-		const cache = await caches.open(CACHE_NAME);
-		await cache.put(ev.request, res.clone());
+		// const cache = await caches.open(CACHE_NAME);
+		// await cache.put(ev.request, res.clone());
 
 		return res;
 	};

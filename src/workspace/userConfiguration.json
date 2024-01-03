@@ -16,7 +16,7 @@
 	"editor.overviewRulerBorder": false,
 	"editor.fixedOverflowWidgets": true,
 	"files.autoSave": "onFocusChange",
-	"workbench.activityBar.location": "top",
+	"workbench.activityBar.location": "right",
 	"javascript.preferences.importModuleSpecifierEnding": "js",
 	"typescript.preferences.importModuleSpecifierEnding": "js",
 	"[javascript]": {

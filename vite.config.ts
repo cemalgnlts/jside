@@ -19,6 +19,11 @@ const mvaDeps = Object.keys(pkg.dependencies).filter((name) => name.startsWith("
 // https://vitejs.dev/config/
 export default defineConfig({
 	plugins: [extensionWorkerTranformer(), MinifyCompressPWA()],
+	define: {
+		__APP_NAME: "'JSIDE'",
+		__APP_VERSION: JSON.stringify(pkg.version),
+		__APP_DATE: "new Date().toLocaleDateString()"
+	},
 	build: {
 		target: "es2020",
 		minify: false,
@@ -142,15 +147,15 @@ function MinifyCompressPWA(): PluginOption {
 }
 
 async function removeSomeFiles() {
-	const files = fastGlob.sync("./dist/**/lib.es{2,5,6}*");
-	const promises = files.map((file) => fs.promises.rm(file));
+	// const files = fastGlob.sync("./dist/**/lib.es{2,5,6}*");
+	// const promises = files.map((file) => fs.promises.rm(file));
 
-	await Promise.all(promises);
+	// await Promise.all(promises);
 }
 
 function setupPWA() {
 	let assets: string[] = fastGlob.sync("./dist/**", {
-		ignore: ["./dist/sw.js", "./dist/**/*.map"]
+		ignore: ["./dist/sw.js", "./dist/*.png", "./dist/**/*.map"]
 	});
 
 	assets = assets.map((path) => path.slice("./dist".length));

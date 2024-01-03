@@ -20,7 +20,7 @@ class ProjectTreeDataProvider implements TreeDataProvider<ProjectTreeItem> {
 	readonly onDidChangeTreeData: Event<void | ProjectTreeItem | ProjectTreeItem[] | null | undefined> | undefined =
 		this.dataChangeEventEmitter.event;
 
-	constructor(public readonly fs: WebFileSystem | null) {}
+	constructor(public fs: WebFileSystem | null) {}
 
 	getTreeItem(element: ProjectTreeItem): TreeItem | Thenable<TreeItem> {
 		return element;

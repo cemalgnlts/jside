@@ -249,6 +249,7 @@ async function activate() {
 	api.commands.registerCommand("projectManager.dfsPermissionRequest", async () => {
 		try {
 			await dfs.initFS();
+			dfsTreeDataProvider.fs = dfs;
 			dfsTreeDataProvider.refresh();
 		} catch (err) {
 			window.showErrorMessage((err as Error).toString());

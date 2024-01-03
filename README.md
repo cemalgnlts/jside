@@ -1,20 +1,12 @@
 # JSIDE
 
-A PWA-powered IDE for the entire JS ecosystem that works completely offline.
+PWA-powered Web Code Editor that works completely offline.
 
-# Compression Results
+# Credits
 
-## Default
-| UglifyJS | Terser | SWC |
-|----------|--------|-----|
-| 28M      | 24M    | 27M |
+Web Editor is made possible by the following open source projects.
 
-## Compress & Mangle
-| UglifyJS | Terser | SWC  |
-|----------|--------|------|
-| ?M       | ?M     | 27M  |
+* https://github.com/CodinGame/monaco-vscode-api
 
-## Brotli
-| UglifyJS | Terser | SWC  |
-|----------|--------|------|
-| ?M       | ?M     | 27M  |
+# License
+Licensed under the GPL-3.0, [license](LICENSE).
