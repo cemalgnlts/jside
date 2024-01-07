@@ -111,7 +111,7 @@ function extensionWorkerTranformer(): PluginOption {
 
 	return {
 		name: "ExtensionWorker",
-		enforce: "post",
+		enforce: "pre",
 		apply: () => true,
 		async transform(code, id) {
 			if (/extensions\/[\w]+\/worker.ts$/.test(id)) {

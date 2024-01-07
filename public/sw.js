@@ -5,7 +5,7 @@ const CACHE_NAME = `file-${VERSION}`;
 
 self.addEventListener("install", (ev) => {
 	self.skipWaiting();
-	
+
 	const handle = async () => {
 		const cache = await caches.open(CACHE_NAME);
 		await cache.addAll(files);
@@ -29,12 +29,14 @@ self.addEventListener("activate", (ev) => {
 
 self.addEventListener("fetch", (ev) => {
 	const handle = async () => {
-		// const resFromCache = await caches.match(ev.request, { ignoreSearch: true });
-		// if (resFromCache) return resFromCache;
+		const resFromCache = await caches.match(ev.request, { ignoreSearch: true });
+		if (resFromCache) return resFromCache;
 
-		const res = await fetch(ev.request);
+		const [res, cache] = Promise.all([fetch(ev.request), cahces.open(CACHE_NAME)]);
+
+		// const res = await fetch(ev.request);
 		// const cache = await caches.open(CACHE_NAME);
-		// await cache.put(ev.request, res.clone());
+		await cache.put(ev.request, res.clone());
 
 		return res;
 	};
