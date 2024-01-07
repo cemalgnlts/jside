@@ -9,7 +9,7 @@
 :root {
 	--color-bg: #282c34;
 
-	--radius: 6px;
+	--radius: 4px;
 	--sidebar-width: 20vw;
 }
 
@@ -36,19 +36,6 @@ p {
 
 small {
 	font-size: 0.7rem;
-}
-
-.monaco-workbench .part.editor > .content .editor-group-container > .editor-group-watermark > .letterpress,
-.monaco-workbench.vs-dark .part.editor > .content .editor-group-container .editor-group-watermark > .letterpress {
-	background-image: url("data:image/svg+xml,%0A%3Csvg xmlns='http://www.w3.org/2000/svg' height='48' viewBox='0 -960 960 960' width='48' fill='%231c1f25'%3E%3Cpath d='m166-482 176 176q9 9 8.5 21t-9.5 21q-9 9-21.5 9t-21.5-9L101-461q-5-5-7-10t-2-11q0-6 2-11t7-10l200-200q9-9 21.5-9t21.5 9q9 9 9 21.5t-9 21.5L166-482Zm628 0L618-658q-9-9-8.5-21t9.5-21q9-9 21.5-9t21.5 9l197 197q5 5 7 10t2 11q0 6-2 11t-7 10L659-261q-9 9-21 8.5t-21-9.5q-9-9-9-21.5t9-21.5l177-177Z'/%3E%3C/svg%3E") !important;
-}
-
-.menubar {
-	display: none !important;
-}
-
-.actions-container {
-	gap: 0.5em;
 }
 /* #endregion */
 
@@ -161,5 +148,20 @@ small {
 /* #region helper */
 .monaco-button-custom:hover {
 	--vscode-button-background: var(--vscode-button-hoverBackground);
+}
+/* #endregion */
+
+/* #region Workspace */
+.monaco-workbench .part.editor > .content .editor-group-container > .editor-group-watermark > .letterpress,
+.monaco-workbench.vs-dark .part.editor > .content .editor-group-container .editor-group-watermark > .letterpress {
+	background-image: url("data:image/svg+xml,%0A%3Csvg xmlns='http://www.w3.org/2000/svg' height='48' viewBox='0 -960 960 960' width='48' fill='%231c1f25'%3E%3Cpath d='m166-482 176 176q9 9 8.5 21t-9.5 21q-9 9-21.5 9t-21.5-9L101-461q-5-5-7-10t-2-11q0-6 2-11t7-10l200-200q9-9 21.5-9t21.5 9q9 9 9 21.5t-9 21.5L166-482Zm628 0L618-658q-9-9-8.5-21t9.5-21q9-9 21.5-9t21.5 9l197 197q5 5 7 10t2 11q0 6-2 11t-7 10L659-261q-9 9-21 8.5t-21-9.5q-9-9-9-21.5t9-21.5l177-177Z'/%3E%3C/svg%3E") !important;
+}
+
+.menubar {
+	display: none !important;
+}
+
+.sidebar .composite-bar .actions-container {
+	gap: 0.5em;
 }
 /* #endregion */

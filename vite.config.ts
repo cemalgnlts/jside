@@ -1,11 +1,14 @@
 import fs from "node:fs";
 import url from "node:url";
 import zlib from "node:zlib";
+import { pipeline } from "node:stream";
+import { promisify } from "node:util";
 
-import { defineConfig } from "vite";
+import { defineConfig, transformWithEsbuild } from "vite";
 import type { PluginOption } from "vite";
 
-import { buildSync } from "esbuild";
+import { build } from "esbuild";
+import type { Plugin } from "esbuild";
 import fastGlob from "fast-glob";
 
 import { minify } from "terser";
@@ -76,6 +79,7 @@ function importMetaResolver() {
 					newCode += code.slice(i, match.index);
 
 					const path = match[1].slice(1, -1);
+					// @ts-expect-error ESNext feature?
 					const resolved = import.meta.resolve!(path, url.pathToFileURL(args.path));
 
 					newCode += `new URL(${JSON.stringify(url.fileURLToPath(resolved))}, import.meta.url)`;
@@ -91,16 +95,32 @@ function importMetaResolver() {
 }
 
 function extensionWorkerTranformer(): PluginOption {
+	const Provider: Plugin = {
+		name: "VSCodeExtensionProvier",
+		setup(build) {
+			build.onLoad({ filter: /\.wasm$/ }, (args) => {
+				// @ts-expect-error process is node global namespace?
+				const path = args.path.replace(process.cwd(), "");
+
+				return {
+					contents: `export default "${path}";`
+				};
+			});
+		}
+	};
+
 	return {
 		name: "ExtensionWorker",
 		enforce: "post",
 		apply: () => true,
-		transform(code, id) {
+		async transform(code, id) {
 			if (/extensions\/[\w]+\/worker.ts$/.test(id)) {
 				const {
 					outputFiles: [file]
-				} = buildSync({
-					stdin: { contents: code },
+				} = await build({
+					// stdin: { contents: code },
+					entryPoints: [id],
+					plugins: [Provider],
 					write: false,
 					platform: "node",
 					format: "cjs",
@@ -135,7 +155,7 @@ function MinifyCompressPWA(): PluginOption {
 			return { code: res.code };
 		},
 		async closeBundle() {
-			await removeSomeFiles();
+			// await removeSomeFiles();
 
 			setupPWA();
 
@@ -146,13 +166,13 @@ function MinifyCompressPWA(): PluginOption {
 	};
 }
 
-async function removeSomeFiles() {
-	// const files = fastGlob.sync("./dist/**/lib.es{2,5,6}*");
-	// const promises = files.map((file) => fs.promises.rm(file));
-	// await Promise.all(promises);
-}
+// async function removeSomeFiles() {
+// 	const files = fastGlob.sync("./dist/**/lib.es{2,5,6}*");
+// 	const promises = files.map((file) => fs.promises.rm(file));
+// 	await Promise.all(promises);
+// }
 
-function setupPWA() {
+async function setupPWA() {
 	let assets: string[] = fastGlob.sync("./dist/**", {
 		ignore: ["./dist/sw.js", "./dist/*.png", "./dist/**/*.map"]
 	});
@@ -189,11 +209,15 @@ async function extraMinify(minifiedFiles: string[]) {
 
 			content = code;
 		} else if (filePath.endsWith(".css")) {
-			content = buildSync({
+			const {
+				outputFiles: [file]
+			} = await build({
 				entryPoints: [filePath],
 				write: false,
 				minify: true
-			}).outputFiles[0].text;
+			});
+
+			content = file.text;
 		} else if (filePath.endsWith(".json")) {
 			content = JSON.stringify(JSONC.parse(content));
 		}
@@ -206,6 +230,21 @@ async function extraMinify(minifiedFiles: string[]) {
 
 function compressAssets() {
 	const assets = fastGlob.sync("./dist/**");
+
+	// const compressStream = zlib.createBrotliCompress({
+	// 	params: {
+	// 		[zlib.constants.BROTLI_PARAM_MODE]: zlib.constants.BROTLI_MODE_TEXT,
+	// 		[zlib.constants.BROTLI_PARAM_QUALITY]: zlib.constants.BROTLI_MAX_QUALITY
+	// 	}
+	// });
+
+	// const pipe = promisify(pipeline);
+
+	// const promises = assets.map((filePath) =>
+	// 	pipe(fs.createReadStream(filePath), compressStream, fs.createWriteStream(filePath))
+	// );
+
+	// await Promise.all(promises);
 
 	for (const filePath of assets) {
 		const contents = fs.readFileSync(filePath);

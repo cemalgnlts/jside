@@ -26,7 +26,7 @@ import getEnvironmentServiceOverride from "@codingame/monaco-vscode-environment-
 import getSearchServiceOverride from "@codingame/monaco-vscode-search-service-override";
 
 // Extensions
-import "./extensions.ts";
+import { activateDefaultExtensions } from "./extensions.ts";
 
 // Workers
 import ExtensionHostWorkerUrl from "vscode/workers/extensionHost.worker?worker&url";
@@ -38,11 +38,9 @@ import { StatusBarAlignment, Uri, window } from "vscode";
 
 import "vscode/localExtensionHost";
 
-import userConfig from "./userConfiguration.json?raw";
-
-import { activateDefaultExtensions } from "./extensions.ts";
 import { createIndexedDBProviders } from "./fileSystem.ts";
 import { CrossOriginWorker, FakeWorker } from "./workers.ts";
+import userConfig from "./userConfiguration.json?raw";
 
 self.MonacoEnvironment = {
 	getWorker(moduleId: string, label: string) {
@@ -143,14 +141,14 @@ async function extras() {
 		return `$(${icon.join("")})`;
 	};
 
-	const statusBarItem = window.createStatusBarItem(StatusBarAlignment.Right, 0);
-	statusBarItem.command = "notifications.showList";
-	statusBarItem.name = "Notifications";
-	statusBarItem.text = getIcon();
+	const notifyItem = window.createStatusBarItem(StatusBarAlignment.Right, 1);
+	notifyItem.command = "notifications.showList";
+	notifyItem.name = "Notifications";
+	notifyItem.text = getIcon();
 
-	notifyService.onDidChangeDoNotDisturbMode(() => (statusBarItem.text = getIcon()));
-	notifyService.onDidRemoveNotification(() => (statusBarItem.text = getIcon()));
-	notifyService.onDidAddNotification(() => (statusBarItem.text = getIcon(true)));
+	notifyService.onDidChangeDoNotDisturbMode(() => (notifyItem.text = getIcon()));
+	notifyService.onDidRemoveNotification(() => (notifyItem.text = getIcon()));
+	notifyService.onDidAddNotification(() => (notifyItem.text = getIcon(true)));
 
-	statusBarItem.show();
+	notifyItem.show();
 }

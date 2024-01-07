@@ -5,6 +5,7 @@
 	"workbench.sideBar.location": "right",
 	"workbench.view.alwaysShowHeaderActions": true,
 	"editor.fontSize": 14,
+	"editor.lineHeight": 1.5,
 	"editor.tabSize": 2,
 	"editor.scrollBeyondLastLine": false,
 	"editor.insertSpaces": false,
@@ -15,11 +16,19 @@
 	"editor.renderLineHighlightOnlyWhenFocus": true,
 	"editor.overviewRulerBorder": false,
 	"editor.fixedOverflowWidgets": true,
+	"editor.glyphMargin": false,
 	"files.autoSave": "onFocusChange",
-	"workbench.activityBar.location": "right",
+	"workbench.activityBar.location": "top",
 	"javascript.preferences.importModuleSpecifierEnding": "js",
 	"typescript.preferences.importModuleSpecifierEnding": "js",
+	"json.schemaDownload.enable": true,
 	"[javascript]": {
+		"editor.tabSize": 2
+	},
+	"[html]": {
+		"editor.tabSize": 2
+	},
+	"[css]": {
 		"editor.tabSize": 2
 	}
 }

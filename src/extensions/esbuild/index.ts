@@ -8,8 +8,25 @@ const manifest: IExtensionManifest = {
 	engines: {
 		vscode: "*"
 	},
+	contributes: {
+		commands: [
+			{
+				command: "esbuild.init",
+				title: "Init Esbuild"
+			}
+		],
+		menus: {
+			commandPalette: [
+				{
+					command: "esbuild.init",
+					when: "false"
+				}
+			]
+		}
+	},
 	activationEvents: [
-		"onStartupFinished"
+		// "workspaceContains:esbuild.config.json",
+		"command:esbuild.init"
 	]
 };
 

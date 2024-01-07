@@ -1,5 +1,17 @@
-{
-    "label": "React",
-    "detail": "The library for web and native user interfaces",
-    "description": "Web Framework"
-}
+[
+    {
+        "label": "Empty",
+        "detail": "JavaScript",
+        "description": "empty"
+    },
+    {
+        "label": "Basic",
+        "detail": "HTML, CSS, JavaScript",
+        "description": "ui"
+    },
+	{
+		"label": "React",
+		"detail": "The library for web and native user interfaces",
+		"description": "ui"
+	}
+]

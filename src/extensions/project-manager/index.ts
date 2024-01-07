@@ -218,6 +218,7 @@ async function activate() {
 		});
 
 		await commands.executeCommand("workbench.view.explorer");
+		await commands.executeCommand("esbuild.init");
 	});
 
 	api.commands.registerCommand("projectManager.rename", async (item: ProjectTreeItem) => {
@@ -226,9 +227,9 @@ async function activate() {
 		const fs = provider.fs!;
 
 		// await removeProject(projectName, provider);
-		const newName = await showFileNamePrompt({ title: "Rename project", value: projectName});
+		const newName = await showFileNamePrompt({ title: "Rename project", value: projectName });
 
-		if(!newName || projectName === newName) return;
+		if (!newName || projectName === newName) return;
 
 		const projectsUri = Uri.file("/JSIDE/projects");
 
@@ -263,12 +264,13 @@ async function activate() {
 	api.commands.registerCommand("projectManager.refresh.dfs", () => dfsTreeDataProvider.refresh());
 }
 
+// Project creation help dialog.
 function showCreateProjectQuickPick(fsType: WebFileSystemType) {
 	const stepData = [
 		{
 			placeholder: "Select template",
 			value: "",
-			items: [{ ...templateMeta }]
+			items: templateMeta
 		},
 		{
 			placeholder: "Select language",
@@ -325,6 +327,7 @@ function showCreateProjectQuickPick(fsType: WebFileSystemType) {
 	quickPick.show();
 }
 
+// Create the folder structure using the given information.
 async function createProjectTemplate(projectName: string, projectType: string, provider: ProjectTreeDataProvider) {
 	const files = await getTemplate(projectType);
 	const fs = provider.fs!;
@@ -390,7 +393,8 @@ async function removeProject(projectName: string, provider: ProjectTreeDataProvi
 	window.withProgress(options, task);
 }
 
-function showFileNamePrompt(opts: { title: string, prompt?: string, value?: string }) {
+// To create a Unix-compatible project folder name.
+function showFileNamePrompt(opts: { title: string; prompt?: string; value?: string }) {
 	return window.showInputBox({
 		...opts,
 		validateInput(value) {

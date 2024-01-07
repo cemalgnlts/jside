@@ -1,4 +1,4 @@
-import { ProgressLocation, window } from "vscode";
+// import { ProgressLocation, window } from "vscode";
 
 import App from "./App.ts";
 
@@ -24,9 +24,15 @@ function onSWUpdateFound(regsitration: ServiceWorkerRegistration) {
 			};
 		});
 
-	window
-		.withProgress({ title: "PWA Installing", location: ProgressLocation.Notification }, task)
-		.then(() => setTimeout(() => window.showInformationMessage("PWA Installed."), 1000));
+	task()
+		.then(() => console.log("Offline Ready!"))
+		.catch(console.error);
+
+	// window
+	// 	.withProgress({ title: "PWA Installing", location: ProgressLocation.Notification }, task)
+	// 	.then(() => setTimeout(() => window.showInformationMessage("PWA Installed."), 1000));
 }
 
-App().then(() => (import.meta.env.PROD ? registerSW() : null));
+if (import.meta.env.PROD) registerSW();
+
+App();

@@ -1,4 +1,4 @@
-const files = new Map();
+export const files = new Map();
 
 files.set("package.json", `{
 "name": "react-project",
@@ -123,5 +123,3 @@ files.set("App.css", `.App {
         transform: rotate(360deg);
     }
 }`);
-
-export { files };
