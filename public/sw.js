@@ -32,7 +32,7 @@ self.addEventListener("fetch", (ev) => {
 		const resFromCache = await caches.match(ev.request, { ignoreSearch: true });
 		if (resFromCache) return resFromCache;
 
-		const [res, cache] = Promise.all([fetch(ev.request), cahces.open(CACHE_NAME)]);
+		const [res, cache] = Promise.all([fetch(ev.request), caches.open(CACHE_NAME)]);
 
 		// const res = await fetch(ev.request);
 		// const cache = await caches.open(CACHE_NAME);

@@ -1,4 +1,4 @@
-// import { ProgressLocation, window } from "vscode";
+import { ProgressLocation, window } from "vscode";
 
 import App from "./App.ts";
 
@@ -28,11 +28,11 @@ function onSWUpdateFound(regsitration: ServiceWorkerRegistration) {
 		.then(() => console.log("Offline Ready!"))
 		.catch(console.error);
 
-	// window
-	// 	.withProgress({ title: "PWA Installing", location: ProgressLocation.Notification }, task)
-	// 	.then(() => setTimeout(() => window.showInformationMessage("PWA Installed."), 1000));
+	window
+		.withProgress({ title: "Preparing for offline use...", location: ProgressLocation.Notification }, task)
+		.then(() => window.showInformationMessage("Ready for offline use."));
 }
 
-if (import.meta.env.PROD) registerSW();
-
-App();
+App().then(() => {
+	if (import.meta.env.PROD) registerSW();
+});

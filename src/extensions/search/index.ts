@@ -16,7 +16,7 @@ const { getApi, setAsDefaultApi } = registerExtension(manifest, ExtensionHostKin
 
 async function activate() {
 	await setAsDefaultApi();
-	
+
 	const api = await getApi();
 
 	api.workspace.registerFileSearchProvider("file", {

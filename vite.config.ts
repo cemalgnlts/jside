@@ -30,9 +30,9 @@ export default defineConfig({
 	build: {
 		target: "es2020",
 		minify: false,
-		sourcemap: false,
 		reportCompressedSize: false,
-		assetsInlineLimit: 1024,
+		cssCodeSplit: false,
+		assetsInlineLimit: 2048,
 		modulePreload: {
 			resolveDependencies: () => []
 		},
@@ -79,7 +79,7 @@ function importMetaResolver() {
 					newCode += code.slice(i, match.index);
 
 					const path = match[1].slice(1, -1);
-					// @ts-expect-error ESNext feature?
+					// @ts-expect-error ESNext feature
 					const resolved = import.meta.resolve!(path, url.pathToFileURL(args.path));
 
 					newCode += `new URL(${JSON.stringify(url.fileURLToPath(resolved))}, import.meta.url)`;
@@ -94,16 +94,30 @@ function importMetaResolver() {
 	};
 }
 
+// VSCode worker extension file must be in CJS format and bundle must be enabled.
+// I left it that way because I couldn't find a better way.
 function extensionWorkerTranformer(): PluginOption {
+	let isBuildMode = false;
+	let wasmAbsolutePath = "";
+	let wasmOutputPath = "";
+	let tempWorkerFile = "";
+
 	const Provider: Plugin = {
 		name: "VSCodeExtensionProvier",
 		setup(build) {
 			build.onLoad({ filter: /\.wasm$/ }, (args) => {
-				// @ts-expect-error process is node global namespace?
+				// @ts-expect-error process is node global namespace
 				const path = args.path.replace(process.cwd(), "");
+				wasmAbsolutePath = args.path;
+				wasmOutputPath = path;
+
+				if (isBuildMode) {
+					const file = path.split("/").pop();
+					wasmOutputPath = `/assets/${file}`;
+				}
 
 				return {
-					contents: `export default "${path}";`
+					contents: `export default "${wasmOutputPath}";`
 				};
 			});
 		}
@@ -112,25 +126,50 @@ function extensionWorkerTranformer(): PluginOption {
 	return {
 		name: "ExtensionWorker",
 		enforce: "pre",
-		apply: () => true,
+		apply(_, env) {
+			if (env.command === "build") isBuildMode = true;
+
+			return true;
+		},
 		async transform(code, id) {
-			if (/extensions\/[\w]+\/worker.ts$/.test(id)) {
+			const fileRe = isBuildMode ? /extensions\/esbuild\/index.ts$/ : /extensions\/esbuild\/worker.ts$/;
+
+			if (fileRe.test(id)) {
+				const workerFile = isBuildMode ? id.replace(/index.ts$/, "worker.ts") : id;
+				// const workerFile = isBuildMode ? id : id.replace(/index.ts$/, "worker.ts");
+
 				const {
 					outputFiles: [file]
 				} = await build({
-					// stdin: { contents: code },
-					entryPoints: [id],
+					entryPoints: [workerFile],
 					plugins: [Provider],
-					write: false,
 					platform: "node",
 					format: "cjs",
 					external: ["vscode"],
 					bundle: true,
-					minify: true
+					// minify: true,
+					write: false
 				});
 
-				return { code: file.text };
+				if (isBuildMode) {
+					code = code.replace(
+						'new URL("./worker.ts", import.meta.url).toString()',
+						'new URL("./worker.js", import.meta.url).toString()'
+					);
+
+					tempWorkerFile = workerFile.replace(".ts", ".js");
+
+					fs.writeFileSync(tempWorkerFile, file.text);
+				}
+
+				return { code: isBuildMode ? code : file.text, map: null, moduleSideEffects: true };
 			}
+		},
+		closeBundle() {
+			if (!isBuildMode || wasmAbsolutePath.length === 0) return;
+
+			fs.cpSync(wasmAbsolutePath, `dist${wasmOutputPath}`);
+			fs.rmSync(tempWorkerFile);
 		}
 	};
 }
@@ -178,6 +217,9 @@ async function setupPWA() {
 	});
 
 	assets = assets.map((path) => path.slice("./dist".length));
+
+	const rootFileIndex = assets.findIndex((name) => name === "/index.html");
+	assets[rootFileIndex] = "/";
 
 	const contents = fs.readFileSync("./dist/sw.js", "utf-8").split("\n");
 	contents[0] = `const VERSION = "${pkg.version}";`;
@@ -230,6 +272,10 @@ async function extraMinify(minifiedFiles: string[]) {
 
 function compressAssets() {
 	const assets = fastGlob.sync("./dist/**");
+
+	// const perItem = Math.floor(assets.length / 20);
+
+	// let grouped = Array.from({ length: assets.length / perItem }, () => assets.splice(0, perItem));
 
 	// const compressStream = zlib.createBrotliCompress({
 	// 	params: {

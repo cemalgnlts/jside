@@ -50,9 +50,7 @@
 		"@codingame/monaco-vscode-view-status-bar-service-override": "^1.85.0",
 		"@codingame/monaco-vscode-views-service-override": "^1.85.0",
 		"esbuild-wasm": "^0.19.11",
-		"i": "^0.3.7",
-		"monaco-editor": "^0.45.0",
-		"npm": "^10.2.5"
+		"monaco-editor": "^0.45.0"
 	},
 	"devDependencies": {
 		"@types/vscode": "^1.85.0",
