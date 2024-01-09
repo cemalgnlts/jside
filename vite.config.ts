@@ -136,7 +136,6 @@ function extensionWorkerTranformer(): PluginOption {
 
 			if (fileRe.test(id)) {
 				const workerFile = isBuildMode ? id.replace(/index.ts$/, "worker.ts") : id;
-				// const workerFile = isBuildMode ? id : id.replace(/index.ts$/, "worker.ts");
 
 				const {
 					outputFiles: [file]
@@ -147,7 +146,7 @@ function extensionWorkerTranformer(): PluginOption {
 					format: "cjs",
 					external: ["vscode"],
 					bundle: true,
-					// minify: true,
+					minify: true,
 					write: false
 				});
 
@@ -216,6 +215,7 @@ async function setupPWA() {
 		ignore: ["./dist/sw.js", "./dist/*.png", "./dist/**/*.map"]
 	});
 
+	// convert: ./dist/sw.js -> /sw.js
 	assets = assets.map((path) => path.slice("./dist".length));
 
 	const rootFileIndex = assets.findIndex((name) => name === "/index.html");
@@ -296,7 +296,6 @@ function compressAssets() {
 		const contents = fs.readFileSync(filePath);
 		const compressed = zlib.brotliCompressSync(contents, {
 			params: {
-				[zlib.constants.BROTLI_PARAM_MODE]: zlib.constants.BROTLI_MODE_TEXT,
 				[zlib.constants.BROTLI_PARAM_QUALITY]: zlib.constants.BROTLI_MAX_QUALITY
 			}
 		});

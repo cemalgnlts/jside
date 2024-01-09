@@ -142,8 +142,8 @@ const manifest: IRelaxedExtensionManifest = {
 		},
 		viewsWelcome: [
 			{
-				view: "project-manager",
-				contents: "Hello World"
+				view: "deviceFileSystem",
+				contents: "You must grant permission to perform write/read operations on your device.\n[$(shield) Request Permission](command:projectManager.dfsPermissionRequest)"
 			}
 		]
 	}
@@ -402,26 +402,6 @@ function showFileNamePrompt(opts: { title: string; prompt?: string; value?: stri
 			else if (!/^[\w\-. ]+$/.test(value.trim())) return "Please choose a valid folder name.";
 		}
 	});
-}
-
-export function renderProjectManagerWelcomeView() {
-	const pane = (document.querySelector("[aria-label='Device File System Projects Section']") as HTMLDivElement)
-		.parentElement as HTMLDivElement;
-	pane.querySelector(".pane-body")!.classList.add("welcome");
-	const welcomeView = pane.parentElement!.querySelector(".welcome-view") as HTMLDivElement;
-
-	welcomeView.querySelector(
-		".welcome-view-content"
-	)!.innerHTML = `<p>You must grant permission to perform write/read operations on your device.</p>
-	<div class="button-container">
-	<a class="monaco-button monaco-button-custom monaco-text-button" tabindex="0" role="button" style="color: var(--vscode-button-foreground); background-color: var(--vscode-button-background);">
-		<span class="codicon codicon-shield"></span><span>Request Permission</span>
-	</a>
-</div>`;
-
-	(welcomeView.querySelector(".monaco-button-custom") as HTMLAnchorElement).onclick = () => {
-		commands.executeCommand("projectManager.dfsPermissionRequest");
-	};
 }
 
 export default activate;

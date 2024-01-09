@@ -1,12 +1,20 @@
-import { HTMLFileSystemProvider } from "@codingame/monaco-vscode-files-service-override";
+import {
+	FileChangeType,
+	HTMLFileSystemProvider,
+	IFileChange,
+	IFileWriteOptions
+} from "@codingame/monaco-vscode-files-service-override";
 
 import { StandaloneServices, ILogService } from "vscode/services";
 import { fileHandlesStoreName, indexedDB } from "../../workspace/fileSystem";
-import { Uri } from "vscode";
+import { Uri, EventEmitter, Event } from "vscode";
 
 import type { WebFileSystemType } from "./index.ts";
 
 class WebFileSystem extends HTMLFileSystemProvider {
+	private readonly changeFileEmitter = new EventEmitter<IFileChange[]>();
+	readonly onDidChangeFile: Event<readonly IFileChange[]> = this.changeFileEmitter.event;
+
 	constructor(public readonly type: WebFileSystemType) {
 		// No need to remember the OPFS path.
 		// Store in indexedDB to avoid selecting folders every time in DFS.
@@ -50,9 +58,8 @@ class WebFileSystem extends HTMLFileSystemProvider {
 				});
 
 				// If the selected folder is a JSIDE folder, use it, if not, create one and select it.
-				if (rootDirHandle.name !== "JSIDE") {
+				if (rootDirHandle.name !== "JSIDE")
 					rootDirHandle = await rootDirHandle.getDirectoryHandle("JSIDE", { create: true });
-				}
 			}
 		}
 
@@ -66,6 +73,17 @@ class WebFileSystem extends HTMLFileSystemProvider {
 		);
 
 		await this.registerDirectoryHandle(rootDirHandle);
+	}
+
+	async writeFile(resource: Uri, content: Uint8Array, opts: IFileWriteOptions): Promise<void> {
+		await super.writeFile(resource, content, opts);
+
+		this.changeFileEmitter.fire([
+			{
+				resource,
+				type: opts.create ? FileChangeType.ADDED : FileChangeType.UPDATED
+			}
+		]);
 	}
 
 	readDirectory(resource: Uri) {

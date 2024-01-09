@@ -10,7 +10,6 @@ import {
 import { Sash, ISashEvent } from "monaco-editor/esm/vs/base/browser/ui/sash/sash.js";
 
 import { init } from "./workspace/init";
-import { renderProjectManagerWelcomeView } from "./extensions/project-manager/index.ts";
 
 async function App() {
 	await init();
@@ -39,7 +38,6 @@ async function App() {
 	}
 
 	await commands.executeCommand("workbench.view.extension.project-manager");
-	renderProjectManagerWelcomeView();
 
 	document.querySelector(".splash")?.remove();
 }

@@ -1,4 +1,4 @@
-import { INotificationService, getService, initialize as initializeServices } from "vscode/services";
+import { initialize as initializeServices } from "vscode/services";
 
 // Services
 import getDialogsServiceOverride from "@codingame/monaco-vscode-dialogs-service-override";
@@ -24,6 +24,7 @@ import getAccessibilityServiceOverride from "@codingame/monaco-vscode-accessibil
 import getLogServiceOverride from "@codingame/monaco-vscode-log-service-override";
 import getEnvironmentServiceOverride from "@codingame/monaco-vscode-environment-service-override";
 import getSearchServiceOverride from "@codingame/monaco-vscode-search-service-override";
+import getWelcomeServiceOverride from "@codingame/monaco-vscode-welcome-service-override";
 
 // Extensions
 import { activateDefaultExtensions } from "./extensions.ts";
@@ -34,7 +35,7 @@ import EditorWorkerServiceUrl from "monaco-editor/esm/vs/editor/editor.worker.js
 import TextMateWorkerUrl from "@codingame/monaco-vscode-textmate-service-override/worker?worker&url";
 import OutputLinkComputerWorkerUrl from "@codingame/monaco-vscode-output-service-override/worker?worker&url";
 
-import { StatusBarAlignment, Uri, window } from "vscode";
+import { Uri } from "vscode";
 
 import "vscode/localExtensionHost";
 
@@ -105,7 +106,8 @@ export async function init() {
 			...getLifecycleServiceOverride(),
 			...getEnvironmentServiceOverride(),
 			...getLanguagesServiceOverride(),
-			...getSearchServiceOverride()
+			...getSearchServiceOverride(),
+			...getWelcomeServiceOverride()
 		},
 		document.body,
 		{
@@ -123,32 +125,5 @@ export async function init() {
 		}
 	);
 
-	await extras();
-
 	await activateDefaultExtensions();
-}
-
-async function extras() {
-	// Notification status bar item.
-	const notifyService = await getService(INotificationService);
-
-	const getIcon = (dotIcon: boolean = false) => {
-		const icon = ["bell"];
-
-		if (notifyService.doNotDisturbMode) icon.push("-slash");
-		if (dotIcon) icon.push("-dot");
-
-		return `$(${icon.join("")})`;
-	};
-
-	const notifyItem = window.createStatusBarItem(StatusBarAlignment.Right, 1);
-	notifyItem.command = "notifications.showList";
-	notifyItem.name = "Notifications";
-	notifyItem.text = getIcon();
-
-	notifyService.onDidChangeDoNotDisturbMode(() => (notifyItem.text = getIcon()));
-	notifyService.onDidRemoveNotification(() => (notifyItem.text = getIcon()));
-	notifyService.onDidAddNotification(() => (notifyItem.text = getIcon(true)));
-
-	notifyItem.show();
 }
