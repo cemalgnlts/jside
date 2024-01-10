@@ -271,7 +271,7 @@ async function extraMinify(minifiedFiles: string[]) {
 }
 
 function compressAssets() {
-	const assets = fastGlob.sync("./dist/**");
+	const assets = fastGlob.sync("./dist/assets/*");
 
 	// const perItem = Math.floor(assets.length / 20);
 

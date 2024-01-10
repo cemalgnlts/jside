@@ -24,15 +24,11 @@ function onSWUpdateFound(regsitration: ServiceWorkerRegistration) {
 			};
 		});
 
-	task()
-		.then(() => console.log("Offline Ready!"))
-		.catch(console.error);
-
 	window
 		.withProgress({ title: "Preparing for offline use...", location: ProgressLocation.Notification }, task)
 		.then(() => window.showInformationMessage("Ready for offline use."));
 }
 
 App().then(() => {
-	if (import.meta.env.PROD) registerSW();
+	/*if (import.meta.env.PROD) */registerSW();
 });

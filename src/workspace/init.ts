@@ -35,7 +35,7 @@ import EditorWorkerServiceUrl from "monaco-editor/esm/vs/editor/editor.worker.js
 import TextMateWorkerUrl from "@codingame/monaco-vscode-textmate-service-override/worker?worker&url";
 import OutputLinkComputerWorkerUrl from "@codingame/monaco-vscode-output-service-override/worker?worker&url";
 
-import { Uri } from "vscode";
+import { Uri, commands } from "vscode";
 
 import "vscode/localExtensionHost";
 
@@ -124,6 +124,10 @@ export async function init() {
 			}
 		}
 	);
+
+	commands.registerCommand("workbench.action.toggleFullScreen", () => {
+		document.body.requestFullscreen({ navigationUI: "hide" }).catch(() => {});
+	});
 
 	await activateDefaultExtensions();
 }

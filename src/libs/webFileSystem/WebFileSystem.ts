@@ -69,7 +69,7 @@ class WebFileSystem extends HTMLFileSystemProvider {
 
 		// Set up the folder structure.
 		await Promise.all(
-			["projects", "libs", "types"].map((name) => rootDirHandle!.getDirectoryHandle(name, { create: true }))
+			["projects", "libs", "dist", "types"].map((name) => rootDirHandle!.getDirectoryHandle(name, { create: true }))
 		);
 
 		await this.registerDirectoryHandle(rootDirHandle);

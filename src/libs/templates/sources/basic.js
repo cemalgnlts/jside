@@ -4,8 +4,6 @@ files.set("esbuild.config.json", `{
 	"entryPoints": [
 		"./main.js"
 	],
-	"outdir": "dist",
-	"platform": "browser",
 	"target": "es2019",
 	"bundle": true,
 	"minify": true
@@ -56,3 +54,5 @@ body {
   background-color: var(--color-bg);
   color: var(--color-fg);
 }`);
+
+files.set("README.md", `# Hello`);

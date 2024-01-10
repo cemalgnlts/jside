@@ -68,6 +68,7 @@ small {
 	grid-area: editor;
 	height: 45vh;
 	align-self: end;
+	z-index: 5;
 }
 
 #statusbar {
@@ -105,49 +106,6 @@ small {
 	bottom: 3em;
 	width: 48px;
 	height: 48px;
-}
-/* #endregion */
-
-/* #region template */
-.templates {
-	display: flex;
-	gap: 1em;
-	margin-top: 3em;
-}
-
-.template {
-	border: solid 1px rgba(255, 255, 255, 0.1);
-	background-color: var(--vscode-sideBar-background);
-	padding: 1.3em 2em;
-	gap: 1em;
-	display: flex;
-	align-items: center;
-	border-radius: var(--radius);
-	cursor: pointer;
-	min-width: 180px;
-}
-
-.template-info {
-	margin-left: 1em;
-}
-
-.template-info > p {
-	margin-bottom: 6px;
-}
-
-.template-info > small {
-	color: var(--vscode-sideBarSectionHeader-foreground);
-}
-
-.template:hover,
-.template:focus {
-	outline: solid 1px var(--vscode-focusBorder);
-}
-/* #endregion template */
-
-/* #region helper */
-.monaco-button-custom:hover {
-	--vscode-button-background: var(--vscode-button-hoverBackground);
 }
 /* #endregion */
 

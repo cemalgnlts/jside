@@ -12,6 +12,7 @@ let esbuildCtx: esbuild.BuildContext;
 let statusBarItem: StatusBarItem;
 let projectFolderUri: Uri;
 let outputFolderUri: Uri;
+let distDirHandle: FileSystemDirectoryHandle;
 
 async function activate() {
 	logger.info("Activating...");
@@ -24,6 +25,9 @@ async function activate() {
 
 	// Warm up.
 	await esbuild.transform("let a=1;");
+
+	const rootHandle = await (await navigator.storage.getDirectory()).getDirectoryHandle("JSIDE");
+	distDirHandle = await rootHandle.getDirectoryHandle("dist");
 
 	commands.registerCommand("esbuild.init", init);
 	commands.registerCommand("esbuild.build", build);
@@ -55,7 +59,8 @@ async function init() {
 		...userChoices!,
 
 		// Overrides user choices.
-		absWorkingDir: projectFolderUri.path
+		absWorkingDir: projectFolderUri.path,
+		publicPath: "/preview"
 	};
 
 	if (userChoices.outdir && userChoices.outdir.startsWith("/")) {
@@ -82,13 +87,14 @@ async function build() {
 	await esbuildCtx.cancel();
 	const { errors, warnings, outputFiles } = await esbuildCtx.rebuild();
 
-	if (errors.length > 0) logger.error(errors.join("\n"));
-	if (warnings.length > 0) logger.warn(warnings.join("\n"));
+	if (errors.length > 0) logger.error(errors.join("\n* "));
+	if (warnings.length > 0) logger.warn(warnings.join("\n* "));
 
-	let promises: Thenable<void>[] = [];
+	let promises: Thenable<void>[] | Promise<void>[] = [];
 
 	if (outputFiles && outputFiles.length > 0) {
 		promises = outputFiles.map((file) => workspace.fs.writeFile(Uri.file(file.path), file.contents));
+		promises.push(...outputFiles.map(writeOPFSDistFolder));
 	} else {
 		if (!outputFiles) logger.warn(`outputFiles is ${typeof outputFiles}`);
 		else if (outputFiles.length === 0) logger.warn("There is no output files.");
@@ -103,24 +109,66 @@ async function build() {
 	statusBarItem.text = "$(zap) Build";
 }
 
-function onSaveFile(ev: TextDocument) {
-	const fileName = ev.fileName.slice(projectFolderUri.path.length + 1);
-	logger.info(`File changed: ${fileName}`);
+async function onSaveFile(ev: TextDocument) {
+	const fileName = ev.fileName.split("/").pop();
+	const fileRelativePath = ev.fileName.slice(projectFolderUri.path.length + 1);
+	logger.info(`File changed: ${fileRelativePath}`);
 
-	switch (fileName) {
-		case "index.html":
-			workspace.fs
-				.copy(ev.uri, projectFolderUri)
-				.then(() => logger.info("index.html file copied to the output folder."));
-			return;
-		case "esbuild.config.json":
-			statusBarItem.text = "$(sync~spin) Loading...";
-			logger.info("Changed config file, restarting...");
-			init();
-			return;
+	if (fileName === "index.html") {
+		const htmlTargetUri = Uri.joinPath(outputFolderUri, "index.html");
+
+		// Promise.all([
+		// 	writeOPFSDistFolder({
+		// 		path: htmlTargetUri.path,
+		// 		contents: await workspace.fs.readFile(ev.uri),
+		// 		hash: "",
+		// 		text: ""
+		// 	}),
+		// 	workspace.fs.copy(ev.uri, htmlTargetUri, { overwrite: true })
+		// ]).then(
+		// 	() => logger.info("index.html file copied to the output folder."),
+		// 	(err: Error) => logger.error(err.toString())
+		// );
+
+		const ui8 = await workspace.fs.readFile(ev.uri);
+		let content = new TextDecoder().decode(ui8);
+		content = content.replace(/\<head\>/, '<head>\n<base href="/preview/">\n');
+		
+		await writeOPFSDistFolder({
+			path: htmlTargetUri.path,
+			contents: new TextEncoder().encode(content)
+		});
+
+		return;
+	} else if (fileName === "esbuild.config.json") {
+		statusBarItem.text = "$(sync~spin) Loading...";
+		logger.info("Changed config file, reloading...");
+		init();
+
+		return;
+	}
+
+	// "/JSIDE/projects/test/dist".slice("/JSIDE/projects/test") -> "dist/"
+	const outputDirName = outputFolderUri.path.slice(projectFolderUri.path.length + 1) + "/";
+
+	if (fileRelativePath.startsWith(outputDirName)) {
+		logger.info("Changes in the output folder were ignored.");
+		return;
 	}
 
 	build();
+}
+
+async function writeOPFSDistFolder(output: Partial<esbuild.OutputFile>) {
+	const fileName = output.path!.split("/").pop()!;
+
+	const file = await distDirHandle.getFileHandle(fileName, { create: true });
+	const syncAccess = await file.createSyncAccessHandle();
+
+	syncAccess.write(output.contents!, { at: 0 });
+
+	syncAccess.flush();
+	syncAccess.close();
 }
 
 function addStatusBarItem() {

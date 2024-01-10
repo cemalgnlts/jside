@@ -3,12 +3,14 @@ const files = []; // It will be updated automatically in the build process.
 
 const CACHE_NAME = `file-${VERSION}`;
 
+self.addEventListener("message", console.log);
+
 self.addEventListener("install", (ev) => {
 	self.skipWaiting();
 
 	const handle = async () => {
 		const cache = await caches.open(CACHE_NAME);
-		await cache.addAll(files);
+		// await cache.addAll(files);
 	};
 
 	ev.waitUntil(handle());
@@ -29,17 +31,54 @@ self.addEventListener("activate", (ev) => {
 
 self.addEventListener("fetch", (ev) => {
 	const handle = async () => {
-		const resFromCache = await caches.match(ev.request, { ignoreSearch: true });
-		if (resFromCache) return resFromCache;
+		const reqUrl = new URL(ev.request.url);
+		let res = null;
 
-		const [res, cache] = Promise.all([fetch(ev.request), caches.open(CACHE_NAME)]);
-
-		// const res = await fetch(ev.request);
-		// const cache = await caches.open(CACHE_NAME);
-		await cache.put(ev.request, res.clone());
+		if (reqUrl.pathname.startsWith("/preview")) {
+			res = await getFileFromOPFS(reqUrl);
+		} else {
+			res = await cacheFirstRequest(ev.request);
+		}
 
 		return res;
 	};
 
 	ev.respondWith(handle());
 });
+
+async function cacheFirstRequest(request) {
+	const resFromCache = await caches.match(request, { ignoreSearch: true });
+
+	if (resFromCache) return resFromCache;
+
+	const [res, cache] = Promise.all([fetch(request), caches.open(CACHE_NAME)]);
+
+	await cache.put(ev.request, res.clone());
+
+	return res;
+}
+
+async function getFileFromOPFS(reqUrl) {
+	let path = `/JSIDE/${reqUrl.pathname.replace("/preview", "dist")}`;
+	if (path.endsWith("/")) path = path.slice(0, -1);
+
+	if (path === "/JSIDE/dist") path += "/index.html";
+
+	let parentDirHandle = await navigator.storage.getDirectory();
+	let fileHandle = null;
+
+	const dirNames = path.split("/");
+	dirNames.shift();
+
+	const fileName = dirNames.pop();
+
+	for (const name of dirNames) {
+		parentDirHandle = await parentDirHandle.getDirectoryHandle(name);
+	}
+
+	/** @type {FileSystemFileHandle} */
+	fileHandle = await parentDirHandle.getFileHandle(fileName);
+	const file = await fileHandle.getFile();
+
+	return new Response(file);
+}
