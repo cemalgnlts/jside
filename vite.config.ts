@@ -273,25 +273,6 @@ async function extraMinify(minifiedFiles: string[]) {
 function compressAssets() {
 	const assets = fastGlob.sync("./dist/assets/*");
 
-	// const perItem = Math.floor(assets.length / 20);
-
-	// let grouped = Array.from({ length: assets.length / perItem }, () => assets.splice(0, perItem));
-
-	// const compressStream = zlib.createBrotliCompress({
-	// 	params: {
-	// 		[zlib.constants.BROTLI_PARAM_MODE]: zlib.constants.BROTLI_MODE_TEXT,
-	// 		[zlib.constants.BROTLI_PARAM_QUALITY]: zlib.constants.BROTLI_MAX_QUALITY
-	// 	}
-	// });
-
-	// const pipe = promisify(pipeline);
-
-	// const promises = assets.map((filePath) =>
-	// 	pipe(fs.createReadStream(filePath), compressStream, fs.createWriteStream(filePath))
-	// );
-
-	// await Promise.all(promises);
-
 	for (const filePath of assets) {
 		const contents = fs.readFileSync(filePath);
 		const compressed = zlib.brotliCompressSync(contents, {
