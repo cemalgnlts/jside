@@ -1,8 +1,16 @@
+// @ts-expect-error node type
 import fs from "node:fs";
+// @ts-expect-error node type
 import url from "node:url";
+// @ts-expect-error node type
 import zlib from "node:zlib";
+// @ts-expect-error node type
 import { Worker } from "node:worker_threads";
+// @ts-expect-error node type
 import os from "node:os";
+
+declare const require: (packageName: string) => any;
+declare const $require: typeof require;
 
 import { defineConfig } from "vite";
 import type { PluginOption } from "vite";
@@ -29,7 +37,7 @@ export default defineConfig({
 	},
 	build: {
 		target: "es2020",
-		minify: "terser",
+		minify: "esbuild",
 		reportCompressedSize: false,
 		cssCodeSplit: false,
 		assetsInlineLimit: 2048,
@@ -174,37 +182,37 @@ function extensionWorkerTranformer(): PluginOption {
 }
 
 function MinifyCompressPWA(): PluginOption {
-	const minifiedFiles = [];
+	// const minifiedFiles = [];
 
 	return {
 		name: "MinifyCompressPWA",
 		enforce: "post",
 		apply: "build",
-		async renderChunk(code, chunk) {
-			const res = await minify(code, {
-				ecma: 2020,
-				format: {
-					comments: false
-				}
-			});
+		// async renderChunk(code, chunk) {
+		// 	const res = await minify(code, {
+		// 		ecma: 2020,
+		// 		format: {
+		// 			comments: false
+		// 		}
+		// 	});
 
-			minifiedFiles.push(chunk.fileName);
+		// 	minifiedFiles.push(chunk.fileName);
 
-			return { code: res.code };
-		},
+		// 	return { code: res.code };
+		// },
 		async closeBundle() {
 			// await removeSomeFiles();
 
 			setupPWA();
 
-			const exclude = minifiedFiles.map((file) => file.replace(/assets\/([^-]+).*.js/, "**/$1*.js"));
-			let assets = fastGlob.sync("./dist/**", { ignore: exclude });
-			assets = assets.filter((file) => /\.(css|js|json)$/.test(file));
-			
-			const thread = new Thread(extraMinify);
-			await Promise.all(assets.map((filePath) => thread.run(filePath)));
+			// const exclude = minifiedFiles.map((file) => file.replace(/assets\/([^-]+).*.js/, "**/$1*.js"));
+			// let assets = fastGlob.sync("./dist/**", { ignore: exclude });
+			// assets = assets.filter((file) => /\.(css|js|json)$/.test(file));
 
-			console.log("Assets minimized.");
+			// const thread = new Thread(extraMinify);
+			// await Promise.all(assets.map((filePath) => thread.run(filePath)));
+
+			// console.log("Assets minimized.");
 
 			await compressAssets();
 		}
@@ -237,39 +245,39 @@ async function setupPWA() {
 	console.log("PWA builded.");
 }
 
-async function extraMinify(filePath: string) {
-	const fs = $require("fs");
-	const { minify } = $require("terser");
-	const { build } = $require("esbuild");
-	const { default: JSONC } = await import("jsonc-simple-parser");
+// async function extraMinify(filePath: string) {
+// 	const fs = $require("fs");
+// 	const { minify } = $require("terser");
+// 	const { build } = $require("esbuild");
+// 	const { default: JSONC } = await import("jsonc-simple-parser");
 
-	let content = fs.readFileSync(filePath, "utf-8");
+// 	let content = fs.readFileSync(filePath, "utf-8");
 
-	if (filePath.endsWith(".js")) {
-		const { code } = await minify(content, {
-			ecma: 2020,
-			format: {
-				comments: false
-			}
-		});
+// 	if (filePath.endsWith(".js")) {
+// 		const { code } = await minify(content, {
+// 			ecma: 2020,
+// 			format: {
+// 				comments: false
+// 			}
+// 		});
 
-		content = code;
-	} else if (filePath.endsWith(".css")) {
-		const {
-			outputFiles: [file]
-		} = await build({
-			entryPoints: [filePath],
-			write: false,
-			minify: true
-		});
+// 		content = code;
+// 	} else if (filePath.endsWith(".css")) {
+// 		const {
+// 			outputFiles: [file]
+// 		} = await build({
+// 			entryPoints: [filePath],
+// 			write: false,
+// 			minify: true
+// 		});
 
-		content = file.text;
-	} else if (filePath.endsWith(".json")) {
-		content = JSON.stringify(JSONC.parse(content));
-	}
+// 		content = file.text;
+// 	} else if (filePath.endsWith(".json")) {
+// 		content = JSON.stringify(JSONC.parse(content));
+// 	}
 
-	fs.writeFileSync(filePath, content, "utf-8");
-}
+// 	fs.writeFileSync(filePath, content, "utf-8");
+// }
 
 async function compressAssets() {
 	const assets: string[] = fastGlob.sync("./dist/assets/*");
@@ -291,23 +299,6 @@ async function compressAssets() {
 	});
 
 	await Promise.all(assets.map((filePath) => threads.run(filePath)));
-
-	// for (const filePath of assets) {
-	// 	await threads.run(filePath);
-	// }
-
-	// for (const filePath of assets) {
-	// 	const contents = fs.readFileSync(filePath);
-
-	// 	const compressed = zlib.brotliCompressSync(contents, {
-	// 		params: {
-	// 			[zlib.constants.BROTLI_PARAM_QUALITY]: zlib.constants.BROTLI_MAX_QUALITY,
-	// 			[zlib.constants.BROTLI_PARAM_MODE]: zlib.constants.BROTLI_MODE_TEXT
-	// 		}
-	// 	});
-
-	// 	fs.writeFileSync(filePath, compressed);
-	// }
 
 	console.log("Assets Compressed.");
 }
