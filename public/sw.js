@@ -53,7 +53,7 @@ async function cacheFirstRequest(request) {
 
 	const [res, cache] = await Promise.all([fetch(request), caches.open(CACHE_NAME)]);
 
-	await cache.put(ev.request, res.clone());
+	await cache.put(request, res.clone());
 
 	return res;
 }
