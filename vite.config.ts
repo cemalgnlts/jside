@@ -1,10 +1,10 @@
 import fs from "node:fs";
 import url from "node:url";
 import zlib from "node:zlib";
-import { pipeline } from "node:stream";
-import { promisify } from "node:util";
+import { Worker } from "node:worker_threads";
+import os from "node:os";
 
-import { defineConfig, transformWithEsbuild } from "vite";
+import { defineConfig } from "vite";
 import type { PluginOption } from "vite";
 
 import { build } from "esbuild";
@@ -29,7 +29,7 @@ export default defineConfig({
 	},
 	build: {
 		target: "es2020",
-		minify: false,
+		minify: "terser",
 		reportCompressedSize: false,
 		cssCodeSplit: false,
 		assetsInlineLimit: 2048,
@@ -197,9 +197,16 @@ function MinifyCompressPWA(): PluginOption {
 
 			setupPWA();
 
-			await extraMinify(minifiedFiles);
+			const exclude = minifiedFiles.map((file) => file.replace(/assets\/([^-]+).*.js/, "**/$1*.js"));
+			let assets = fastGlob.sync("./dist/**", { ignore: exclude });
+			assets = assets.filter((file) => /\.(css|js|json)$/.test(file));
+			
+			const thread = new Thread(extraMinify);
+			await Promise.all(assets.map((filePath) => thread.run(filePath)));
 
-			compressAssets();
+			console.log("Assets minimized.");
+
+			await compressAssets();
 		}
 	};
 }
@@ -230,59 +237,139 @@ async function setupPWA() {
 	console.log("PWA builded.");
 }
 
-async function extraMinify(minifiedFiles: string[]) {
-	const exclude = minifiedFiles.map((file) => file.replace(/assets\/([^-]+).*.js/, "**/$1*.js"));
-	let assets = fastGlob.sync("./dist/**", {
-		ignore: exclude
-	});
+async function extraMinify(filePath: string) {
+	const fs = $require("fs");
+	const { minify } = $require("terser");
+	const { build } = $require("esbuild");
+	const { default: JSONC } = await import("jsonc-simple-parser");
 
-	assets = assets.filter((file) => /\.(css|js|json)$/.test(file));
+	let content = fs.readFileSync(filePath, "utf-8");
 
-	for (const filePath of assets) {
-		let content = fs.readFileSync(filePath, "utf-8");
+	if (filePath.endsWith(".js")) {
+		const { code } = await minify(content, {
+			ecma: 2020,
+			format: {
+				comments: false
+			}
+		});
 
-		if (filePath.endsWith(".js")) {
-			const { code } = await minify(content, {
-				ecma: 2020,
-				format: {
-					comments: false
-				}
-			});
+		content = code;
+	} else if (filePath.endsWith(".css")) {
+		const {
+			outputFiles: [file]
+		} = await build({
+			entryPoints: [filePath],
+			write: false,
+			minify: true
+		});
 
-			content = code;
-		} else if (filePath.endsWith(".css")) {
-			const {
-				outputFiles: [file]
-			} = await build({
-				entryPoints: [filePath],
-				write: false,
-				minify: true
-			});
-
-			content = file.text;
-		} else if (filePath.endsWith(".json")) {
-			content = JSON.stringify(JSONC.parse(content));
-		}
-
-		fs.writeFileSync(filePath, content, "utf-8");
+		content = file.text;
+	} else if (filePath.endsWith(".json")) {
+		content = JSON.stringify(JSONC.parse(content));
 	}
 
-	console.log("Assets minimized.");
+	fs.writeFileSync(filePath, content, "utf-8");
 }
 
-function compressAssets() {
-	const assets = fastGlob.sync("./dist/assets/*");
+async function compressAssets() {
+	const assets: string[] = fastGlob.sync("./dist/assets/*");
 
-	for (const filePath of assets) {
+	const threads = new Thread((filePath) => {
+		const fs = $require("node:fs");
+		const zlib = $require("node:zlib");
+
 		const contents = fs.readFileSync(filePath);
+
 		const compressed = zlib.brotliCompressSync(contents, {
 			params: {
-				[zlib.constants.BROTLI_PARAM_QUALITY]: zlib.constants.BROTLI_MAX_QUALITY
+				[zlib.constants.BROTLI_PARAM_QUALITY]: zlib.constants.BROTLI_MAX_QUALITY,
+				[zlib.constants.BROTLI_PARAM_MODE]: zlib.constants.BROTLI_MODE_TEXT
 			}
 		});
 
 		fs.writeFileSync(filePath, compressed);
-	}
+	});
+
+	await Promise.all(assets.map((filePath) => threads.run(filePath)));
+
+	// for (const filePath of assets) {
+	// 	await threads.run(filePath);
+	// }
+
+	// for (const filePath of assets) {
+	// 	const contents = fs.readFileSync(filePath);
+
+	// 	const compressed = zlib.brotliCompressSync(contents, {
+	// 		params: {
+	// 			[zlib.constants.BROTLI_PARAM_QUALITY]: zlib.constants.BROTLI_MAX_QUALITY,
+	// 			[zlib.constants.BROTLI_PARAM_MODE]: zlib.constants.BROTLI_MODE_TEXT
+	// 		}
+	// 	});
+
+	// 	fs.writeFileSync(filePath, compressed);
+	// }
 
 	console.log("Assets Compressed.");
+}
+
+class Thread<Args extends any[]> {
+	threads = new Set<Worker>();
+	queue: Array<() => void> = [];
+	maxThreadCount = (os?.availableParallelism() ?? os.cpus()) - 1;
+	code: string;
+
+	constructor(fun: (...args: Args) => any) {
+		this.code = this.buildWorkerCode(fun.toString());
+	}
+
+	async run(...args: Args): Promise<any> {
+		const worker = await this.getWorker();
+
+		return new Promise((resolve, reject) => {
+			worker.resolveMessage = resolve;
+			worker.rejectMessage = reject;
+			worker.postMessage(args);
+		});
+	}
+
+	async getWorker() {
+		if (this.threads.size <= this.maxThreadCount) {
+			const worker = new Worker(this.code, { eval: true });
+
+			worker.on("message", (ev) => {
+				worker.resolveMessage(ev);
+				worker.unref();
+				this.threads.delete(worker);
+
+				if (this.queue.length > 0) {
+					const resolve = this.queue.shift();
+					resolve();
+				}
+			});
+
+			worker.on("error", (err) => {
+				worker.rejectMessage();
+				console.error(err);
+			});
+
+			this.threads.add(worker);
+
+			return worker;
+		}
+
+		return new Promise<void>((resolve, reject) => {
+			this.queue.push(resolve);
+		}).then(() => this.getWorker());
+	}
+
+	buildWorkerCode(fn: string) {
+		return `const { parentPort } = require("worker_threads");
+		const $require = require;
+		const fun = ${fn};
+
+		parentPort.on("message", async args => {
+			const res = await fun(...args);
+			parentPort.postMessage(res);
+		});`;
+	}
 }
