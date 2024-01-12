@@ -1,4 +1,4 @@
-const VERSION = "0.0.1"; // It will be updated automatically in the build process.
+const VERSION = "0.0.0"; // It will be updated automatically in the build process.
 const files = []; // It will be updated automatically in the build process.
 
 const CACHE_NAME = `file-${VERSION}`;
@@ -10,7 +10,7 @@ self.addEventListener("install", (ev) => {
 
 	const handle = async () => {
 		const cache = await caches.open(CACHE_NAME);
-		// await cache.addAll(files);
+		await cache.addAll(files);
 	};
 
 	ev.waitUntil(handle());
