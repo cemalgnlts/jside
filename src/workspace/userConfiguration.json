@@ -23,6 +23,9 @@
 	"workbench.activityBar.location": "top",
 	"javascript.preferences.importModuleSpecifierEnding": "js",
 	"typescript.preferences.importModuleSpecifierEnding": "js",
+	"html.format.extraLiners": "",
+	"html.format.indentInnerHtml": true,
+	"css.format.spaceAroundSelectorSeparator": true,
 	"[javascript]": {
 		"editor.tabSize": 2
 	},

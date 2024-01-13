@@ -1,6 +1,6 @@
 const VERSION = "0.0.0"; // It will be updated automatically in the build process.
 const files = []; // It will be updated automatically in the build process.
-const isPROD = location.hostname === "jside.vercel.app";
+const isProduction = location.hostname === "jside.vercel.app";
 
 // @ts-check
 /// <reference lib="webworker"/>
@@ -17,7 +17,7 @@ self.addEventListener("install", (ev) => {
 		await cache.addAll(files);
 	};
 
-	ev.waitUntil(handle());
+	if(isProduction) ev.waitUntil(handle());
 });
 
 self.addEventListener("activate", (ev) => {
@@ -30,7 +30,7 @@ self.addEventListener("activate", (ev) => {
 		if (oldCaches.length !== 0) await Promise.all(oldCaches.map((key) => caches.delete(key)));
 	};
 
-	ev.waitUntil(handle());
+	if(isProduction) ev.waitUntil(handle());
 });
 
 self.addEventListener("fetch", (ev) => {
@@ -40,8 +40,10 @@ self.addEventListener("fetch", (ev) => {
 
 		if (reqUrl.pathname.startsWith("/preview")) {
 			res = await getFileFromOPFS(reqUrl);
-		} else {
+		} else if(isProduction) {
 			res = await cacheFirstRequest(ev.request);
+		} else {
+			res = await fetch(ev.request);
 		}
 
 		return res;

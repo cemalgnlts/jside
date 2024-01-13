@@ -7,6 +7,14 @@ function registerSW() {
 	navigator.serviceWorker.register("/sw.js").then((registration) => {
 		registration.onupdatefound = () => onSWUpdateFound(registration);
 	});
+
+	// https://github.com/CodinGame/monaco-vscode-api/discussions/312
+	navigator.serviceWorker.getRegistrations().then((registrations) => {
+		const rootScope = `${location.protocol}//${location.hostname}/`;
+		const unwanted = registrations.filter((registration) => registration.scope !== rootScope);
+
+		if (unwanted.length > 0) unwanted.forEach((sw) => sw.unregister());
+	});
 }
 
 function onSWUpdateFound(regsitration: ServiceWorkerRegistration) {

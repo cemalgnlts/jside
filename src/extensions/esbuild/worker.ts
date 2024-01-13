@@ -92,11 +92,11 @@ async function start(mode: "serve" | "build") {
 	let promises: Thenable<void>[] | Promise<void>[] = [];
 
 	if (outputFiles && outputFiles.length > 0) {
-		// serve default.
-		let outputHandler = writeOPFSDistFolder;
+		// Serve default.
+		let outputHandler: any = writeOPFSDistFolder;
 
-		if(mode === "build") {
-			outputHandler = (file) => workspace.fs.writeFile(Uri.file(file.path), file.contents);
+		if (mode === "build") {
+			outputHandler = (file: esbuild.OutputFile) => workspace.fs.writeFile(Uri.file(file.path), file.contents);
 		}
 
 		promises = outputFiles.map(outputHandler);
@@ -153,22 +153,29 @@ async function onSaveFile(ev: TextDocument) {
 
 		const ui8 = await workspace.fs.readFile(ev.uri);
 		let content = new TextDecoder().decode(ui8);
-		content = content.replace(/\<head\>/, `<head>
-		<base href="/preview/">
-		<script>
-		const bc = new BroadcastChannel("live_reload");
-		bc.onmessage = ev => {
-			switch(ev.data) {
-				case "reload": location.reload(); break;
-			}
-		};
-		</script>
-		`);
-		
+		content = content.replace(
+			/\<head\>/,
+			`<head>
+<base href="/preview/">
+<script>
+	const bc = new BroadcastChannel("live_reload");
+	bc.onmessage = ev => {
+		switch(ev.data) {
+			case "reload": location.reload(); break;
+		}
+	};
+</script>
+`
+		);
+
 		await writeOPFSDistFolder({
 			path: htmlTargetUri.path,
 			contents: new TextEncoder().encode(content)
 		});
+
+		logger.info("index.html file copied to the output folder.");
+
+		liveReloadBC.postMessage("reload");
 
 		return;
 	} else if (fileName === "esbuild.config.json") {
