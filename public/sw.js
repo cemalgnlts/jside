@@ -1,4 +1,4 @@
-const VERSION = "0.0.1"; // It will be updated automatically in the build process.
+const VERSION = "0.0.0"; // It will be updated automatically in the build process.
 const files = []; // It will be updated automatically in the build process.
 const isPROD = location.hostname === "jside.vercel.app";
 
@@ -57,7 +57,7 @@ async function cacheFirstRequest(request) {
 
 	const [res, cache] = await Promise.all([fetch(request), caches.open(CACHE_NAME)]);
 
-	await cache.put(ev.request, res.clone());
+	await cache.put(request, res.clone());
 
 	return res;
 }
