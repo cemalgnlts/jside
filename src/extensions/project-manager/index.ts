@@ -143,7 +143,8 @@ const manifest: IRelaxedExtensionManifest = {
 		viewsWelcome: [
 			{
 				view: "deviceFileSystem",
-				contents: "You must grant permission to perform write/read operations on your device.\n[$(shield) Request Permission](command:projectManager.dfsPermissionRequest)"
+				contents:
+					"You must grant permission to perform write/read operations on your device.\n[$(shield) Request Permission](command:projectManager.dfsPermissionRequest)"
 			}
 		]
 	}

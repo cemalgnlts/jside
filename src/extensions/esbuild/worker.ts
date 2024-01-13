@@ -8,6 +8,8 @@ import { logger } from "./logger.ts";
 
 import "./esbuildFSBinding.ts";
 
+const liveReloadBC = new BroadcastChannel("live_reload");
+
 let esbuildCtx: esbuild.BuildContext;
 let statusBarItem: StatusBarItem;
 let projectFolderUri: Uri;
@@ -75,13 +77,10 @@ async function init() {
 	esbuildCtx = await esbuild.context(opts);
 
 	logger.info("Active.");
-	statusBarItem.text = "$(zap) Build";
+	statusBarItem.text = "$(zap) Preview";
 }
 
-async function build() {
-	logger.info("Building...");
-	statusBarItem.text = "$(loading~spin) Building...";
-
+async function start(mode: "serve" | "build") {
 	const buildStart = performance.now();
 
 	await esbuildCtx.cancel();
@@ -93,8 +92,14 @@ async function build() {
 	let promises: Thenable<void>[] | Promise<void>[] = [];
 
 	if (outputFiles && outputFiles.length > 0) {
-		promises = outputFiles.map((file) => workspace.fs.writeFile(Uri.file(file.path), file.contents));
-		promises.push(...outputFiles.map(writeOPFSDistFolder));
+		// serve default.
+		let outputHandler = writeOPFSDistFolder;
+
+		if(mode === "build") {
+			outputHandler = (file) => workspace.fs.writeFile(Uri.file(file.path), file.contents);
+		}
+
+		promises = outputFiles.map(outputHandler);
 	} else {
 		if (!outputFiles) logger.warn(`outputFiles is ${typeof outputFiles}`);
 		else if (outputFiles.length === 0) logger.warn("There is no output files.");
@@ -102,11 +107,27 @@ async function build() {
 
 	await Promise.all(promises);
 
-	await commands.executeCommand("workbench.files.action.refreshFilesExplorer");
-
 	const buildTime = performance.now() - buildStart;
 	logger.info(`Done in ${buildTime | 0}ms`);
-	statusBarItem.text = "$(zap) Build";
+	statusBarItem.text = "$(zap) Preview";
+}
+
+async function serve() {
+	logger.info("Building...");
+	statusBarItem.text = "$(loading~spin) Building...";
+
+	await start("serve");
+
+	liveReloadBC.postMessage("reload");
+}
+
+async function build() {
+	logger.info("Building...");
+	statusBarItem.text = "$(loading~spin) Building...";
+
+	await start("build");
+
+	await commands.executeCommand("workbench.files.action.refreshFilesExplorer");
 }
 
 async function onSaveFile(ev: TextDocument) {
@@ -132,7 +153,17 @@ async function onSaveFile(ev: TextDocument) {
 
 		const ui8 = await workspace.fs.readFile(ev.uri);
 		let content = new TextDecoder().decode(ui8);
-		content = content.replace(/\<head\>/, '<head>\n<base href="/preview/">\n');
+		content = content.replace(/\<head\>/, `<head>
+		<base href="/preview/">
+		<script>
+		const bc = new BroadcastChannel("live_reload");
+		bc.onmessage = ev => {
+			switch(ev.data) {
+				case "reload": location.reload(); break;
+			}
+		};
+		</script>
+		`);
 		
 		await writeOPFSDistFolder({
 			path: htmlTargetUri.path,
@@ -156,7 +187,7 @@ async function onSaveFile(ev: TextDocument) {
 		return;
 	}
 
-	build();
+	serve();
 }
 
 async function writeOPFSDistFolder(output: Partial<esbuild.OutputFile>) {
@@ -176,7 +207,7 @@ function addStatusBarItem() {
 	statusBarItem.command = "esbuild.showLogger";
 	statusBarItem.text = "$(sync~spin) Loading...";
 	statusBarItem.tooltip = "Show output";
-	statusBarItem.name = "Build";
+	statusBarItem.name = "Preview";
 	statusBarItem.show();
 }
 

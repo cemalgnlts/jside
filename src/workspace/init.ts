@@ -20,7 +20,6 @@ import getQuickAccessServiceOverride from "@codingame/monaco-vscode-quickaccess-
 import getOutputServiceOverride from "@codingame/monaco-vscode-output-service-override";
 import getMarkersServiceOverride from "@codingame/monaco-vscode-markers-service-override";
 import getLifecycleServiceOverride from "@codingame/monaco-vscode-lifecycle-service-override";
-import getAccessibilityServiceOverride from "@codingame/monaco-vscode-accessibility-service-override";
 import getLogServiceOverride from "@codingame/monaco-vscode-log-service-override";
 import getEnvironmentServiceOverride from "@codingame/monaco-vscode-environment-service-override";
 import getSearchServiceOverride from "@codingame/monaco-vscode-search-service-override";
@@ -101,7 +100,6 @@ export async function init() {
 			}),
 			...getOutputServiceOverride(),
 			...getMarkersServiceOverride(),
-			...getAccessibilityServiceOverride(),
 			...getStorageServiceOverrride(),
 			...getLifecycleServiceOverride(),
 			...getEnvironmentServiceOverride(),

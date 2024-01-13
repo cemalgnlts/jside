@@ -13,7 +13,6 @@
 		"postinstall": "monaco-treemending"
 	},
 	"dependencies": {
-		"@codingame/monaco-vscode-accessibility-service-override": "^1.85.1",
 		"@codingame/monaco-vscode-configuration-service-override": "^1.85.1",
 		"@codingame/monaco-vscode-css-default-extension": "^1.85.1",
 		"@codingame/monaco-vscode-css-language-features-default-extension": "^1.85.1",

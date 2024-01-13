@@ -29,6 +29,4 @@ function onSWUpdateFound(regsitration: ServiceWorkerRegistration) {
 		.then(() => window.showInformationMessage("Ready for offline use."));
 }
 
-App().then(() => {
-	/*if (import.meta.env.PROD) */registerSW();
-});
+App().then(registerSW);
