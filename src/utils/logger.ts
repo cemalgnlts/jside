@@ -1,10 +1,12 @@
-import { window } from "vscode";
-
 type LogLevel = "info" | "warning" | "error";
 
 class Logger {
-	private outputChannel = window.createOutputChannel("Builder", "log");
 	private textDecoder = new TextDecoder();
+	outputChannel: import("vscode").OutputChannel;
+
+	constructor(window: typeof import("vscode").window, outputChannelName: string) {
+		this.outputChannel = window.createOutputChannel(outputChannelName, "log");
+	}
 
 	show() {
 		this.outputChannel.show();
@@ -32,6 +34,4 @@ class Logger {
 	}
 }
 
-const logger = new Logger();
-
-export { logger };
+export default Logger;

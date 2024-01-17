@@ -1,3 +1,9 @@
+import { commands } from "vscode";
+
+async function refreshFilesExplorer() {
+	await commands.executeCommand("workbench.files.action.refreshFilesExplorer");
+}
+
 async function requestOPFSPersistentPermission(): Promise<undefined> {
 	const isPersisted = await navigator.storage.persisted();
 
@@ -16,4 +22,4 @@ function encodeSVG(svg: string) {
 	return `data:image/svg+xml;base64,${encoded}`;
 }
 
-export { requestOPFSPersistentPermission, encodeSVG };
+export { refreshFilesExplorer, requestOPFSPersistentPermission, encodeSVG };

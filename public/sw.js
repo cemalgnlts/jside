@@ -40,7 +40,7 @@ self.addEventListener("fetch", (ev) => {
 
 		if (reqUrl.pathname.startsWith("/preview")) {
 			res = await getFileFromOPFS(reqUrl);
-		} else if(isProduction) {
+		} else if(reqUrl.hostname === "jside.vercel.app" && isProduction) {
 			res = await cacheFirstRequest(ev.request);
 		} else {
 			res = await fetch(ev.request);

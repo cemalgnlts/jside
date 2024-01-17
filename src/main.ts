@@ -10,6 +10,8 @@ function registerSW() {
 
 	// https://github.com/CodinGame/monaco-vscode-api/discussions/312
 	navigator.serviceWorker.getRegistrations().then((registrations) => {
+		if(registrations.length <= 1) return;
+		
 		const rootScope = `${location.protocol}//${location.hostname}/`;
 		const unwanted = registrations.filter((registration) => registration.scope !== rootScope);
 

@@ -1,7 +1,8 @@
-import { Uri, workspace, FileType } from "vscode";
+import { Uri, workspace, window, FileType } from "vscode";
 import type { FileStat } from "vscode";
+import Logger from "../../utils/logger";
 
-import { logger } from "./logger";
+export const logger = new Logger(window, "Builder");
 
 const projectFolderUri: Uri = workspace.workspaceFolders![0].uri;
 

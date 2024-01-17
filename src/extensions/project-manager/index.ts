@@ -3,7 +3,6 @@ import { ProjectTreeDataProvider, ProjectTreeItem } from "./projectTreeDataProvi
 
 import { IRelaxedExtensionManifest } from "vscode/vscode/vs/platform/extensions/common/extensions";
 import { getTemplate, templateMeta } from "../../libs/templates";
-import { ProgressLocation, Uri, window, commands } from "vscode";
 import { reinitializeWorkspace } from "@codingame/monaco-vscode-configuration-service-override";
 import WebFileSystem, { WebFileSystemType } from "../../libs/webFileSystem";
 import { requestOPFSPersistentPermission } from "../../utils/utils";
@@ -23,7 +22,6 @@ const manifest: IRelaxedExtensionManifest = {
 				{
 					id: "project-manager",
 					title: "Project Manager",
-					// @ts-expect-error Missing type
 					icon: "$(home)"
 				}
 			]
@@ -32,38 +30,36 @@ const manifest: IRelaxedExtensionManifest = {
 			{
 				command: "projectManager.refresh.opfs",
 				title: "Refresh",
-				// @ts-expect-error Missing type
 				icon: "$(refresh)"
 			},
 			{
 				command: "projectManager.refresh.dfs",
 				title: "Refresh",
-				// @ts-expect-error Missing type
 				icon: "$(refresh)"
 			},
 			{
 				command: "projectManager.add.opfs",
 				title: "New Project",
-				// @ts-expect-error Missing type
 				icon: "$(add)"
 			},
 			{
 				command: "projectManager.add.dfs",
 				title: "New Project",
-				// @ts-expect-error Missing type
 				icon: "$(add)"
 			},
 			{
 				command: "projectManager.rename",
 				title: "Rename",
-				// @ts-expect-error Missing type
 				icon: "$(edit)"
 			},
 			{
 				command: "projectManager.delete",
 				title: "Delete",
-				// @ts-expect-error Missing type
 				icon: "$(trash)"
+			},
+			{
+				command: "projectManager.projectOpened",
+				title: "Project Opened Trigger"
 			}
 		],
 		views: {
@@ -137,6 +133,10 @@ const manifest: IRelaxedExtensionManifest = {
 				{
 					command: "projectManager.delete",
 					when: "false"
+				},
+				{
+					command: "projectManager.projectOpened",
+					when: "false"
 				}
 			]
 		},
@@ -152,15 +152,21 @@ const manifest: IRelaxedExtensionManifest = {
 
 const { getApi, setAsDefaultApi } = registerExtension(manifest, ExtensionHostKind.LocalProcess);
 
+let api: typeof import("vscode");
+
 async function activate() {
 	await setAsDefaultApi();
 
-	const api = await getApi();
+	api = await getApi();
+
+	const { window, commands, Uri, ProgressLocation } = api;
+
+	await commands.executeCommand("setContext", "projectManager.isAnyProjectOpen", false);
 
 	try {
 		await requestOPFSPersistentPermission();
 	} catch (err) {
-		if (err instanceof Error) api.window.showWarningMessage(err.message);
+		if (err instanceof Error) window.showWarningMessage(err.message);
 		else console.error(err);
 	}
 
@@ -175,16 +181,16 @@ async function activate() {
 	const dfsTreeDataProvider = new ProjectTreeDataProvider(null);
 
 	// Tree views
-	api.window.createTreeView("deviceFileSystem", {
+	window.createTreeView("deviceFileSystem", {
 		treeDataProvider: dfsTreeDataProvider
 	});
 
-	api.window.createTreeView("originPrivateFileSystem", {
+	window.createTreeView("originPrivateFileSystem", {
 		treeDataProvider: opfsTreeDataProvider
 	});
 
 	// Commands
-	api.commands.registerCommand(
+	commands.registerCommand(
 		"projectManager.new",
 		async (projectName: string, projectType: string, fsType: WebFileSystemType) => {
 			const provider = fsType === "opfs" ? opfsTreeDataProvider : dfsTreeDataProvider;
@@ -206,7 +212,7 @@ async function activate() {
 		}
 	);
 
-	api.commands.registerCommand("projectManager.open", async (fsType, projectName) => {
+	commands.registerCommand("projectManager.open", async (fsType, projectName) => {
 		const fs = fsType === "opfs" ? opfs : dfs;
 
 		registerFileSystemOverlay(1, fs);
@@ -218,11 +224,14 @@ async function activate() {
 			id: projectFolderUri.toString()
 		});
 
-		await commands.executeCommand("workbench.view.explorer");
-		await commands.executeCommand("esbuild.init");
+		await Promise.all([
+			commands.executeCommand("workbench.view.explorer"),
+			commands.executeCommand("esbuild.init"),
+			commands.executeCommand("setContext", "projectManager.isAnyProjectOpen", true)
+		]);
 	});
 
-	api.commands.registerCommand("projectManager.rename", async (item: ProjectTreeItem) => {
+	commands.registerCommand("projectManager.rename", async (item: ProjectTreeItem) => {
 		const [fsType, projectName] = item.command!.arguments as [WebFileSystemType, string];
 		const provider = fsType === "opfs" ? opfsTreeDataProvider : dfsTreeDataProvider;
 		const fs = provider.fs!;
@@ -241,14 +250,14 @@ async function activate() {
 		provider.refresh();
 	});
 
-	api.commands.registerCommand("projectManager.delete", async (item: ProjectTreeItem) => {
+	commands.registerCommand("projectManager.delete", async (item: ProjectTreeItem) => {
 		const [fsType, projectName] = item.command!.arguments as [WebFileSystemType, string];
 		const provider = fsType === "opfs" ? opfsTreeDataProvider : dfsTreeDataProvider;
 
 		await removeProject(projectName, provider);
 	});
 
-	api.commands.registerCommand("projectManager.dfsPermissionRequest", async () => {
+	commands.registerCommand("projectManager.dfsPermissionRequest", async () => {
 		try {
 			await dfs.initFS();
 			dfsTreeDataProvider.fs = dfs;
@@ -258,11 +267,11 @@ async function activate() {
 		}
 	});
 
-	api.commands.registerCommand("projectManager.add.opfs", () => showCreateProjectQuickPick("opfs"));
-	api.commands.registerCommand("projectManager.add.dfs", () => showCreateProjectQuickPick("dfs"));
+	commands.registerCommand("projectManager.add.opfs", () => showCreateProjectQuickPick("opfs"));
+	commands.registerCommand("projectManager.add.dfs", () => showCreateProjectQuickPick("dfs"));
 
-	api.commands.registerCommand("projectManager.refresh.opfs", () => opfsTreeDataProvider.refresh());
-	api.commands.registerCommand("projectManager.refresh.dfs", () => dfsTreeDataProvider.refresh());
+	commands.registerCommand("projectManager.refresh.opfs", () => opfsTreeDataProvider.refresh());
+	commands.registerCommand("projectManager.refresh.dfs", () => dfsTreeDataProvider.refresh());
 }
 
 // Project creation help dialog.
@@ -283,7 +292,7 @@ function showCreateProjectQuickPick(fsType: WebFileSystemType) {
 		}
 	];
 
-	const quickPick = window.createQuickPick();
+	const quickPick = api.window.createQuickPick();
 	quickPick.matchOnDescription = true;
 	quickPick.title = "Create Project";
 	quickPick.totalSteps = stepData.length + 1;
@@ -293,11 +302,14 @@ function showCreateProjectQuickPick(fsType: WebFileSystemType) {
 	quickPick.items = stepData[quickPick.step - 1].items;
 
 	const showProjectNameInputBox = async (template: string) => {
-		const projectName = await showFileNamePrompt({ title: "Create Project (3/3)", prompt: "Project Folder Name" });
+		const projectName = await showFileNamePrompt({
+			title: "Create Project (3/3)",
+			prompt: "Project Folder Name"
+		});
 
 		if (!projectName) return;
 
-		await commands.executeCommand("projectManager.new", projectName, template, fsType);
+		await api.commands.executeCommand("projectManager.new", projectName, template, fsType);
 	};
 
 	const onAccept = async () => {
@@ -334,7 +346,7 @@ async function createProjectTemplate(projectName: string, projectType: string, p
 	const fs = provider.fs!;
 	const encoder = new TextEncoder();
 
-	const projectFolderUri = Uri.file(`/JSIDE/projects/${projectName}`);
+	const projectFolderUri = api.Uri.file(`/JSIDE/projects/${projectName}`);
 
 	await fs.createDirectory(projectFolderUri);
 
@@ -342,8 +354,8 @@ async function createProjectTemplate(projectName: string, projectType: string, p
 		const splitted = path.split("/");
 
 		const parentFolderUri =
-			splitted.length === 1 ? projectFolderUri : Uri.joinPath(projectFolderUri, ...splitted.slice(0, -1));
-		const fileUri = Uri.joinPath(parentFolderUri, splitted.pop() as string);
+			splitted.length === 1 ? projectFolderUri : api.Uri.joinPath(projectFolderUri, ...splitted.slice(0, -1));
+		const fileUri = api.Uri.joinPath(parentFolderUri, splitted.pop() as string);
 
 		await fs.createDirectory(parentFolderUri);
 		await fs.writeFile(fileUri, encoder.encode(contents), {
@@ -358,7 +370,7 @@ async function createProjectTemplate(projectName: string, projectType: string, p
 }
 
 async function removeProject(projectName: string, provider: ProjectTreeDataProvider) {
-	const res = await window.showWarningMessage(
+	const res = await api.window.showWarningMessage(
 		"Delete",
 		{
 			detail: `Do you want to delete the ${projectName} project?\nThis action is irreversible!`,
@@ -369,12 +381,12 @@ async function removeProject(projectName: string, provider: ProjectTreeDataProvi
 
 	if (res == undefined || res.title !== "Delete") return;
 
-	const projectUri = Uri.file(`/JSIDE/projects/${projectName}`);
+	const projectUri = api.Uri.file(`/JSIDE/projects/${projectName}`);
 
 	const options = {
 		cancellable: false,
 		title: "Project deleting...",
-		location: ProgressLocation.Window
+		location: api.ProgressLocation.Window
 	};
 
 	const task = async () => {
@@ -387,16 +399,16 @@ async function removeProject(projectName: string, provider: ProjectTreeDataProvi
 
 			provider.refresh();
 		} catch (err) {
-			window.showErrorMessage((err as Error).toString());
+			api.window.showErrorMessage((err as Error).toString());
 		}
 	};
 
-	window.withProgress(options, task);
+	api.window.withProgress(options, task);
 }
 
 // To create a Unix-compatible project folder name.
 function showFileNamePrompt(opts: { title: string; prompt?: string; value?: string }) {
-	return window.showInputBox({
+	return api.window.showInputBox({
 		...opts,
 		validateInput(value) {
 			if (value.length < 3) return "Minimum 3 character.";

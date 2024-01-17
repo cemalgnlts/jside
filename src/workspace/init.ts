@@ -118,6 +118,7 @@ export async function init() {
 				nameLong: __APP_NAME,
 				version: __APP_VERSION,
 				date: __APP_DATE,
+				commandPaletteSuggestedCommandIds: ["workbench.action.files.openFile"],
 				enableTelemetry: false
 			}
 		}

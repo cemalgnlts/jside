@@ -4,9 +4,8 @@ import type { StatusBarItem, TextDocument } from "vscode";
 import esbuild from "esbuild-wasm/lib/browser.js";
 import esbuildWasmURL from "esbuild-wasm/esbuild.wasm?url";
 
-import { logger } from "./logger.ts";
-
-import "./esbuildFSBinding.ts";
+import { logger } from "./esbuildFSBinding.ts";
+import { refreshFilesExplorer } from "../../utils/utils.ts";
 
 const liveReloadBC = new BroadcastChannel("live_reload");
 
@@ -100,9 +99,10 @@ async function start(mode: "serve" | "build") {
 		}
 
 		promises = outputFiles.map(outputHandler);
-	} else {
-		if (!outputFiles) logger.warn(`outputFiles is ${typeof outputFiles}`);
-		else if (outputFiles.length === 0) logger.warn("There is no output files.");
+	} else if (outputFiles && outputFiles.length === 0) {
+		logger.warn("There is no output files.");
+	} else if (!outputFiles) {
+		logger.warn(`outputFiles is ${typeof outputFiles}`);
 	}
 
 	await Promise.all(promises);
@@ -116,7 +116,7 @@ async function serve() {
 	logger.info("Building...");
 	statusBarItem.text = "$(loading~spin) Building...";
 
-	await start("serve");
+	await start("serve").catch(() => console.error("error occured!"));
 
 	liveReloadBC.postMessage("reload");
 }
@@ -125,9 +125,10 @@ async function build() {
 	logger.info("Building...");
 	statusBarItem.text = "$(loading~spin) Building...";
 
-	await start("build");
+	await start("build").catch(() => console.error("error occured!"));
 
-	await commands.executeCommand("workbench.files.action.refreshFilesExplorer");
+	// await commands.executeCommand("workbench.files.action.refreshFilesExplorer");
+	await refreshFilesExplorer();
 }
 
 async function onSaveFile(ev: TextDocument) {
