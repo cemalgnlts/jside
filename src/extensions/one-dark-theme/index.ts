@@ -9,8 +9,8 @@ const manifest: IExtensionManifest = {
 	},
 	contributes: {
 		themes: [
+			// @ts-ignore id type problem
 			{
-				id: "oneDark",
 				label: "One Dark",
 				path: "/one-dark.json",
 				uiTheme: "vs-dark"

@@ -1,125 +1,134 @@
 @font-face {
-	font-family: "Fira Code";
-	src: url("/FiraCode-Regular.woff2") format("woff2");
-	font-weight: 400;
-	font-style: normal;
-	font-display: swap;
+  font-family: "Fira Code";
+  src: url("/FiraCode-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
 }
 
 :root {
-	--color-bg: #282c34;
+  --color-bg: #282c34;
 
-	--radius: 4px;
-	--sidebar-width: 20vw;
+  --radius: 4px;
+  --sidebar-width: 20vw;
 }
 
 html,
 body,
 #app {
-	width: 100vw;
-	height: 100vh;
+  width: 100vw;
+  height: 100vh;
 }
 
 body {
-	margin: 0;
-	font-family: Roboto, sans-serif;
-	background: var(--color-bg);
-	color: var(--vscode-foreground);
-	font-size: 13px;
-	user-select: none;
+  margin: 0;
+  font-family: Roboto, sans-serif;
+  background: var(--color-bg);
+  color: var(--vscode-foreground);
+  font-size: 13px;
+  user-select: none;
 }
 
 /* #region Reset */
 p {
-	margin: 0;
+  margin: 0;
 }
 
 small {
-	font-size: 0.7rem;
+  font-size: 0.7rem;
 }
 /* #endregion */
 
 /* #region Parts */
 #app {
-	display: grid;
-	grid-template:
-		"editor sidebar" calc(100vh - 22px)
-		"statusbar statusbar" 22px / calc(100vw - var(--sidebar-width)) var(--sidebar-width);
-	overflow: hidden;
+  display: grid;
+  grid-template:
+    "titlebar ."
+    "editor sidebar" calc(100vh - 30px - 22px) /* 100vh - title bar height - footer height */
+    "statusbar statusbar" 22px / calc(100vw - var(--sidebar-width)) var(--sidebar-width);
+  overflow: hidden;
 }
 
 #editor,
 #sidebar,
 #panel,
-#statusbar {
-	position: relative;
+#statusbar,
+#titlebar {
+  position: relative;
+}
+
+#titlebar {
+  grid-area: titlebar;
+  /* border-bottom: solid 1px rgba(83, 89, 93, 0.3); */
 }
 
 #editor {
-	grid-area: editor;
+  grid-area: editor;
 }
 
 #sidebar {
-	grid-area: sidebar;
-	outline: solid 1px rgba(83, 89, 93, 0.5);
+  grid-area: sidebar;
+  top: -30px;
+  height: calc(100% + 30px);
+  outline: solid 1px rgba(83, 89, 93, 0.5);
 }
 
 #panel {
-	grid-area: editor;
-	height: 45vh;
-	align-self: end;
-	z-index: 5;
+  grid-area: editor;
+  height: 45vh;
+  align-self: end;
+  z-index: 5;
 }
 
 #statusbar {
-	grid-area: statusbar;
-	outline: solid 1px rgba(83, 89, 93, 0.5);
+  grid-area: statusbar;
+  outline: solid 1px rgba(83, 89, 93, 0.5);
 }
 
 .part:is(.editor, .sidebar, .panel, .statusbar):focus {
-	outline-style: solid;
-	outline-width: 1px;
+  outline-style: solid;
+  outline-width: 1px;
 }
 /* #endregion */
 
-/* #region Spash */
+/* #region Splash */
 .splash {
-	position: fixed;
-	left: 0;
-	top: 0;
-	width: 100%;
-	height: 100%;
-	z-index: 1001;
-	background-color: var(--color-bg);
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1001;
+  background-color: var(--color-bg);
 }
 
 .splash > .app-icon {
-	position: absolute;
-	left: 50%;
-	top: 50%;
-	transform: translate(-50%, -50%);
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
 }
 
 .splash > .loading-icon {
-	position: absolute;
-	left: 3em;
-	bottom: 3em;
-	width: 48px;
-	height: 48px;
+  position: absolute;
+  left: 3em;
+  bottom: 3em;
+  width: 48px;
+  height: 48px;
 }
 /* #endregion */
 
 /* #region Workspace */
 .monaco-workbench .part.editor > .content .editor-group-container > .editor-group-watermark > .letterpress,
 .monaco-workbench.vs-dark .part.editor > .content .editor-group-container .editor-group-watermark > .letterpress {
-	background-image: url("data:image/svg+xml,%0A%3Csvg xmlns='http://www.w3.org/2000/svg' height='48' viewBox='0 -960 960 960' width='48' fill='%231c1f25'%3E%3Cpath d='m166-482 176 176q9 9 8.5 21t-9.5 21q-9 9-21.5 9t-21.5-9L101-461q-5-5-7-10t-2-11q0-6 2-11t7-10l200-200q9-9 21.5-9t21.5 9q9 9 9 21.5t-9 21.5L166-482Zm628 0L618-658q-9-9-8.5-21t9.5-21q9-9 21.5-9t21.5 9l197 197q5 5 7 10t2 11q0 6-2 11t-7 10L659-261q-9 9-21 8.5t-21-9.5q-9-9-9-21.5t9-21.5l177-177Z'/%3E%3C/svg%3E") !important;
-}
-
-.menubar {
-	display: none !important;
+  background-image: url("data:image/svg+xml,%0A%3Csvg xmlns='http://www.w3.org/2000/svg' height='48' viewBox='0 -960 960 960' width='48' fill='%231c1f25'%3E%3Cpath d='m166-482 176 176q9 9 8.5 21t-9.5 21q-9 9-21.5 9t-21.5-9L101-461q-5-5-7-10t-2-11q0-6 2-11t7-10l200-200q9-9 21.5-9t21.5 9q9 9 9 21.5t-9 21.5L166-482Zm628 0L618-658q-9-9-8.5-21t9.5-21q9-9 21.5-9t21.5 9l197 197q5 5 7 10t2 11q0 6-2 11t-7 10L659-261q-9 9-21 8.5t-21-9.5q-9-9-9-21.5t9-21.5l177-177Z'/%3E%3C/svg%3E") !important;
 }
 
 .sidebar .composite-bar .actions-container {
-	gap: 0.5em;
+  gap: 0.5em;
+}
+
+.menubar-menu-button {
+  cursor: pointer !important;
 }
 /* #endregion */

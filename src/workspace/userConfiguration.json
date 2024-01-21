@@ -14,6 +14,8 @@
 	"editor.guides.indentation": false,
 	"editor.overviewRulerBorder": false,
 	"editor.glyphMargin": false,
+	"window.commandCenter": false,
+    "workbench.layoutControl.enabled": false,
 	"editor.renderLineHighlightOnlyWhenFocus": true,
 	"workbench.view.alwaysShowHeaderActions": true,
 	"editor.fixedOverflowWidgets": true,
@@ -22,6 +24,9 @@
 	"css.format.spaceAroundSelectorSeparator": true,
 	"workbench.startupEditor": "none",
 	"files.autoSave": "onFocusChange",
+	"window.menuBarVisibility": "classic",
+	"window.confirmBeforeClose": "always",
+	"window.title": "${dirty}${activeEditorMedium}${separator}${appName}",
 	"workbench.activityBar.location": "top",
 	"javascript.preferences.importModuleSpecifierEnding": "js",
 	"typescript.preferences.importModuleSpecifierEnding": "js",
@@ -29,6 +34,7 @@
 	"editor.multiCursorModifier": "ctrlCmd",
 	"editor.showFoldingControls": "always",
 	"editor.hover.delay": 750,
+	"typescript.tsserver.web.projectWideIntellisense.suppressSemanticErrors": false,
 	"[javascript]": {
 		"editor.tabSize": 2
 	},

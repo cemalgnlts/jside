@@ -3,7 +3,7 @@
   "short_name": "jside",
   "start_url": "/",
   "display": "fullscreen",
-  "background_color": "#100f0f",
+  "background_color": "#282c34",
   "lang": "en",
   "scope": "/",
   "id": "/",
@@ -11,7 +11,7 @@
     "window-controls-overlay"
   ],
   "description": "A PWA-powered IDE for the entire JS ecosystem that works completely offline.",
-  "theme_color": "#100f0f",
+  "theme_color": "#282c34",
   "icons": [
     {
       "sizes": "512x512",

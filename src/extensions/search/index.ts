@@ -1,25 +1,24 @@
 import { editor } from "monaco-editor";
-import { ProviderResult, Uri } from "vscode";
 import { ExtensionHostKind, registerExtension } from "vscode/extensions";
+
+import type { ProviderResult, Uri } from "vscode";
 
 const manifest = {
 	name: "search-provider",
-	publisher: "JSIDE",
-	version: "1.0.0",
+	publisher: __APP_NAME,
+	version: __APP_VERSION,
 	engines: {
 		vscode: "*"
 	},
 	enabledApiProposals: ["fileSearchProvider"]
 };
 
-const { getApi, setAsDefaultApi } = registerExtension(manifest, ExtensionHostKind.LocalProcess);
+const { getApi } = registerExtension(manifest, ExtensionHostKind.LocalProcess);
 
 async function activate() {
-	await setAsDefaultApi();
+	const { workspace } = await getApi();
 
-	const api = await getApi();
-
-	api.workspace.registerFileSearchProvider("file", {
+	workspace.registerFileSearchProvider("file", {
 		provideFileSearchResults: function (): ProviderResult<Uri[]> {
 			return editor
 				.getModels()

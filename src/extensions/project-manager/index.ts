@@ -11,8 +11,8 @@ import { registerFileSystemOverlay } from "@codingame/monaco-vscode-files-servic
 const manifest: IRelaxedExtensionManifest = {
 	name: "project-manager",
 	displayName: "Project Manager",
-	version: "0.0.1",
-	publisher: "jside",
+	version: __APP_VERSION,
+	publisher: __APP_NAME,
 	engines: {
 		vscode: "*"
 	},
@@ -150,13 +150,11 @@ const manifest: IRelaxedExtensionManifest = {
 	}
 };
 
-const { getApi, setAsDefaultApi } = registerExtension(manifest, ExtensionHostKind.LocalProcess);
+const { getApi } = registerExtension(manifest, ExtensionHostKind.LocalProcess);
 
 let api: typeof import("vscode");
 
 async function activate() {
-	await setAsDefaultApi();
-
 	api = await getApi();
 
 	const { window, commands, Uri, ProgressLocation } = api;

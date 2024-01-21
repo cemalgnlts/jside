@@ -4,160 +4,176 @@ import Logger from "../../utils/logger";
 import { refreshFilesExplorer } from "../../utils/utils";
 
 const manifest: IRelaxedExtensionManifest = {
-	name: "package-manager",
-	displayName: "Package Manager",
-	publisher: "jside",
-	version: "0.0.1",
-	engines: {
-		vscode: "*"
-	},
-	contributes: {
-		viewsContainers: {
-			activitybar: [
-				{
-					id: "package-manager",
-					title: "Package Manager",
-					icon: "$(package)"
-				}
-			]
-		},
-		commands: [
-			{
-				command: "packageManager.install",
-				title: "Install dependency",
-				icon: "$(add)"
-			}
-		],
-		views: {
-			"package-manager": [
-				{
-					id: "dependencies",
-					name: "Dependencies"
-				}
-			]
-		},
-		menus: {
-			"view/title": [
-				{
-					command: "packageManager.install",
-					group: "navigation",
-					when: "projectManager.isAnyProjectOpen && view == dependencies"
-				}
-			]
-		},
-		viewsWelcome: [
-			{
-				view: "dependencies",
-				contents:
-					"Open a project to be able to manage packages.\n[Show projects](command:workbench.view.extension.project-manager)"
-			}
-		]
-	}
+  name: "package-manager",
+  displayName: "Package Manager",
+  publisher: __APP_NAME,
+  version: __APP_VERSION,
+  engines: {
+    vscode: "*"
+  },
+  contributes: {
+    viewsContainers: {
+      activitybar: [
+        {
+          id: "package-manager",
+          title: "Package Manager",
+          icon: "$(package)"
+        }
+      ]
+    },
+    commands: [
+      {
+        command: "packageManager.install",
+        title: "Install dependency",
+        icon: "$(add)"
+      }
+    ],
+    views: {
+      explorer: [
+        {
+          id: "dependencies",
+          name: "Dependencies"
+        }
+      ]
+    },
+    menus: {
+      "view/title": [
+        {
+          command: "packageManager.install",
+          group: "navigation",
+          when: "projectManager.isAnyProjectOpen && view == dependencies"
+        }
+      ]
+    },
+    viewsWelcome: [
+      {
+        view: "dependencies",
+        contents:
+          "Open a project to be able to manage packages.\n[Show projects](command:workbench.view.extension.project-manager)"
+      }
+    ]
+  }
 };
 
-const { getApi, setAsDefaultApi } = registerExtension(manifest, ExtensionHostKind.LocalProcess);
+const { getApi } = registerExtension(manifest, ExtensionHostKind.LocalProcess);
 
 let api: typeof import("vscode");
 let logger: Logger;
 
 async function activate() {
-	await setAsDefaultApi();
+  api = await getApi();
 
-	api = await getApi();
+  const { commands, window } = api;
 
-	const { commands, window } = api;
+  logger = new Logger(window, "Package Manager");
 
-	logger = new Logger(window, "Package Manager");
+  // workspace.onDidChangeWorkspaceFolders((ev) => console.log(ev.added));
 
-	// workspace.onDidChangeWorkspaceFolders((ev) => console.log(ev.added));
-
-	commands.registerCommand("packageManager.install", installDependency);
+  commands.registerCommand("packageManager.install", installDependency);
 }
 
 async function installDependency() {
-	let packageName = await api.window.showInputBox({
-		title: "Install Dependency - Package Manager",
-		placeHolder: "package or package@version",
-		validateInput(value) {
-			return value.trim().length < 3 ? "Minimum 3 character" : undefined;
-		}
-	});
+  let packageName = await api.window.showInputBox({
+    title: "Install Dependency - Package Manager",
+    placeHolder: "package or package@version",
+    validateInput(value) {
+      return value.trim().length < 3 ? "Minimum 3 character" : undefined;
+    }
+  });
 
-	if (!packageName) return;
+  if (!packageName) return;
 
-	packageName = packageName.trim();
+  packageName = packageName.trim();
 
-	logger.info(`----- Install ${packageName} -----`);
+  logger.info(`----- Install ${packageName} -----`);
 
-	api.window
-		.withProgress(
-			{
-				location: api.ProgressLocation.Notification,
-				title: `Install ${packageName}`
-			},
-			async () => await downloadPackage(packageName!)
-		)
-		.then(null, (err) => {
-			api.window.showErrorMessage(err.toString());
-			logger.error(err.toString());
-		});
+  api.window
+    .withProgress(
+      {
+        location: api.ProgressLocation.Notification,
+        title: `Install ${packageName}`
+      },
+      async () => await downloadPackage(packageName!)
+    )
+    .then(null, (err) => {
+      api.window.showErrorMessage(err.toString());
+      logger.error(err.toString());
+    });
 }
 
 async function downloadPackage(packageName: string) {
-	const Uri = api.Uri;
+  const Uri = api.Uri;
 
-	logger.info(`Fetch package from https://esm.sh/${packageName}`);
+  logger.info(`Fetch package from https://esm.sh/${packageName}`);
 
-	const packageReq = await fetch(`https://esm.sh/${packageName}`);
-	let typeReq: Response | null = null;
+  const nodeModulesFolderUri = Uri.joinPath(api.workspace.workspaceFolders![0].uri, "node_modules");
+  const packageFolderUri = Uri.joinPath(nodeModulesFolderUri, packageName);
+  const files = new Map<import("vscode").Uri, ArrayBuffer>();
 
-	if (!packageReq.ok) throw new Error(`${packageReq.status}:${packageReq.statusText}`);
+  const packageReq = await fetch(`https://esm.sh/${packageName}`);
+  let typeReq: Response | null = null;
 
-	if (packageReq.headers.has("x-typescript-types")) {
-		const typeUrl = packageReq.headers.get("x-typescript-types")!;
-		typeReq = await fetch(typeUrl);
+  if (!packageReq.ok) throw new Error(`${packageReq.status}:${packageReq.statusText}`);
 
-		logger.info(`Type file found: ${typeUrl}`);
-	}
+  const packageVersion = packageReq.url.slice(packageReq.url.lastIndexOf("@") + 1);
 
-	const nodeModulesFolderUri = Uri.joinPath(api.workspace.workspaceFolders![0].uri, "node_modules");
-	const packageFolderUri = Uri.joinPath(nodeModulesFolderUri, packageName);
+  if (packageReq.headers.has("x-typescript-types")) {
+    const typeUrl = packageReq.headers.get("x-typescript-types")!;
+    typeReq = await fetch(typeUrl);
 
-	const files = new Map<import("vscode").Uri, ArrayBuffer>();
-	const indexFile = await packageReq.text();
-	const pathsChangedIndexFile = indexFile.replace(/from ".+";/g, (line) => `from "./${line.split("/").pop()}`);
+    logger.info(`Type file found: ${typeUrl}`);
 
-	files.set(Uri.joinPath(packageFolderUri, "index.js"), new TextEncoder().encode(pathsChangedIndexFile));
+    let typePath;
 
-	if (typeReq !== null && typeReq.ok)
-		files.set(Uri.joinPath(nodeModulesFolderUri, "@types", packageName, "index.d.ts"), await typeReq.arrayBuffer());
+    if (typeUrl.includes("/@types/")) {
+      typePath = Uri.joinPath(nodeModulesFolderUri, packageName, "@types", "index.d.ts");
+    } else {
+      typePath = Uri.joinPath(nodeModulesFolderUri, packageName, "dist", `${packageName}.d.ts`);
 
-	let libs: Set<string> | Array<string> = new Set([...indexFile.matchAll(/from "(.*)";/g)].map((match) => match[1]));
-	libs = Array.from(libs, (lib) => `https://esm.sh${lib}`);
+      files.set(
+        Uri.joinPath(packageFolderUri, "package.json"),
+        new TextEncoder().encode(`{
+	"name": "${packageName}",
+	"version": "${packageVersion}",
+	"types": "./dist/${packageName}.d.ts"
+}`)
+      );
+    }
 
-	logger.info(`Loading the library files: ${libs.map((lib) => lib.split("/").pop())}`);
+    files.set(typePath, await typeReq.arrayBuffer());
+  }
 
-	let libRes = await Promise.all(libs.map((url) => fetch(url)));
-	libRes.filter((res) => res.ok);
+  const indexFile = await packageReq.text();
+  const pathsChangedIndexFile = indexFile.replace(/from ".+";/g, (line) => `from "./${line.split("/").pop()}`);
 
-	for (const res of libRes) {
-		const fileName = res.url.split("/").pop()!;
-		files.set(Uri.joinPath(packageFolderUri, fileName), await res.arrayBuffer());
-	}
+  files.set(Uri.joinPath(packageFolderUri, "index.js"), new TextEncoder().encode(pathsChangedIndexFile));
 
-	logger.info(
-		`The files are being saved: ${Array.from(files.keys(), (file) =>
-			file.path.slice(nodeModulesFolderUri.path.length)
-		).join(", ")}`
-	);
+  let libs: Set<string> | Array<string> = new Set([...indexFile.matchAll(/from "(.*)";/g)].map((match) => match[1]));
+  libs = Array.from(libs, (lib) => `https://esm.sh${lib}`);
 
-	for (const [pathUri, contents] of files.entries()) {
-		await api.workspace.fs.writeFile(pathUri, new Uint8Array(contents));
-	}
+  logger.info(`Loading the library files: ${libs.map((lib) => lib.split("/").pop())}`);
 
-	await refreshFilesExplorer();
+  let libRes = await Promise.all(libs.map((url) => fetch(url)));
+  libRes.filter((res) => res.ok);
 
-	logger.info(`Package ${packageName} successfully added.`);
+  for (const res of libRes) {
+    const fileName = res.url.split("/").pop()!;
+    files.set(Uri.joinPath(packageFolderUri, fileName), await res.arrayBuffer());
+  }
+
+  logger.info(
+    `The files are being saved: ${Array.from(files.keys(), (file) =>
+      file.path.slice(nodeModulesFolderUri.path.length)
+    ).join(", ")}`
+  );
+
+  for (const [pathUri, contents] of files.entries()) {
+    await api.workspace.fs.writeFile(pathUri, new Uint8Array(contents));
+  }
+
+  await refreshFilesExplorer();
+
+  logger.info(`Package ${packageName} successfully added.`);
 }
 
 export default activate;

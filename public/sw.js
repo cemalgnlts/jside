@@ -17,7 +17,7 @@ self.addEventListener("install", (ev) => {
 		await cache.addAll(files);
 	};
 
-	if(isProduction) ev.waitUntil(handle());
+	if (isProduction) ev.waitUntil(handle());
 });
 
 self.addEventListener("activate", (ev) => {
@@ -30,17 +30,18 @@ self.addEventListener("activate", (ev) => {
 		if (oldCaches.length !== 0) await Promise.all(oldCaches.map((key) => caches.delete(key)));
 	};
 
-	if(isProduction) ev.waitUntil(handle());
+	if (isProduction) ev.waitUntil(handle());
 });
 
 self.addEventListener("fetch", (ev) => {
+	const reqUrl = new URL(ev.request.url);
+
 	const handle = async () => {
-		const reqUrl = new URL(ev.request.url);
 		let res = null;
 
 		if (reqUrl.pathname.startsWith("/preview")) {
 			res = await getFileFromOPFS(reqUrl);
-		} else if(reqUrl.hostname === "jside.vercel.app" && isProduction) {
+		} else if (reqUrl.hostname === "jside.vercel.app" && isProduction) {
 			res = await cacheFirstRequest(ev.request);
 		} else {
 			res = await fetch(ev.request);
@@ -49,7 +50,8 @@ self.addEventListener("fetch", (ev) => {
 		return res;
 	};
 
-	ev.respondWith(handle());
+	if (reqUrl.pathname.startsWith("/preview") || (reqUrl.hostname === "jside.vercel.app" && isProduction))
+		ev.respondWith(handle());
 });
 
 async function cacheFirstRequest(request) {

@@ -2,7 +2,7 @@ import { ExtensionHostKind, IExtensionManifest, registerExtension } from "vscode
 
 const manifest: IExtensionManifest = {
 	name: "esbuild",
-	publisher: "JSIDE",
+	publisher: __APP_NAME,
 	version: "1.0.0",
 	browser: "/worker.js",
 	engines: {

@@ -14,7 +14,7 @@ import { init } from "./workspace/init";
 async function App() {
 	await init();
 
-	const parts = [Parts.EDITOR_PART, Parts.SIDEBAR_PART, Parts.PANEL_PART, Parts.STATUSBAR_PART];
+	const parts = [Parts.TITLEBAR_PART, Parts.EDITOR_PART, Parts.SIDEBAR_PART, Parts.PANEL_PART, Parts.STATUSBAR_PART];
 
 	for (const part of parts) {
 		const id = part.split(".")[2];

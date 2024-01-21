@@ -1,6 +1,5 @@
 {
 	"tabWidth": 2,
-	"useTabs": true,
 	"trailingComma": "none",
 	"bracketSameLine": true,
 	"printWidth": 120
