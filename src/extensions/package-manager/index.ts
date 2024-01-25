@@ -154,7 +154,7 @@ async function downloadPackage(packageName: string) {
   logger.info(`Loading the library files: ${libs.map((lib) => lib.split("/").pop())}`);
 
   let libRes = await Promise.all(libs.map((url) => fetch(url)));
-  libRes.filter((res) => res.ok);
+  libRes = libRes.filter((res) => res.ok);
 
   for (const res of libRes) {
     const fileName = res.url.split("/").pop()!;

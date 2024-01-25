@@ -3,13 +3,11 @@ import fs from "node:fs";
 // @ts-expect-error node type
 import url from "node:url";
 // @ts-expect-error node type
-import zlib from "node:zlib";
-// @ts-expect-error node type
 import os from "node:os";
 // @ts-expect-error node type
 import { Worker } from "node:worker_threads";
 
-declare const require: (packageName: string) => any;
+declare const require: (packageName: string) => unknown;
 declare const $require: typeof require;
 
 import { defineConfig } from "vite";
@@ -135,7 +133,7 @@ function extensionWorkerTranformer(): PluginOption {
       return true;
     },
     async transform(code, id) {
-      const fileRe = isBuildMode ? /extensions\/esbuild\/index.ts$/ : /extensions\/esbuild\/worker.ts$/;
+      const fileRe = isBuildMode ? /extensions\/\w+\/index.ts$/ : /extensions\/\w+\/worker.ts$/;
 
       if (fileRe.test(id)) {
         const workerFile = isBuildMode ? id.replace(/index.ts$/, "worker.ts") : id;
@@ -198,7 +196,9 @@ async function removeSomeFiles() {
     "./dist/assets/*.svg",
     "./dist/assets/*.png",
     "./dist/assets/vs_code_editor_walkthrough*",
-    "./dist/assets/*.map"
+    "./dist/assets/*.map",
+    "./dist/assets/notebookProfile*",
+    "./dist/assets/jquery*"
   ]);
   const promises = files.map((file) => fs.promises.rm(file));
   await Promise.all(promises);
@@ -228,8 +228,10 @@ async function compressAssets() {
   const assets: string[] = fastGlob.sync("./dist/assets/*");
 
   const threads = new Thread((filePath) => {
-    const fs = $require("node:fs");
-    const zlib = $require("node:zlib");
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const fs = $require("node:fs") as any;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const zlib = $require("node:zlib") as any;
 
     const contents = fs.readFileSync(filePath);
 
@@ -248,17 +250,17 @@ async function compressAssets() {
   console.log("Assets Compressed.");
 }
 
-class Thread<Args extends any[]> {
+class Thread<Args extends unknown[]> {
   threads = new Set<Worker>();
   queue: Array<() => void> = [];
   maxThreadCount = (os?.availableParallelism() ?? os.cpus()) - 1;
   code: string;
 
-  constructor(fun: (...args: Args) => any) {
+  constructor(fun: (...args: Args) => unknown) {
     this.code = this.buildWorkerCode(fun.toString());
   }
 
-  async run(...args: Args): Promise<any> {
+  async run(...args: Args): Promise<unknown> {
     const worker = await this.getWorker();
 
     return new Promise((resolve, reject) => {
@@ -293,7 +295,7 @@ class Thread<Args extends any[]> {
       return worker;
     }
 
-    return new Promise<void>((resolve, reject) => {
+    return new Promise<void>((resolve) => {
       this.queue.push(resolve);
     }).then(() => this.getWorker());
   }

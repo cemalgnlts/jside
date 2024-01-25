@@ -3,21 +3,21 @@ import { IExtensionManifest } from "vscode/vscode/vs/platform/extensions/common/
 import { encodeSVG } from "../../utils/utils";
 
 const manifest: IExtensionManifest = {
-	name: "vsc-material-theme",
-	publisher: "Philipp Kief",
-	version: "4.32.0",
-	engines: {
-		vscode: "*"
-	},
-	contributes: {
-		iconThemes: [
-			{
-				id: "material-icon-theme",
-				label: "Material Icon Theme",
-				path: "./material-icons.json"
-			}
-		]
-	}
+  name: "vsc-material-theme",
+  publisher: "Philipp Kief",
+  version: "4.32.0",
+  engines: {
+    vscode: "*"
+  },
+  contributes: {
+    iconThemes: [
+      {
+        id: "material-icon-theme",
+        label: "Material Icon Theme",
+        path: "./material-icons.json"
+      }
+    ]
+  }
 };
 
 const { registerFileUrl } = registerExtension(manifest, ExtensionHostKind.LocalProcess);
@@ -25,10 +25,10 @@ const { registerFileUrl } = registerExtension(manifest, ExtensionHostKind.LocalP
 registerFileUrl("/material-icons.json", new URL("./material-icons.json", import.meta.url).toString());
 
 const icons = import.meta.glob("./icons/*.svg", {
-	as: "raw",
-	eager: true
+  as: "raw",
+  eager: true
 });
 
 for (const [path, svg] of Object.entries(icons)) {
-	registerFileUrl(path, encodeSVG(svg));
+  registerFileUrl(path, encodeSVG(svg));
 }

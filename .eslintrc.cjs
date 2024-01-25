@@ -4,7 +4,9 @@ module.exports = {
   extends: ["eslint:recommended", "plugin:@typescript-eslint/recommended"],
   ignorePatterns: ["dist", ".eslintrc.cjs"],
   parser: "@typescript-eslint/parser",
+  plugins: ["@typescript-eslint"],
   rules: {
-	quotes: ["error", "single"]
+    semi: "error",
+    indent: ["error", 2, { SwitchCase: 1 }]
   }
 };

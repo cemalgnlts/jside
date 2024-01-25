@@ -24,19 +24,19 @@ import "@codingame/monaco-vscode-search-result-default-extension";
 import "@codingame/monaco-vscode-emmet-default-extension";
 
 // Custom
-import activateTools from "../extensions/tools";
+import activateDefaults from "../extensions/defaults";
 import activatePackageManager from "../extensions/package-manager";
 import activateProjectManager from "../extensions/project-manager";
 import activateSearch from "../extensions/search";
-import "../extensions/esbuild";
+import "../extensions/bundler";
 
 async function activateDefaultExtensions() {
-	await Promise.all([
-        activateTools(),
-        activatePackageManager(),
-        activateProjectManager(),
-        activateSearch()
-    ]);
+  await Promise.all([
+    activateDefaults(),
+    activatePackageManager(),
+    activateProjectManager(),
+    activateSearch()
+  ]);
 }
 
 export { activateDefaultExtensions };

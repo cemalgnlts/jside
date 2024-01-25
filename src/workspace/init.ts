@@ -6,7 +6,7 @@ import getStorageServiceOverrride from "@codingame/monaco-vscode-storage-service
 import getViewsServiceOverride, { isEditorPartVisible } from "@codingame/monaco-vscode-views-service-override";
 import getModelServiceOverride from "@codingame/monaco-vscode-model-service-override";
 import getConfigurationServiceOverride, {
-  initUserConfiguration
+  initUserConfiguration, reinitializeWorkspace
 } from "@codingame/monaco-vscode-configuration-service-override";
 import { initFile } from "@codingame/monaco-vscode-files-service-override";
 import getExtensionsServiceOverride, { WorkerConfig } from "@codingame/monaco-vscode-extensions-service-override";
@@ -88,7 +88,7 @@ export async function init() {
       ...getConfigurationServiceOverride(),
       ...getTextmateServiceOverride(),
       ...getThemeServiceOverride(),
-      ...getViewsServiceOverride(undefined, undefined, (_state) => ({
+      ...getViewsServiceOverride(undefined, undefined, () => ({
         editor: { restoreEditors: false, editorsToOpen: Promise.resolve([]) },
         views: { containerToRestore: { auxiliaryBar: "", panel: "", sideBar: "" }, defaults: [] },
         layout: { editors: undefined }
@@ -116,6 +116,7 @@ export async function init() {
         open: async () => false,
         workspace: { workspaceUri }
       },
+      additionalTrustedDomains: ["https://github.com/cemalgnlts", location.origin],
       productConfiguration: {
         nameLong: __APP_NAME,
         version: __APP_VERSION,
@@ -126,8 +127,14 @@ export async function init() {
     }
   );
 
+  reinitializeWorkspace({ id: "empty" });
+
   commands.registerCommand("workbench.action.toggleFullScreen", () => {
-    document.body.requestFullscreen({ navigationUI: "hide" }).catch(() => {});
+    if (document.fullscreenEnabled) {
+      document.exitFullscreen();
+    } else {
+      document.body.requestFullscreen({ navigationUI: "hide" }).catch(() => {});
+    }
   });
 
   await activateDefaultExtensions();
