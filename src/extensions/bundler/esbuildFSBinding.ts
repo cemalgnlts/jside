@@ -2,7 +2,7 @@ import { Uri, workspace, window, FileType } from "vscode";
 import type { FileStat } from "vscode";
 import Logger from "../../utils/logger";
 
-export const logger = new Logger(window, "Builder");
+export const logger = new Logger(window, "Bundler");
 
 // https://github.com/esbuild/esbuild.github.io/blob/main/src/try/fs.ts
 

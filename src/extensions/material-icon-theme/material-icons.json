@@ -1,139 +1,154 @@
 {
-	"iconDefinitions": {
-		"json": {
-			"iconPath": "./icons/json.svg"
-		},
-		"javascript": {
-			"iconPath": "./icons/javascript.svg"
-		},
-		"typescript": {
-			"iconPath": "./icons/typescript.svg"
-		},
-		"css": {
-			"iconPath": "./icons/css.svg"
-		},
-		"react": {
-			"iconPath": "./icons/react.svg"
-		},
-		"html": {
-			"iconPath": "./icons/html.svg"
-		},
-		"svg": {
-			"iconPath": "./icons/svg.svg"
-		},
-		"react_ts": {
-			"iconPath": "./icons/react_ts.svg"
-		},
-		"image": {
-			"iconPath": "./icons/image.svg"
-		},
-		"font": {
-			"iconPath": "./icons/font.svg"
-		},
-		"markdown": {
-			"iconPath": "./icons/markdown.svg"
-		},
-		"readme": {
-			"iconPath": "./icons/readme.svg"
-		},
-		"favicon": {
-			"iconPath": "./icons/favicon.svg"
-		},
-		"file": {
-			"iconPath": "./icons/file.svg"
-		},
-		"folder": {
-			"iconPath": "./icons/folder.svg"
-		},
-		"folder-open": {
-			"iconPath": "./icons/folder-open.svg"
-		},
-		"folder-root": {
-			"iconPath": "./icons/folder-root.svg"
-		},
-		"folder-root-open": {
-			"iconPath": "./icons/folder-root-open.svg"
-		}
+  "iconDefinitions": {
+    "json": {
+      "iconPath": "./icons/json.svg"
+    },
+    "javascript": {
+      "iconPath": "./icons/javascript.svg"
+    },
+    "typescript": {
+      "iconPath": "./icons/typescript.svg"
+    },
+    "css": {
+      "iconPath": "./icons/css.svg"
+    },
+    "react": {
+      "iconPath": "./icons/react.svg"
+    },
+    "html": {
+      "iconPath": "./icons/html.svg"
+    },
+    "svg": {
+      "iconPath": "./icons/svg.svg"
+    },
+    "react_ts": {
+      "iconPath": "./icons/react_ts.svg"
+    },
+    "image": {
+      "iconPath": "./icons/image.svg"
+    },
+    "font": {
+      "iconPath": "./icons/font.svg"
+    },
+    "markdown": {
+      "iconPath": "./icons/markdown.svg"
+    },
+    "readme": {
+      "iconPath": "./icons/readme.svg"
+    },
+    "favicon": {
+      "iconPath": "./icons/favicon.svg"
+    },
+	"esbuild": {
+      "iconPath": "./icons/esbuild.svg"
+    },
+	"jsconfig": {
+		"iconPath": "./icons/jsconfig.svg"
 	},
-	"folderNames": {},
-	"fileExtensions": {
-		"htm": "html",
-		"xhtml": "html",
-		"md": "markdown",
-		"markdown": "markdown",
-		"css": "css",
-		"json": "json",
-		"jsonc": "json",
-		"xml": "xml",
-		"svg": "svg",
-		"png": "image",
-		"jpeg": "image",
-		"jpg": "image",
-		"gif": "image",
-		"ico": "image",
-		"tif": "image",
-		"tiff": "image",
-		"avif": "image",
-		"jfif": "image",
-		"jsx": "react",
-		"tsx": "react_ts",
-		"woff": "font",
-		"woff2": "font",
-		"ttf": "font",
-		"eot": "font",
-		"otf": "font",
-		"font": "font",
-		"fonts": "font"
+	"tsconfig": {
+		"iconPath": "./icons/tsconfig.svg"
 	},
-	"fileNames": {
-		"readme.md": "readme",
-		"readme.txt": "readme",
-		"esbuild.js": "esbuild",
-		"esbuild.ts": "esbuild",
-		"esbuild.config.js": "esbuild",
-		"esbuild.config.ts": "esbuild"
+    "file": {
+      "iconPath": "./icons/file.svg"
+    },
+	"folder-src": {
+		"iconPath": "./icons/folder-src.svg"
 	},
-	"languageIds": {
-		"xml": "xml",
-		"json": "json",
-		"jsonc": "json",
-		"jsonl": "json",
-		"javascript": "javascript",
-		"typescript": "typescript",
-		"css": "css",
-		"javascriptreact": "react",
-		"typescriptreact": "react_ts",
-		"html": "html",
-		"markdown": "markdown",
-		"svg": "svg"
-	},
-	"light": {},
-	"highContrast": {
-		"fileExtensions": {},
-		"fileNames": {}
-	},
-	"options": {
-		"folders": {
-			"theme": "specific",
-			"color": "#90a4ae",
-			"associations": {}
-		},
-		"activeIconPack": "angular",
-		"hidesExplorerArrows": false,
-		"opacity": 1,
-		"saturation": 1,
-		"files": {
-			"color": "#90a4ae",
-			"associations": {}
-		},
-		"languages": {
-			"associations": {}
-		}
-	},
-	"file": "file",
-	"hidesExplorerArrows": false,
-	"folder": "folder",
-	"folderExpanded": "folder-open",
-	"rootFolder": "folder-root",
-	"rootFolderExpanded": "folder-root-open"
+    "folder": {
+      "iconPath": "./icons/folder.svg"
+    },
+    "folder-open": {
+      "iconPath": "./icons/folder-open.svg"
+    },
+    "folder-root": {
+      "iconPath": "./icons/folder-root.svg"
+    },
+    "folder-root-open": {
+      "iconPath": "./icons/folder-root-open.svg"
+    }
+  },
+  "folderNames": {},
+  "fileExtensions": {
+    "htm": "html",
+    "xhtml": "html",
+    "md": "markdown",
+    "markdown": "markdown",
+    "css": "css",
+    "json": "json",
+    "jsonc": "json",
+    "xml": "xml",
+    "svg": "svg",
+    "png": "image",
+    "jpeg": "image",
+    "jpg": "image",
+    "gif": "image",
+    "ico": "image",
+    "tif": "image",
+    "tiff": "image",
+    "avif": "image",
+    "jfif": "image",
+    "jsx": "react",
+    "tsx": "react_ts",
+    "woff": "font",
+    "woff2": "font",
+    "ttf": "font",
+    "eot": "font",
+    "otf": "font",
+    "font": "font",
+    "fonts": "font"
+  },
+  "fileNames": {
+    "readme.md": "readme",
+    "readme.txt": "readme",
+	"esbuild.config.json": "esbuild",
+    "esbuild.js": "esbuild",
+    "esbuild.ts": "esbuild",
+    "esbuild.config.js": "esbuild",
+    "esbuild.config.ts": "esbuild",
+	"jsconfig.json": "jsconfig",
+	"tsconfig.json": "tsconfig"
+  },
+  "languageIds": {
+    "xml": "xml",
+    "json": "json",
+    "jsonc": "json",
+    "jsonl": "json",
+    "javascript": "javascript",
+    "typescript": "typescript",
+    "css": "css",
+    "javascriptreact": "react",
+    "typescriptreact": "react_ts",
+    "html": "html",
+    "markdown": "markdown",
+    "svg": "svg"
+  },
+  "light": {},
+  "highContrast": {
+    "fileExtensions": {},
+    "fileNames": {}
+  },
+  "options": {
+    "folders": {
+      "theme": "specific",
+      "color": "#90a4ae",
+      "associations": {}
+    },
+    "activeIconPack": "angular",
+    "hidesExplorerArrows": false,
+    "opacity": 1,
+    "saturation": 1,
+    "files": {
+      "color": "#90a4ae",
+      "associations": {}
+    },
+    "languages": {
+      "associations": {}
+    }
+  },
+  "file": "file",
+  "hidesExplorerArrows": false,
+  "folder": "folder",
+  "folderExpanded": "folder-open",
+  "rootFolder": "folder-root",
+  "rootFolderExpanded": "folder-root-open"
 }

@@ -74,6 +74,12 @@ const manifest: IRelaxedExtensionManifest = {
         }
       ]
     },
+    keybindings: [
+      {
+        command: "workbench.view.extension.project-manager",
+        key: "CTRL+SHIFT+H"
+      }
+    ],
     menus: {
       "view/title": [
         {
@@ -195,7 +201,7 @@ async function activate() {
       const options = {
         cancellable: false,
         title: "Project creating...",
-        location: ProgressLocation.Window
+        location: ProgressLocation.Notification
       };
 
       const task = async () => {
@@ -377,14 +383,14 @@ async function removeProject(projectName: string, provider: ProjectTreeDataProvi
     { title: "Delete Project" }
   );
 
-  if (res == undefined || res.title !== "Delete") return;
+  if (res === undefined || res.title !== "Delete Project") return;
 
   const projectUri = api.Uri.file(`/JSIDE/projects/${projectName}`);
 
   const options = {
     cancellable: false,
     title: "Project deleting...",
-    location: api.ProgressLocation.Window
+    location: api.ProgressLocation.Notification
   };
 
   const task = async () => {

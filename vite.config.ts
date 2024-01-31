@@ -40,7 +40,6 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks: {
-          monaco: ["monaco-editor"],
           vscode: [...mvaDeps]
         }
       }
@@ -60,7 +59,7 @@ export default defineConfig({
     }
   },
   resolve: {
-    dedupe: ["monaco-editor", "vscode", ...mvaDeps]
+    dedupe: ["vscode", ...mvaDeps]
   }
 });
 
@@ -133,7 +132,7 @@ function extensionWorkerTranformer(): PluginOption {
       return true;
     },
     async transform(code, id) {
-      const fileRe = isBuildMode ? /extensions\/\w+\/index.ts$/ : /extensions\/\w+\/worker.ts$/;
+      const fileRe = isBuildMode ? /extensions\/bundler\/index.ts$/ : /extensions\/bundler\/worker.ts$/;
 
       if (fileRe.test(id)) {
         const workerFile = isBuildMode ? id.replace(/index.ts$/, "worker.ts") : id;

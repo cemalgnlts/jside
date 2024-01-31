@@ -28,9 +28,21 @@ async function activate() {
 
   addCustomMenuItems();
   purgeMenus();
+
+  // globalThis.MenuRegistry = MenuRegistry;
+  // globalThis.MenuId = MenuId;
 }
 
 function addCustomMenuItems() {
+  MenuRegistry.appendMenuItem(MenuId.MenubarViewMenu, {
+    group: "3_views",
+    order: 3,
+    command: {
+      id: "workbench.view.extension.project-manager",
+      title: "Project Manager"
+    }
+  });
+
   MenuRegistry.appendMenuItem(MenuId.MenubarHelpMenu, {
     group: "2_links",
     command: {
@@ -64,6 +76,14 @@ function purgeMenus() {
 
   removeSubmenu(MenuId.MenubarHelpMenu, "workbench.action.openWalkthrough");
   removeSubmenu(MenuId.MenubarHelpMenu, "workbench.action.showInteractivePlayground");
+
+  removeSubmenu(MenuId.MenubarViewMenu, "workbench.action.showCommands");
+  removeSubmenu(MenuId.MenubarViewMenu, "workbench.action.openView");
+
+  removeSubmenu(MenuId.ViewContainerTitleContext, "workbench.action.toggleSidebarPosition");
+  removeSubmenu(MenuId.ViewContainerTitleContext, "workbench.action.toggleSidebarPosition");
+  removeSubmenu(MenuId.ViewTitleContext, "workbench.action.toggleSidebarPosition");
+  removeSubmenu(MenuId.ViewTitleContext, "workbench.action.toggleSidebarPosition");
 
   removeSubmenu(MenuId.MenubarFileMenu, "addRootFolder");
 }

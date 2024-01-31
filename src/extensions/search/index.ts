@@ -1,7 +1,8 @@
-import { editor } from "monaco-editor";
+// import { editor } from "monaco-editor";
 import { ExtensionHostKind, registerExtension } from "vscode/extensions";
 
 import type { ProviderResult, Uri } from "vscode";
+// import { editor } from "vscode/vscode/vs/editor/editor.api";
 
 const manifest = {
   name: "search-provider",
@@ -20,10 +21,11 @@ async function activate() {
 
   workspace.registerFileSearchProvider("file", {
     provideFileSearchResults: function (): ProviderResult<Uri[]> {
-      return editor
-        .getModels()
-        .map((model) => model.uri)
-        .filter((uri) => uri.scheme === "file");
+      return workspace.textDocuments.map((doc) => doc.uri).filter((uri) => uri.scheme === "file");
+      // return editor
+      //   .getModels()
+      //   .map((model) => model.uri)
+      //   .filter((uri) => uri.scheme === "file");
     }
   });
 }

@@ -6,7 +6,8 @@ import getStorageServiceOverrride from "@codingame/monaco-vscode-storage-service
 import getViewsServiceOverride, { isEditorPartVisible } from "@codingame/monaco-vscode-views-service-override";
 import getModelServiceOverride from "@codingame/monaco-vscode-model-service-override";
 import getConfigurationServiceOverride, {
-  initUserConfiguration, reinitializeWorkspace
+  initUserConfiguration,
+  reinitializeWorkspace
 } from "@codingame/monaco-vscode-configuration-service-override";
 import { initFile } from "@codingame/monaco-vscode-files-service-override";
 import getExtensionsServiceOverride, { WorkerConfig } from "@codingame/monaco-vscode-extensions-service-override";
@@ -31,17 +32,17 @@ import { activateDefaultExtensions } from "./extensions.ts";
 
 // Workers
 import ExtensionHostWorkerUrl from "vscode/workers/extensionHost.worker?worker&url";
-import EditorWorkerServiceUrl from "monaco-editor/esm/vs/editor/editor.worker.js?worker&url";
+import EditorWorkerUrl from "vscode/workers/editor.worker?worker&url";
 import TextMateWorkerUrl from "@codingame/monaco-vscode-textmate-service-override/worker?worker&url";
 import OutputLinkComputerWorkerUrl from "@codingame/monaco-vscode-output-service-override/worker?worker&url";
 
 import { Uri, commands } from "vscode";
 
-import "vscode/localExtensionHost";
-
 import { createIndexedDBProviders } from "./fileSystem.ts";
 import { CrossOriginWorker, FakeWorker } from "./workers.ts";
 import userConfig from "./userConfiguration.json?raw";
+
+import "vscode/localExtensionHost";
 
 self.MonacoEnvironment = {
   getWorker(moduleId: string, label: string) {
@@ -49,7 +50,7 @@ self.MonacoEnvironment = {
 
     switch (label) {
       case "editorWorkerService":
-        url = EditorWorkerServiceUrl;
+        url = EditorWorkerUrl;
         break;
       case "textMateWorker":
         url = TextMateWorkerUrl;
@@ -116,7 +117,7 @@ export async function init() {
         open: async () => false,
         workspace: { workspaceUri }
       },
-      additionalTrustedDomains: ["https://github.com/cemalgnlts", location.origin],
+      additionalTrustedDomains: ["https://github.com", location.origin],
       productConfiguration: {
         nameLong: __APP_NAME,
         version: __APP_VERSION,
@@ -127,10 +128,11 @@ export async function init() {
     }
   );
 
+  // Remove workspace logic.
   reinitializeWorkspace({ id: "empty" });
 
   commands.registerCommand("workbench.action.toggleFullScreen", () => {
-    if (document.fullscreenEnabled) {
+    if (document.fullscreenElement !== null) {
       document.exitFullscreen();
     } else {
       document.body.requestFullscreen({ navigationUI: "hide" }).catch(() => {});

@@ -7,7 +7,7 @@ import {
   onPartVisibilityChange,
   setPartVisibility
 } from "@codingame/monaco-vscode-views-service-override";
-import { Sash, ISashEvent } from "monaco-editor/esm/vs/base/browser/ui/sash/sash.js";
+import { Sash, ISashEvent } from "vscode/vscode/vs/base/browser/ui/sash/sash";
 
 import { init } from "./workspace/init";
 

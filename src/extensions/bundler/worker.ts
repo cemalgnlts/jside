@@ -1,25 +1,26 @@
 import { StatusBarAlignment, Uri, env, commands, window, workspace } from "vscode";
-import type { StatusBarItem, TextDocument, Disposable } from "vscode";
+import type { TextDocument, Disposable } from "vscode";
 
 import esbuild from "esbuild-wasm/lib/browser.js";
 import esbuildWasmURL from "esbuild-wasm/esbuild.wasm?url";
 
 import { logger } from "./esbuildFSBinding.ts";
 import { refreshFilesExplorer } from "../../utils/utils.ts";
+import StatusBarItemController from "./statusBarItemController.ts";
 
+const statusBarController = new StatusBarItemController(window, StatusBarAlignment.Left, 1);
 const liveReloadBC = new BroadcastChannel("live_reload");
 
 let esbuildCtx: esbuild.BuildContext;
-let statusBarItem: StatusBarItem;
 let projectFolderUri: Uri;
 let outputFolderUri: Uri;
 let distDirHandle: FileSystemDirectoryHandle;
-// let watchingFiles: string[] = [];
+let watchingFiles: string[] = [];
 let livePreviewDisposable: Disposable;
 
 async function activate() {
   logger.info("Activating...");
-  addStatusBarItem();
+  statusBarController.init();
 
   await esbuild.initialize({
     wasmURL: esbuildWasmURL,
@@ -35,22 +36,43 @@ async function activate() {
   commands.registerCommand("bundler.init", init);
   commands.registerCommand("bundler.build", build);
   commands.registerCommand("bundler.startLivePreview", startLivePreview);
-  commands.registerCommand("bundler.stopLivePreview", () => livePreviewDisposable.dispose());
-  commands.registerCommand("bundler.openWebPage", () => env.openExternal(Uri.parse(`${location.origin}/preview`)));
   commands.registerCommand("bundler.showLogs", () => logger.show());
+  commands.registerCommand("bundler.openWebPage", () => env.openExternal(Uri.parse(`${location.origin}/preview`)));
+  commands.registerCommand("bundler.stopLivePreview", () => {
+    livePreviewDisposable.dispose();
+    statusBarController.disableLiveMode();
+  });
 }
 
 async function init() {
   projectFolderUri = workspace.workspaceFolders![0].uri;
 
+  const userConfig = await getUserConfigFile();
+
+  if (userConfig !== undefined) {
+    outputFolderUri = Uri.joinPath(projectFolderUri, userConfig.outdir!);
+
+    if (esbuildCtx) await esbuildCtx.dispose();
+
+    esbuildCtx = await esbuild.context(userConfig);
+    logger.info("Active.");
+  }
+
+  statusBarController.active();
+}
+
+async function getUserConfigFile(): Promise<esbuild.BuildOptions | undefined> {
   let userChoices: esbuild.BuildOptions;
 
   try {
     const configFileUi8 = await workspace.fs.readFile(Uri.joinPath(projectFolderUri, "esbuild.config.json"));
     userChoices = JSON.parse(new TextDecoder().decode(configFileUi8));
   } catch (err) {
-    logger.error((err as Error).toString());
+    const errMsg = (err as Error).toString();
     logger.error("Error in esbuild.config.json file!");
+    logger.error(errMsg);
+
+    window.showErrorMessage(`Error esbuild.config.json: ${errMsg}`);
     return;
   }
 
@@ -73,72 +95,89 @@ async function init() {
     opts.outdir = "./dist";
   }
 
-  outputFolderUri = Uri.joinPath(projectFolderUri, opts.outdir!);
-
-  if (esbuildCtx) await esbuildCtx.dispose();
-
-  esbuildCtx = await esbuild.context(opts);
-
-  logger.info("Active.");
-  statusBarItem.text = "$(zap) Bundler";
+  return opts;
 }
 
-function startLivePreview() {
+async function startLivePreview() {
+  for await (const entry of distDirHandle.keys()) {
+    distDirHandle.removeEntry(entry);
+  }
+
+  await serve();
+
   livePreviewDisposable = workspace.onDidSaveTextDocument(onSaveFile);
+
+  statusBarController.enableLiveMode();
+  logger.info(`Files watching: \n \u2022 ${watchingFiles.join("\n \u2022 ")}`);
+
+  await commands.executeCommand("bundler.openWebPage");
 }
 
-async function start(mode: "serve" | "build") {
-  statusBarItem.text = "$(loading~spin) Compiling...";
+async function* start(mode: "serve" | "build") {
   const buildStart = performance.now();
 
   await esbuildCtx.cancel();
 
-  const { errors, warnings, outputFiles, metafile } = await esbuildCtx.rebuild();
+  const { errors, warnings, outputFiles, metafile } = await (mode === "serve"
+    ? esbuildCtx.rebuild()
+    : esbuild.build({}));
+
+  console.log(errors);
 
   if (errors.length > 0) logger.error(errors.join("\n* "));
   if (warnings.length > 0) logger.warn(warnings.join("\n* "));
 
   let promises: Thenable<void>[] | Promise<void>[] = [];
-  if (outputFiles && outputFiles.length > 0) {
-    // Serve default.
-    let outputHandler:
-      | ((output: Partial<esbuild.OutputFile>) => Promise<void>)
-      | ((file: esbuild.OutputFile) => Thenable<void>) = writeOPFSDistFolder;
 
-    if (mode === "build") {
-      outputHandler = (file: esbuild.OutputFile) => workspace.fs.writeFile(Uri.file(file.path), file.contents);
-    }
-
-    promises = outputFiles.map(outputHandler);
-  } else if (outputFiles && outputFiles.length === 0) {
+  if (outputFiles!.length > 0) {
+    promises = yield outputFiles;
+  } else {
     logger.warn("There is no output files.");
-  } else if (!outputFiles) {
-    logger.warn(`outputFiles is ${typeof outputFiles}`);
   }
 
   await Promise.all(promises);
 
-  console.log(metafile!.inputs);
+  watchingFiles = Object.keys(metafile!.inputs);
 
   const buildTime = performance.now() - buildStart;
+
   logger.info(`Done in ${buildTime | 0}ms`);
-  statusBarItem.text = "$(zap) Bundler";
+  statusBarController.active();
 }
 
 async function serve() {
-  logger.info("Building...");
+  statusBarController.loading("Serving...");
+  logger.info("Serving...");
 
-  await start("serve").catch(() => console.error("error occured!"));
+  try {
+    const gen = start("serve");
+    const files = (await gen.next()).value!;
+
+    await gen.next(files.map(writeOPFSDistFolder));
+    await gen.next();
+  } catch (err) {
+    statusBarController.error();
+  }
 
   liveReloadBC.postMessage("reload");
 }
 
 async function build() {
+  statusBarController.loading("Building...");
   logger.info("Building...");
 
-  await start("build").catch(() => console.error("error occured!"));
+  try {
+    const gen = start("build");
+    const files = (await gen.next()).value!;
 
-  // await commands.executeCommand("workbench.files.action.refreshFilesExplorer");
+    const writeOutpuFolder = (file: esbuild.OutputFile) => workspace.fs.writeFile(Uri.file(file.path), file.contents);
+
+    await gen.next(files.map(writeOutpuFolder));
+    await gen.next();
+  } catch (err) {
+    statusBarController.error();
+  }
+
   await refreshFilesExplorer();
 }
 
@@ -149,19 +188,6 @@ async function onSaveFile(ev: TextDocument) {
 
   if (fileName === "index.html") {
     const htmlTargetUri = Uri.joinPath(outputFolderUri, "index.html");
-
-    // Promise.all([
-    // 	writeOPFSDistFolder({
-    // 		path: htmlTargetUri.path,
-    // 		contents: await workspace.fs.readFile(ev.uri),
-    // 		hash: "",
-    // 		text: ""
-    // 	}),
-    // 	workspace.fs.copy(ev.uri, htmlTargetUri, { overwrite: true })
-    // ]).then(
-    // 	() => logger.info("index.html file copied to the output folder."),
-    // 	(err: Error) => logger.error(err.toString())
-    // );
 
     const ui8 = await workspace.fs.readFile(ev.uri);
     let content = new TextDecoder().decode(ui8);
@@ -188,25 +214,21 @@ async function onSaveFile(ev: TextDocument) {
     logger.info("index.html file copied to the output folder.");
 
     liveReloadBC.postMessage("reload");
-
-    return;
   } else if (fileName === "esbuild.config.json") {
-    statusBarItem.text = "$(sync~spin) Loading...";
-    logger.info("Changed config file, reloading...");
+    logger.info("Changed config file, synchronizing...");
+    statusBarController.loading();
     init();
-
-    return;
+  } else if (watchingFiles.includes(fileRelativePath)) {
+    serve();
   }
 
-  // "/JSIDE/projects/test/dist".slice("/JSIDE/projects/test") -> "dist/"
-  const outputDirName = outputFolderUri.path.slice(projectFolderUri.path.length + 1) + "/";
+  // // "/JSIDE/projects/test/dist".slice("/JSIDE/projects/test") -> "dist/"
+  // const outputDirName = outputFolderUri.path.slice(projectFolderUri.path.length + 1) + "/";
 
-  if (fileRelativePath.startsWith(outputDirName)) {
-    logger.info("Changes in the output folder were ignored.");
-    return;
-  }
-
-  serve();
+  // if (fileRelativePath.startsWith(outputDirName)) {
+  //   logger.info("Changes in the output folder were ignored.");
+  //   return;
+  // }
 }
 
 async function writeOPFSDistFolder(output: Partial<esbuild.OutputFile>) {
@@ -219,19 +241,6 @@ async function writeOPFSDistFolder(output: Partial<esbuild.OutputFile>) {
 
   syncAccess.flush();
   syncAccess.close();
-}
-
-function addStatusBarItem() {
-  statusBarItem = window.createStatusBarItem(StatusBarAlignment.Left, 1);
-  statusBarItem.text = "$(sync~spin) Loading...";
-  statusBarItem.tooltip = "Show commands";
-  statusBarItem.name = "Bundler";
-  statusBarItem.command = {
-    title: "Commands",
-    command: "workbench.action.quickOpen",
-    arguments: [">Bundler: "]
-  };
-  statusBarItem.show();
 }
 
 export { activate };
