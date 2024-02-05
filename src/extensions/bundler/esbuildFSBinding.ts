@@ -96,7 +96,7 @@ function read(
   // eslint-disable-next-line prefer-const
   const entry = fileDescriptors.get(fd)!;
 
-  if(!entry.isFile) return callback(EISDIR, 0, buffer);
+  if(entry.isDir) return callback(EISDIR, 0, buffer);
 
   const handleError = (name: string) => {
     if (name === "TypeMismatchError") return callback(EISDIR, 0, buffer);
@@ -178,7 +178,7 @@ globalThis.fs = {
       fileDescriptors.set(fd, {
         path: absPath,
         offset: 0,
-        isFile: res.type === FileType.File
+        isDir: res.type === FileType.Directory
       });
 
       callback(null, fd);
