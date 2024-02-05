@@ -14,11 +14,17 @@ const EISDIR = errorWithCode("EISDIR");
 // const ENOENT = errorWithCode("ENOENT");
 const ENOTDIR = errorWithCode("ENOTDIR");
 
-const fileDescriptors: Map<number, [string, number]> = new Map();
+const fileDescriptors: Map<number, { path: string; offset: number; isDir: boolean }> = new Map();
 let nextFDNum = 3; // 0, 1, 2 reserved
 
 // The "esbuild-wasm" package overwrites "fs.writeSync" with this value
-let esbuildWriteSync: (fd: number, buffer: Uint8Array, offset: number, length: number, position: number | null) => void;
+let esbuildWriteSync: (
+  fd: number,
+  buffer: Uint8Array,
+  offset: number,
+  length: number,
+  position: number | null
+) => void;
 
 // The "esbuild-wasm" package overwrites "fs.read" with this value
 let esbuildRead: (
@@ -88,7 +94,9 @@ function read(
   if (!fileDescriptors.has(fd)) return callback(EBADF, 0, buffer);
 
   // eslint-disable-next-line prefer-const
-  let [path, readOffset] = fileDescriptors.get(fd)!;
+  const entry = fileDescriptors.get(fd)!;
+
+  if(!entry.isFile) return callback(EISDIR, 0, buffer);
 
   const handleError = (name: string) => {
     if (name === "TypeMismatchError") return callback(EISDIR, 0, buffer);
@@ -98,20 +106,19 @@ function read(
     throw name;
   };
 
-  workspace.fs.readFile(Uri.file(path)).then(
+  workspace.fs.readFile(Uri.file(entry.path)).then(
     (content) => {
       let slice: Uint8Array;
 
       if (position !== null && position !== -1) {
         slice = content.slice(position, position + length);
       } else {
-        slice = content.slice(readOffset, readOffset + length);
-        readOffset += slice.length;
-        fileDescriptors.set(fd, [path, readOffset]);
+        slice = content.slice(entry.offset, entry.offset + length);
+        entry.offset += slice.length;
       }
 
       buffer.set(slice, offset);
-      callback(null, slice.length, buffer);
+      callback(null, slice.length, buffer); 
     },
     (err) => handleError(err.name)
   );
@@ -143,7 +150,7 @@ globalThis.fs = {
     O_APPEND: -1,
     O_EXCL: -1
   },
-  
+
   get writeSync() {
     return writeSync;
   },
@@ -165,8 +172,17 @@ globalThis.fs = {
     callback: (err: Error | null, fd: number | null) => void
   ) {
     const fd = nextFDNum++;
-    fileDescriptors.set(fd, [path === "/" ? "/JSIDE" : path, 0]);
-    callback(null, fd);
+    const absPath = path === "/" ? "/JSIDE" : path;
+    
+    workspace.fs.stat(Uri.file(absPath)).then(res => {
+      fileDescriptors.set(fd, {
+        path: absPath,
+        offset: 0,
+        isFile: res.type === FileType.File
+      });
+
+      callback(null, fd);
+    });
   },
   close(fd: number, callback: (err: Error | null) => void) {
     callback(fileDescriptors.delete(fd) ? null : EBADF);
@@ -198,9 +214,9 @@ globalThis.fs = {
   fstat(fd: number, callback: (err: Error | null, stats: Stats | null) => void) {
     if (!fileDescriptors.has(fd)) return callback(EBADF, null);
 
-    const [path] = fileDescriptors.get(fd)!;
+    const entry = fileDescriptors.get(fd)!;
 
-    stats(path)
+    stats(entry.path)
       .then((res) => callback(null, res))
       .catch((err) => callback(errorWithCode(err), null));
   },

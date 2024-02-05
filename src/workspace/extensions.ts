@@ -27,15 +27,13 @@ import "@codingame/monaco-vscode-emmet-default-extension";
 import activateDefaults from "../extensions/defaults";
 import activatePackageManager from "../extensions/package-manager";
 import activateProjectManager from "../extensions/project-manager";
-import activateSearch from "../extensions/search";
 import "../extensions/bundler";
 
 async function activateDefaultExtensions() {
   await Promise.all([
     activateDefaults(),
     activatePackageManager(),
-    activateProjectManager(),
-    activateSearch()
+    activateProjectManager()
   ]);
 }
 

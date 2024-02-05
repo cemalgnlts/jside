@@ -53,7 +53,7 @@ async function init() {
     outputFolderUri = Uri.joinPath(projectFolderUri, userConfig.outdir!);
 
     if (esbuildCtx) await esbuildCtx.dispose();
-
+    
     esbuildCtx = await esbuild.context(userConfig);
     logger.info("Active.");
   }
@@ -69,11 +69,18 @@ async function getUserConfigFile(): Promise<esbuild.BuildOptions | undefined> {
     userChoices = JSON.parse(new TextDecoder().decode(configFileUi8));
   } catch (err) {
     const errMsg = (err as Error).toString();
+    
+    if(errMsg.includes("nonexistent file")) throw Error("No esbuild.config.json file found!");
+
     logger.error("Error in esbuild.config.json file!");
     logger.error(errMsg);
 
-    window.showErrorMessage(`Error esbuild.config.json: ${errMsg}`);
-    return;
+    window.showErrorMessage("Error esbuild.config.json", {
+      detail: errMsg,
+      modal: true
+    });
+
+    throw (err as Error).message;
   }
 
   const opts: esbuild.BuildOptions = {
@@ -99,6 +106,19 @@ async function getUserConfigFile(): Promise<esbuild.BuildOptions | undefined> {
 }
 
 async function startLivePreview() {
+  const rootHtmlDoc = workspace.textDocuments.find((doc) => doc.fileName.endsWith("index.html"));
+
+  if (!rootHtmlDoc) {
+    window.showInformationMessage("No index.html file!", {
+      detail: "Try again with the main index.html file open to run the Live Preview feature.",
+      modal: true
+    });
+
+    return;
+  }
+
+  await moveIndexHtmlFile(rootHtmlDoc!.uri);
+
   for await (const entry of distDirHandle.keys()) {
     distDirHandle.removeEntry(entry);
   }
@@ -170,7 +190,8 @@ async function build() {
     const gen = start("build");
     const files = (await gen.next()).value!;
 
-    const writeOutpuFolder = (file: esbuild.OutputFile) => workspace.fs.writeFile(Uri.file(file.path), file.contents);
+    const writeOutpuFolder = (file: esbuild.OutputFile) =>
+      workspace.fs.writeFile(Uri.file(file.path), file.contents);
 
     await gen.next(files.map(writeOutpuFolder));
     await gen.next();
@@ -187,30 +208,7 @@ async function onSaveFile(ev: TextDocument) {
   logger.info(`File changed: ${fileRelativePath}`);
 
   if (fileName === "index.html") {
-    const htmlTargetUri = Uri.joinPath(outputFolderUri, "index.html");
-
-    const ui8 = await workspace.fs.readFile(ev.uri);
-    let content = new TextDecoder().decode(ui8);
-    content = content.replace(
-      /<head>/,
-      `<head>
-<base href="/preview/">
-<script>
-	const bc = new BroadcastChannel("live_reload");
-	bc.onmessage = ev => {
-		switch(ev.data) {
-			case "reload": location.reload(); break;
-		}
-	};
-</script>
-`
-    );
-
-    await writeOPFSDistFolder({
-      path: htmlTargetUri.path,
-      contents: new TextEncoder().encode(content)
-    });
-
+    await moveIndexHtmlFile(ev.uri);
     logger.info("index.html file copied to the output folder.");
 
     liveReloadBC.postMessage("reload");
@@ -231,6 +229,32 @@ async function onSaveFile(ev: TextDocument) {
   // }
 }
 
+async function moveIndexHtmlFile(fileUri: Uri) {
+  const htmlTargetUri = Uri.joinPath(outputFolderUri, "index.html");
+
+  const ui8 = await workspace.fs.readFile(fileUri);
+  let content = new TextDecoder().decode(ui8);
+  content = content.replace(
+    /<head>/,
+    `<head>
+<base href="/preview/">
+<script>
+	const bc = new BroadcastChannel("live_reload");
+	bc.onmessage = ev => {
+		switch(ev.data) {
+			case "reload": location.reload(); break;
+		}
+	};
+</script>
+`
+  );
+
+  await writeOPFSDistFolder({
+    path: htmlTargetUri.path,
+    contents: new TextEncoder().encode(content)
+  });
+}
+
 async function writeOPFSDistFolder(output: Partial<esbuild.OutputFile>) {
   const fileName = output.path!.split("/").pop()!;
 
@@ -238,6 +262,7 @@ async function writeOPFSDistFolder(output: Partial<esbuild.OutputFile>) {
   const syncAccess = await file.createSyncAccessHandle();
 
   syncAccess.write(output.contents!, { at: 0 });
+  syncAccess.truncate(output.contents!.length);
 
   syncAccess.flush();
   syncAccess.close();

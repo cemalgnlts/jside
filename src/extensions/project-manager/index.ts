@@ -1,12 +1,14 @@
 import { registerExtension, ExtensionHostKind } from "vscode/extensions";
+import { IRelaxedExtensionManifest } from "vscode/vscode/vs/platform/extensions/common/extensions";
+import { registerFileSystemOverlay } from "@codingame/monaco-vscode-files-service-override";
+import { type IDisposable } from "vscode/vscode/vs/editor/editor.api";
+
 import { ProjectTreeDataProvider, ProjectTreeItem } from "./projectTreeDataProvider";
 
-import { IRelaxedExtensionManifest } from "vscode/vscode/vs/platform/extensions/common/extensions";
 import { getTemplate, templateMeta } from "../../libs/templates";
 import { reinitializeWorkspace } from "@codingame/monaco-vscode-configuration-service-override";
 import WebFileSystem, { WebFileSystemType } from "../../libs/webFileSystem";
 import { requestOPFSPersistentPermission } from "../../utils/utils";
-import { registerFileSystemOverlay } from "@codingame/monaco-vscode-files-service-override";
 
 const manifest: IRelaxedExtensionManifest = {
   name: "project-manager",
@@ -165,6 +167,8 @@ async function activate() {
 
   const { window, commands, Uri, ProgressLocation } = api;
 
+  let registeredFS: IDisposable;
+
   await commands.executeCommand("setContext", "projectManager.isAnyProjectOpen", false);
 
   try {
@@ -219,13 +223,15 @@ async function activate() {
   commands.registerCommand("projectManager.open", async (fsType, projectName) => {
     const fs = fsType === "opfs" ? opfs : dfs;
 
-    registerFileSystemOverlay(1, fs);
+    if (registeredFS) registeredFS.dispose();
+
+    registeredFS = registerFileSystemOverlay(1, fs);
 
     const projectFolderUri = Uri.file(`/JSIDE/projects/${projectName}`);
 
     await reinitializeWorkspace({
-      uri: projectFolderUri,
-      id: projectFolderUri.toString()
+      id: projectFolderUri.fsPath,
+      uri: projectFolderUri
     });
 
     await Promise.all([

@@ -1,8 +1,9 @@
 import { ExtensionHostKind, registerExtension } from "vscode/extensions";
-
+import { IModelService, StandaloneServices } from "vscode/services";
 import { MenuRegistry, MenuId } from "vscode/monaco";
 
 import type { IExtensionManifest } from "vscode/extensions";
+import type { ProviderResult, Uri } from "vscode";
 
 const manifest: IExtensionManifest = {
   name: "defaults",
@@ -10,7 +11,8 @@ const manifest: IExtensionManifest = {
   version: __APP_VERSION,
   engines: {
     vscode: "*"
-  }
+  },
+  enabledApiProposals: ["fileSearchProvider", "textSearchProvider"]
 };
 
 const { getApi, setAsDefaultApi } = registerExtension(manifest, ExtensionHostKind.LocalProcess);
@@ -18,7 +20,48 @@ const { getApi, setAsDefaultApi } = registerExtension(manifest, ExtensionHostKin
 async function activate() {
   await setAsDefaultApi();
 
-  const { Uri, commands, env } = await getApi();
+  const { workspace, commands, env, Uri, Range } = await getApi();
+
+  const modelService = StandaloneServices.get(IModelService);
+
+  workspace.registerFileSearchProvider("file", {
+    provideFileSearchResults: function (): ProviderResult<Uri[]> {
+      return modelService
+        .getModels()
+        .map((model) => model.uri)
+        .filter((uri) => uri.scheme === "file");
+    }
+  });
+
+  workspace.registerTextSearchProvider("file", {
+    async provideTextSearchResults(query, _, progress) {
+      for (const model of modelService.getModels()) {
+        const matches = model.findMatches(
+          query.pattern,
+          false,
+          !!query.isRegExp,
+          !!query.isCaseSensitive,
+          query.isWordMatch ?? false ? " " : null,
+          true
+        );
+
+        if (matches.length === 0) return {};
+
+        const ranges = matches.map(
+          ({ range }) => new Range(range.startLineNumber, range.startColumn, range.endLineNumber, range.endColumn)
+        );
+
+        progress.report({
+          uri: model.uri,
+          ranges,
+          preview: {
+            text: model.getValue(),
+            matches: ranges
+          }
+        });
+      }
+    }
+  });
 
   const openGitHub = (url: string) => env.openExternal(Uri.parse(`https://github.com/cemalgnlts/jside${url}`));
 

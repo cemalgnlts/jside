@@ -12,6 +12,7 @@ import type { PackageTreeItem } from "./packagesTreeDataProvider.ts";
 interface IPackageJSON {
   title?: string;
   version?: string;
+  private?: boolean;
   dependencies: {
     [dependency: string]: string;
   };
@@ -65,12 +66,12 @@ const manifest: IRelaxedExtensionManifest = {
         {
           command: "packageManager.install",
           group: "navigation",
-          when: "projectManager.isAnyProjectOpen && view == dependencies"
+          when: "projectManager.isAnyProjectOpen && packageManager.isPackageJSONExists && view == dependencies"
         },
         {
           command: "packageManager.refresh",
           group: "navigation",
-          when: "projectManager.isAnyProjectOpen && view == dependencies"
+          when: "projectManager.isAnyProjectOpen && packageManager.isPackageJSONExists && view == dependencies"
         }
       ],
       "view/item/context": [
@@ -101,6 +102,12 @@ const manifest: IRelaxedExtensionManifest = {
         when: "!projectManager.isAnyProjectOpen",
         contents:
           "Open a project to be able to manage packages.\n[Show projects](command:workbench.view.extension.project-manager)"
+      },
+      {
+        view: "dependencies",
+        when: "projectManager.isAnyProjectOpen && !packageManager.isPackageJSONExists",
+        contents:
+          "package.json file not found.\n[$(new-file) Make one](command:packageManager.createPackageJSONFile)"
       }
     ]
   }
@@ -118,21 +125,30 @@ async function activate() {
   const { commands, window, workspace, Uri } = api;
 
   logger = new Logger(window, "Package Manager");
-  // let workingDir: Uri;
 
-  // workspace.onDidSaveTextDocument((doc) => {
-  //   if (workingDir.slice(doc.fileName) !== "package.json") return;
-
-  // });
+  await commands.executeCommand("setContext", "packageManager.isPackageJSONExists", false);
 
   const packageTreeDataProvider = new PackageTreeProvider(workspace, null);
 
-  workspace.onDidChangeWorkspaceFolders((ev) => {
+  workspace.onDidChangeWorkspaceFolders(async (ev) => {
     if (ev.added.length === 0) return;
 
     workingDir = ev.added[0].uri;
-    packageTreeDataProvider.pkgJSONUri = Uri.joinPath(workingDir, "package.json");
-    packageTreeDataProvider.refresh();
+    const pkgJSONUri = Uri.joinPath(workingDir, "package.json");
+    let isExists = true;
+
+    try {
+      await workspace.fs.stat(pkgJSONUri);
+    } catch(err) {
+      isExists = false;
+    }
+
+    await commands.executeCommand("setContext", "packageManager.isPackageJSONExists", isExists);
+
+    if (isExists) {
+      packageTreeDataProvider.pkgJSONUri = pkgJSONUri;
+      packageTreeDataProvider.refresh();
+    }
   });
 
   window.createTreeView("dependencies", {
@@ -142,6 +158,20 @@ async function activate() {
   commands.registerCommand("packageManager.install", installDependency);
   commands.registerCommand("packageManager.refresh", () => packageTreeDataProvider.refresh());
   commands.registerCommand("packageManager.delete", (item: PackageTreeItem) => removePackage(item));
+  commands.registerCommand("packageManager.createPackageJSONFile", createPackageJSONFile);
+}
+
+async function createPackageJSONFile() {
+  const projectName = api.workspace.workspaceFolders?.[0].name;
+
+  await setPackageJSON({
+    title: projectName,
+    version: "0.0.1",
+    private: true,
+    dependencies: {}
+  });
+
+  await api.commands.executeCommand("setContext", "packageManager.isPackageJSONExists", true);
 }
 
 async function removePackage(item: PackageTreeItem) {
@@ -230,10 +260,7 @@ async function downloadPackage(packageName: string) {
   const pkgJSON = await getPackageJSON();
   pkgJSON.dependencies[packageName] = `^${packageVersion}`;
 
-  await Promise.all([
-    setPackageJSON(pkgJSON),
-    refreshFilesExplorer()
-  ]);
+  await Promise.all([setPackageJSON(pkgJSON), refreshFilesExplorer()]);
 
   await commands.executeCommand("packageManager.refresh");
 
