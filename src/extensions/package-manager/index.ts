@@ -21,12 +21,20 @@ interface IPackageJSON {
 const manifest: IRelaxedExtensionManifest = {
   name: "package-manager",
   displayName: "Package Manager",
+  // browser: "./extension.js",
   publisher: __APP_NAME,
   version: __APP_VERSION,
   engines: {
     vscode: "*"
   },
   contributes: {
+    // /// @ts-expect-error Missing type
+    // typescriptServerPlugins: [
+    //   {
+    //     name: "ts-pm-plugin",
+    //     enableForWorkspaceTypeScriptVersions: true
+    //   }
+    // ],
     viewsContainers: {
       activitybar: [
         {
@@ -41,6 +49,10 @@ const manifest: IRelaxedExtensionManifest = {
         command: "packageManager.install",
         title: "Install dependency",
         icon: "$(add)"
+      },
+      {
+        command: "packageManager.startTypeTest",
+        title: "StartType Test"
       },
       {
         command: "packageManager.refresh",
@@ -113,7 +125,10 @@ const manifest: IRelaxedExtensionManifest = {
   }
 };
 
-const { getApi } = registerExtension(manifest, ExtensionHostKind.LocalProcess);
+const { getApi /*, registerFileUrl*/ } = registerExtension(manifest, ExtensionHostKind.LocalProcess);
+// registerFileUrl("./extension.js", new URL("./extension.js", import.meta.url).href);
+// registerFileUrl("node_modules/ts-pm-plugin/package.json", new URL("./package.json", import.meta.url).href);
+// registerFileUrl("node_modules/ts-pm-plugin/ts-pm-plugin.js", new URL("./ts-pm-plugin.js", import.meta.url).href);
 
 let api: typeof import("vscode");
 let workingDir: import("vscode").Uri;
@@ -139,7 +154,7 @@ async function activate() {
 
     try {
       await workspace.fs.stat(pkgJSONUri);
-    } catch(err) {
+    } catch (err) {
       isExists = false;
     }
 
@@ -236,35 +251,36 @@ async function installDependency() {
     });
 }
 
-async function downloadPackage(packageName: string) {
-  const { files, packageVersion } = await fetchPackage(packageName);
+async function downloadPackage(pkgName: string) {
+  const files = await fetchPackage(pkgName);
   const { workspace, commands, Uri } = api;
 
   logger.info(`${files.size} file found.`);
-  logger.info(`Type file found: ${files.has(`types/${packageName}/index.d.ts`)}`);
+  logger.info(`Type file found: ${files.has(`/${pkgName}/index.d.ts`)}`);
 
-  const modulePath = Uri.joinPath(workingDir, "node_modules", packageName);
-  const encoder = new TextEncoder();
+  const modulePath = Uri.joinPath(workingDir, "node_modules");
 
   const promises = [];
 
-  for (const [path, text] of files.entries()) {
-    const absPath = !path.startsWith("types") ? Uri.joinPath(modulePath, path) : Uri.joinPath(workingDir, path);
+  for (const [path, data] of files.entries()) {
+    const relPath = Uri.joinPath(modulePath, path);
 
-    promises.push(workspace.fs.writeFile(absPath, encoder.encode(text)));
+    promises.push(workspace.fs.writeFile(relPath, data));
   }
 
   await Promise.all(promises);
 
   // Add package to package.json
   const pkgJSON = await getPackageJSON();
-  pkgJSON.dependencies[packageName] = `^${packageVersion}`;
+  const contents = JSON.parse(new TextDecoder().decode(files.get(`/${pkgName}/package.json`))) as IPackageJSON;
+  console.log(contents);
+  pkgJSON.dependencies[pkgName] = contents.version!;
 
   await Promise.all([setPackageJSON(pkgJSON), refreshFilesExplorer()]);
 
   await commands.executeCommand("packageManager.refresh");
 
-  logger.info("Package downloaded.");
+  logger.info(`1 package and ${Object.keys(contents.dependencies ?? []).length} dependency downloaded.`);
 }
 
 async function getPackageJSON() {
@@ -297,3 +313,4 @@ async function setPackageJSON(content: IPackageJSON) {
 }
 
 export default activate;
+// export default function activate() {}

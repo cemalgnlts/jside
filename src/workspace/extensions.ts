@@ -25,7 +25,7 @@ import "@codingame/monaco-vscode-emmet-default-extension";
 
 // Custom
 import activateDefaults from "../extensions/defaults";
-import activatePackageManager from "../extensions/package-manager";
+import activatePackageManager from "../extensions/package-manager/index.ts";
 import activateProjectManager from "../extensions/project-manager";
 import "../extensions/bundler";
 

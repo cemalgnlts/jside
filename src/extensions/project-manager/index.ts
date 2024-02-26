@@ -230,7 +230,7 @@ async function activate() {
     const projectFolderUri = Uri.file(`/JSIDE/projects/${projectName}`);
 
     await reinitializeWorkspace({
-      id: projectFolderUri.fsPath,
+      id: `project-${projectName}`,
       uri: projectFolderUri
     });
 

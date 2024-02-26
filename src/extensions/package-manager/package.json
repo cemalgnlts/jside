@@ -1,0 +1,6 @@
+{
+  "name": "ts-pm-plugin",
+  "version": "0.0.1",
+  "browser": "ts-pm-plugin.js",
+  "main": "ts-pm-plugin.js"
+}

@@ -53,7 +53,7 @@ async function init() {
     outputFolderUri = Uri.joinPath(projectFolderUri, userConfig.outdir!);
 
     if (esbuildCtx) await esbuildCtx.dispose();
-    
+
     esbuildCtx = await esbuild.context(userConfig);
     logger.info("Active.");
   }
@@ -69,8 +69,8 @@ async function getUserConfigFile(): Promise<esbuild.BuildOptions | undefined> {
     userChoices = JSON.parse(new TextDecoder().decode(configFileUi8));
   } catch (err) {
     const errMsg = (err as Error).toString();
-    
-    if(errMsg.includes("nonexistent file")) throw Error("No esbuild.config.json file found!");
+
+    if (errMsg.includes("nonexistent file")) throw Error("No esbuild.config.json file found!");
 
     logger.error("Error in esbuild.config.json file!");
     logger.error(errMsg);
@@ -106,18 +106,18 @@ async function getUserConfigFile(): Promise<esbuild.BuildOptions | undefined> {
 }
 
 async function startLivePreview() {
-  const rootHtmlDoc = workspace.textDocuments.find((doc) => doc.fileName.endsWith("index.html"));
+  const htmlDocs = await workspace.findFiles("**/index.html", "", 1);
 
-  if (!rootHtmlDoc) {
+  if (htmlDocs.length === 0) {
     window.showInformationMessage("No index.html file!", {
-      detail: "Try again with the main index.html file open to run the Live Preview feature.",
+      detail: "An index.html file is required for the Live Preview feature.",
       modal: true
     });
 
     return;
   }
 
-  await moveIndexHtmlFile(rootHtmlDoc!.uri);
+  await moveIndexHtmlFile(htmlDocs[0]);
 
   for await (const entry of distDirHandle.keys()) {
     distDirHandle.removeEntry(entry);
@@ -141,8 +141,6 @@ async function* start(mode: "serve" | "build") {
   const { errors, warnings, outputFiles, metafile } = await (mode === "serve"
     ? esbuildCtx.rebuild()
     : esbuild.build({}));
-
-  console.log(errors);
 
   if (errors.length > 0) logger.error(errors.join("\n* "));
   if (warnings.length > 0) logger.warn(warnings.join("\n* "));
@@ -204,8 +202,7 @@ async function build() {
 
 async function onSaveFile(ev: TextDocument) {
   const fileName = ev.fileName.split("/").pop();
-  const fileRelativePath = ev.fileName.slice(projectFolderUri.path.length + 1);
-  logger.info(`File changed: ${fileRelativePath}`);
+  const fileRelativePath = workspace.asRelativePath(ev.uri);
 
   if (fileName === "index.html") {
     await moveIndexHtmlFile(ev.uri);
@@ -215,6 +212,7 @@ async function onSaveFile(ev: TextDocument) {
   } else if (fileName === "esbuild.config.json") {
     logger.info("Changed config file, synchronizing...");
     statusBarController.loading();
+
     init();
   } else if (watchingFiles.includes(fileRelativePath)) {
     serve();

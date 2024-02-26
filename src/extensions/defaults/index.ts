@@ -3,7 +3,7 @@ import { IModelService, StandaloneServices } from "vscode/services";
 import { MenuRegistry, MenuId } from "vscode/monaco";
 
 import type { IExtensionManifest } from "vscode/extensions";
-import type { ProviderResult, Uri } from "vscode";
+import { type Uri } from "vscode";
 
 const manifest: IExtensionManifest = {
   name: "defaults",
@@ -17,20 +17,20 @@ const manifest: IExtensionManifest = {
 
 const { getApi, setAsDefaultApi } = registerExtension(manifest, ExtensionHostKind.LocalProcess);
 
+let api: typeof import("vscode");
+
 async function activate() {
   await setAsDefaultApi();
 
-  const { workspace, commands, env, Uri, Range } = await getApi();
+  api = await getApi();
+  const { workspace, commands, env, Uri, Range } = api;
+
+  // globalThis.api = api;
 
   const modelService = StandaloneServices.get(IModelService);
 
   workspace.registerFileSearchProvider("file", {
-    provideFileSearchResults: function (): ProviderResult<Uri[]> {
-      return modelService
-        .getModels()
-        .map((model) => model.uri)
-        .filter((uri) => uri.scheme === "file");
-    }
+    provideFileSearchResults: findFiles
   });
 
   workspace.registerTextSearchProvider("file", {
@@ -74,6 +74,29 @@ async function activate() {
 
   // globalThis.MenuRegistry = MenuRegistry;
   // globalThis.MenuId = MenuId;
+}
+
+async function findFiles() {
+  const { workspace, Uri, FileType } = api;
+  const projectFolderUri = workspace.workspaceFolders?.[0].uri;
+  const files: Uri[] = [];
+
+  if (!projectFolderUri) return [];
+
+  const travel = async (uri: Uri) => {
+    const contents = await workspace.fs.readDirectory(uri);
+
+    for (const [name, type] of contents) {
+      const fileUri = Uri.joinPath(uri, name);
+
+      if (type === FileType.Directory && name !== "node_modules") await travel(fileUri);
+      else if (type === FileType.File) files.push(fileUri);
+    }
+  };
+
+  await travel(projectFolderUri);
+
+  return files;
 }
 
 function addCustomMenuItems() {

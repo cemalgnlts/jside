@@ -129,7 +129,7 @@ export async function init() {
   );
 
   // Remove workspace logic.
-  reinitializeWorkspace({ id: "empty" });
+  reinitializeWorkspace({ id: "empty", configPath: workspaceUri, uri: Uri.file("/") });
 
   commands.registerCommand("workbench.action.toggleFullScreen", () => {
     if (document.fullscreenElement !== null) {

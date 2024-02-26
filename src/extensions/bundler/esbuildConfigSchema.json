@@ -1,26 +1,27 @@
 {
-	"$schema": "http://json-schema.org/draft-04/schema#",
-	"title": "Schema for esbuild.config.json",
-	"oneOf": [
-		{
-			"type": "object",
-			"allOf": [
-				{
-					"$ref": "#/definitions/optionsDefinition"
-				}
-			]
-		}
-	],
-	"definitions": {
-		"optionsDefinition": {
-			"type": "object",
-			"properties": {
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "Schema for esbuild.config.json",
+  "oneOf": [
+    {
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "#/definitions/optionsDefinition"
+        }
+      ]
+    }
+  ],
+  "definitions": {
+    "optionsDefinition": {
+      "type": "object",
+      "properties": {
         "entryPoints": { "type": "array", "items": { "type": "string" } },
         "external": { "type": "array", "items": { "type": "string" } },
-				"bundle": { "type": "boolean" },
-				"minify": { "type": "boolean" },
-        "outdir": { "type": "string" }
-			}
-		}
-	}
+        "bundle": { "type": "boolean" },
+        "minify": { "type": "boolean" },
+        "outdir": { "type": "string" },
+		"loader": { "type": "object", "items": { "type": "string" } }
+      }
+    }
+  }
 }

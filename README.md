@@ -28,17 +28,18 @@ To create and edit projects on your device, you will need 2020 versions of Chrom
 
 From the **View** menu you can go to **Files**, **Search** and **Projects**.
 
-## Credits
+## Acknowledgement
 
 Web Code Editor is made possible by the following open source projects.
 
-* https://github.com/evanw/esbuild
-* https://github.com/CodinGame/monaco-vscode-api
+* [evanw/esbuild](https://github.com/evanw/esbuild)
+* [CodinGame/monaco-vscode-api](https://github.com/CodinGame/monaco-vscode-api)
+* [esm-dev/esm.sh](https://github.com/esm-dev/esm.sh)
 
 Some extensions have been built using parts of these open source projects:
 
-* https://github.com/Binaryify/OneDark-Pro
-* https://github.com/PKief/vscode-material-icon-theme
+* [Binaryify/OneDark-Pro](https://github.com/Binaryify/OneDark-Pro)
+* [PKief/vscode-material-icon-theme](https://github.com/PKief/vscode-material-icon-theme)
 
 ## License
 
