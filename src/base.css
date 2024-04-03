@@ -49,7 +49,6 @@ body {
 
 #titlebar {
   grid-area: titlebar;
-  border-bottom: solid 1px rgba(83, 89, 93, 0.3);
 }
 
 #editor {
@@ -60,7 +59,6 @@ body {
   grid-area: sidebar;
   top: -30px;
   height: calc(100% + 30px);
-  outline: solid 1px rgba(83, 89, 93, 0.3);
 }
 
 #panel {

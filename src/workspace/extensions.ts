@@ -10,7 +10,7 @@ import "@codingame/monaco-vscode-log-default-extension";
 // Language servers
 import "@codingame/monaco-vscode-html-language-features-default-extension";
 import "@codingame/monaco-vscode-css-language-features-default-extension";
-import "@codingame/monaco-vscode-typescript-language-features-default-extension";
+// import "@codingame/monaco-vscode-typescript-language-features-default-extension";
 import "@codingame/monaco-vscode-json-language-features-default-extension";
 import "@codingame/monaco-vscode-markdown-language-features-default-extension";
 
@@ -27,6 +27,7 @@ import "@codingame/monaco-vscode-emmet-default-extension";
 import activateDefaults from "../extensions/defaults";
 import activatePackageManager from "../extensions/package-manager/index.ts";
 import activateProjectManager from "../extensions/project-manager";
+import "../extensions/intelliSense";
 import "../extensions/bundler";
 
 async function activateDefaultExtensions() {

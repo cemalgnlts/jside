@@ -33,7 +33,7 @@
   "typescript.preferences.importModuleSpecifierEnding": "js",
   "typescript.check.npmIsInstalled": false,
   "typescript.tsserver.web.projectWideIntellisense.suppressSemanticErrors": false,
-  "typescript.experimental.tsserver.web.typeAcquisition.enabled": true,
+  "typescript.experimental.tsserver.web.typeAcquisition.enabled": false,
   "typescript.web.projectWideIntellisense.enabled": true,
   "typescript.disableAutomaticTypeAcquisition": true,
   "html.format.extraLiners": "",
