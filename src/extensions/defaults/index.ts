@@ -15,7 +15,7 @@ const manifest: IExtensionManifest = {
   enabledApiProposals: ["fileSearchProvider", "textSearchProvider"]
 };
 
-const { getApi, setAsDefaultApi } = registerExtension(manifest, ExtensionHostKind.LocalProcess);
+const { getApi, setAsDefaultApi } = registerExtension(manifest, ExtensionHostKind.LocalProcess, { system: true });
 
 let api: typeof import("vscode");
 

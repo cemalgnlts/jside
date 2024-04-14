@@ -9,8 +9,7 @@ files.set(
       entryPoints: ["./src/main.ts"],
       platform: "browser",
       target: "es2019",
-      bundle: true,
-      minify: true
+      bundle: true
     },
     null,
     2

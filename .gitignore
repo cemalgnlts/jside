@@ -1,3 +1,6 @@
+# Custom
+src/extensions/*/worker.js
+
 # Logs
 logs
 *.log

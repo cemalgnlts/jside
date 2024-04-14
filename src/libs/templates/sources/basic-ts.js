@@ -18,7 +18,7 @@ files.set(
   )
 );
 
-files.set("main.ts", 'console.log("JS works.");');
+files.set("main.ts", 'console.log("TS works.");');
 
 files.set("tsconfig.json", files.get("jsconfig.json"));
 

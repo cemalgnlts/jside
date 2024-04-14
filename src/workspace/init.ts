@@ -26,6 +26,7 @@ import getEnvironmentServiceOverride from "@codingame/monaco-vscode-environment-
 import getSearchServiceOverride from "@codingame/monaco-vscode-search-service-override";
 import getWelcomeServiceOverride from "@codingame/monaco-vscode-welcome-service-override";
 import getTitleBarServiceOverride from "@codingame/monaco-vscode-view-title-bar-service-override";
+import getExplorerServiceOverride from "@codingame/monaco-vscode-explorer-service-override";
 
 // Extensions
 import { activateDefaultExtensions } from "./extensions.ts";
@@ -108,7 +109,8 @@ export async function init() {
       ...getLanguagesServiceOverride(),
       ...getSearchServiceOverride(),
       ...getWelcomeServiceOverride(),
-      ...getTitleBarServiceOverride()
+      ...getTitleBarServiceOverride(),
+      ...getExplorerServiceOverride()
     },
     document.body,
     {
@@ -125,6 +127,9 @@ export async function init() {
         commandPaletteSuggestedCommandIds: ["workbench.action.files.openFile"],
         enableTelemetry: false
       }
+    },
+    {
+      userHome: Uri.file("/JSIDE")
     }
   );
 

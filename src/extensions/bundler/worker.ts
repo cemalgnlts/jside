@@ -117,12 +117,11 @@ async function startLivePreview() {
     return;
   }
 
-  await moveIndexHtmlFile(htmlDocs[0]);
-
   for await (const entry of distDirHandle.keys()) {
     distDirHandle.removeEntry(entry);
   }
 
+  await moveIndexHtmlFile(htmlDocs[0]);
   await serve();
 
   livePreviewDisposable = workspace.onDidSaveTextDocument(onSaveFile);
@@ -256,14 +255,21 @@ async function moveIndexHtmlFile(fileUri: Uri) {
 async function writeOPFSDistFolder(output: Partial<esbuild.OutputFile>) {
   const fileName = output.path!.split("/").pop()!;
 
-  const file = await distDirHandle.getFileHandle(fileName, { create: true });
-  const syncAccess = await file.createSyncAccessHandle();
+  let file = null;
+  let syncAccess = null;
 
-  syncAccess.write(output.contents!, { at: 0 });
-  syncAccess.truncate(output.contents!.length);
+  try {
+    file = await distDirHandle.getFileHandle(fileName, { create: true });
+    syncAccess = await file.createSyncAccessHandle();
 
-  syncAccess.flush();
-  syncAccess.close();
+    syncAccess.write(output.contents!, { at: 0 });
+    syncAccess.truncate(output.contents!.length);
+  } catch (err) {
+    logger.error(`writeOPFSDistFolder: ${(err as Error).toString()}`);
+  } finally {
+    syncAccess?.flush();
+    syncAccess?.close();
+  }
 }
 
 export { activate };

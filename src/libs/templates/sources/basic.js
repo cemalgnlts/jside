@@ -4,10 +4,9 @@ files.set(
   "esbuild.config.json",
   JSON.stringify(
     {
-      entryPoints: ["./main.js"],
+      entryPoints: ["./src/main.js"],
       target: "es2019",
-      bundle: true,
-      minify: true
+      bundle: true
     },
     null,
     2
@@ -31,10 +30,7 @@ files.set(
         verbatimModuleSyntax: true,
         strict: true,
         noUnusedLocals: true,
-        noUnusedParameters: true,
-        paths: {
-          "*": ["./types/*"]
-        }
+        noUnusedParameters: true
       },
       include: ["src"],
       exclude: ["node_modules"]
@@ -61,9 +57,9 @@ files.set(
 </html>`
 );
 
-files.set("main.js", 'console.log("JS works.");');
+files.set("src/main.js", 'console.log("JS works.");');
 files.set(
-  "base.css",
+  "srcbase.css",
   `* {
   box-sizing: border-box;
 }

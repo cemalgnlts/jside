@@ -4,11 +4,10 @@ files.set(
   "esbuild.config.json",
   JSON.stringify(
     {
-      entryPoints: ["./src/main.ts"],
+      entryPoints: ["./src/main.js"],
       platform: "browser",
       target: "es2019",
-      bundle: true,
-      minify: true
+      bundle: true
     },
     null,
     2
@@ -33,9 +32,6 @@ files.set(
         skipLibCheck: true,
         noEmit: true,
         strict: true,
-        paths: {
-          "*": ["./types/*"]
-        }
       },
       include: ["src"],
       exclude: ["node_modules"]
